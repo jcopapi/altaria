@@ -1,0 +1,25 @@
+from pathlib import Path
+
+env = SConscript("godot-cpp/SConstruct", {"api_version": "4.7"})
+env = env.Clone()
+# Use the system C++ runtime on Linux. A second statically linked libstdc++ can
+# collide with the graphics driver's runtime (notably locale/stream internals).
+if env["platform"] == "linux":
+    env["LINKFLAGS"] = [flag for flag in env["LINKFLAGS"]
+                        if flag not in ("-static-libgcc", "-static-libstdc++")]
+    env.Append(LINKFLAGS=["-Wl,--exclude-libs,ALL"])
+env.Append(CPPPATH=["src", "..", "build/fastnoise-install/include"])
+env.Append(CPPDEFINES=["FASTNOISE_STATIC_LIB"])
+env.Append(LIBPATH=["build/fastnoise-install/lib"])
+env.Append(LIBS=["FastNoise", "pthread"])
+
+sources = [str(path) for path in sorted(Path("src").rglob("*.cpp"))]
+for folder in ("world_generation", "debug", "player"):
+    sources += [str(path) for path in sorted(Path("../game", folder).rglob("*.cpp"))]
+library = env.SharedLibrary(
+    target="../bin/libaltaria{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+    source=sources,
+)
+
+env.NoCache(library)
+Default(library)

@@ -1,0 +1,246 @@
+{
+  "outline_distance_blacklist": ["altaria:leaves"],
+  "blocks": [
+    {
+      "id": 0,
+      "key": "altaria:air",
+      "name": "Air",
+      "name_pt": "Ar",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "solid": false,
+      "placeable": false,
+      "texture_layer": 0
+    },
+    {
+      "id": 1,
+      "key": "altaria:stone",
+      "name": "Stone",
+      "name_pt": "Pedra",
+      "color": [
+        0.44,
+        0.46,
+        0.48
+      ],
+      "texture_layer": 7
+    },
+    {
+      "id": 2,
+      "key": "altaria:dirt",
+      "name": "Dirt",
+      "name_pt": "Terra",
+      "color": [
+        0.42,
+        0.28,
+        0.18
+      ],
+      "texture_layer": 1
+    },
+    {
+      "id": 3,
+      "key": "altaria:grass",
+      "name": "Grass",
+      "name_pt": "Grama",
+      "color": [
+        0.34,
+        0.52,
+        0.22
+      ],
+      "texture_layer": 3,
+      "tintable": true,
+      "transition_overlay": 1
+    },
+    {
+      "id": 4,
+      "key": "altaria:sand",
+      "name": "Sand",
+      "name_pt": "Areia",
+      "color": [
+        0.77,
+        0.7,
+        0.48
+      ],
+      "texture_layer": 8
+    },
+    {
+      "id": 5,
+      "key": "altaria:water",
+      "name": "Water",
+      "name_pt": "\u00c1gua",
+      "color": [
+        0.13,
+        0.38,
+        0.55
+      ],
+      "solid": false,
+      "water": true,
+      "texture_layer": 0
+    },
+    {
+      "id": 6,
+      "key": "altaria:snow",
+      "name": "Snow",
+      "name_pt": "Neve",
+      "color": [
+        0.88,
+        0.92,
+        0.94
+      ],
+      "texture_layer": 9,
+      "thermal_delta_c": -6,
+      "thermal_radius": 4
+    },
+    {
+      "id": 7,
+      "key": "altaria:bedrock",
+      "name": "Bedrock",
+      "name_pt": "Rocha matriz",
+      "color": [
+        0.19,
+        0.21,
+        0.23
+      ],
+      "placeable": false,
+      "texture_layer": 0
+    },
+    {
+      "id": 8,
+      "key": "altaria:clay",
+      "name": "Clay",
+      "name_pt": "Argila",
+      "color": [
+        0.64,
+        0.32,
+        0.2
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 9,
+      "key": "altaria:wood",
+      "name": "Wood",
+      "name_pt": "Madeira",
+      "color": [
+        0.4,
+        0.24,
+        0.12
+      ],
+      "texture_layer": 10,
+      "wood": true,
+      "mass": 18
+    },
+    {
+      "id": 10,
+      "key": "altaria:leaves",
+      "name": "Leaves",
+      "name_pt": "Folhas",
+      "color": [
+        0.35,
+        0.62,
+        0.23
+      ],
+      "foliage": true,
+      "mass": 0.3,
+      "texture_layer": 11
+    },
+    {
+      "id": 11,
+      "key": "altaria:ice",
+      "name": "Ice",
+      "name_pt": "Gelo",
+      "color": [
+        0.47,
+        0.78,
+        0.94
+      ],
+      "thermal_delta_c": -10,
+      "thermal_radius": 4,
+      "mass": 25
+    },
+    {
+      "id": 12,
+      "key": "altaria:ember",
+      "name": "Ember",
+      "name_pt": "Brasa",
+      "color": [
+        0.95,
+        0.31,
+        0.08
+      ],
+      "thermal_delta_c": 16,
+      "thermal_radius": 5,
+      "mass": 12
+    }
+  ],
+  "roles": {
+    "air": "altaria:air",
+    "stone": "altaria:stone",
+    "dirt": "altaria:dirt",
+    "grass": "altaria:grass",
+    "sand": "altaria:sand",
+    "water": "altaria:water",
+    "snow": "altaria:snow",
+    "bedrock": "altaria:bedrock"
+  },
+  "textures": [
+    {
+      "generator": "solid",
+      "color": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "path": "res://game/assets/blocks/dirt_block.png"
+    },
+    {
+      "path": "res://game/assets/blocks/grass_side_overlay.png"
+    },
+    {
+      "path": "res://game/assets/blocks/grass_top_overlay.png"
+    },
+    {
+      "path": "res://game/assets/blocks/pebbles1.png"
+    },
+    {
+      "path": "res://game/assets/blocks/pebbles2.png"
+    },
+    {
+      "path": "res://game/assets/blocks/pebbles3.png"
+    },
+    {
+      "path": "res://game/assets/blocks/stone.png"
+    },
+    {
+      "path": "res://game/assets/blocks/sand.png"
+    },
+    {
+      "generator": "noise",
+      "color": [
+        0.91,
+        0.94,
+        0.97
+      ]
+    },
+    {
+      "generator": "bark",
+      "color": [
+        0.38,
+        0.24,
+        0.13
+      ]
+    },
+    {
+      "generator": "noise",
+      "color": [
+        0.43,
+        0.62,
+        0.27
+      ]
+    }
+  ]
+}

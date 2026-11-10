@@ -1,0 +1,45 @@
+Altaria shader references
+
+Grass color noise concept:
+"noise 2d grass shader w/ custom texture overlay" by electrick.
+https://godotshaders.com/shader/noise-2d-grass-shader/
+Shader code published under CC0, as stated on the source page (checked 2026-11-09).
+Altaria implements a 3D world-space procedural noise interpretation, shared with
+its existing HSV paint system, and a separate vertex-wind grass blade shader.
+No images or external texture assets from the source page are included.
+
+Sky concept:
+"Procedural Night Sky – Clouds, Moon & Stars." by REDEMO_H747.
+https://godotshaders.com/shader/procedural-night-sky-clouds-moon-stars/
+Shader code published under CC0, as stated on the source page (checked 2026-11-09).
+Altaria implements procedural day/night gradients, a moon, stars, and quantized
+planar clouds with pixel-art silhouettes, driven by the native world clock.
+No images or external texture assets from the source page are included.
+
+Existing HSV tint code is adapted from the shader supplied by the project owner.
+
+Distance pixelation concept:
+"2D Pixel Perfect – Adapted to rotation and scaling" by C4-621_Raven.
+https://godotshaders.com/shader/2d-pixel-perfect-adapted-to-rotation-and-scaling/
+Shader code published under CC0, as stated on the source page (checked 2026-11-09).
+Altaria's current renderer uses a low-resolution 3D SubViewport, nearest upscaling,
+and a subtle depth/normal-aware screen grid that grows with distance. The earlier
+per-LOD block texture quantization has been removed to retain texture scale.
+The supplied 2D canvas shader is not applied directly to 3D geometry. No images,
+videos or external texture assets from the reference page are included.
+
+The cartoon contour uses native depth/normal screen textures in Forward+.
+Godot documentation:
+https://docs.godotengine.org/en/stable/tutorials/shaders/advanced_postprocessing.html
+https://docs.godotengine.org/en/stable/tutorials/shaders/screen-reading_shaders.html
+https://docs.godotengine.org/en/stable/tutorials/rendering/viewports.html
+
+Godrays: native Godot volumetric fog with directional-light shadow occlusion,
+plus Altaria's depth/cloud-masked radial screen-space scattering implementation.
+https://docs.godotengine.org/en/stable/tutorials/3d/volumetric_fog.html
+The user-supplied screenshots are visual references only; no image pixels or
+texture assets from them are included in the game.
+
+Jolt Physics by Jorrit Rouwe (MIT), via Godot's built-in Jolt Physics backend:
+https://github.com/jrouwe/JoltPhysics
+https://docs.godotengine.org/en/stable/tutorials/physics/using_jolt_physics.html

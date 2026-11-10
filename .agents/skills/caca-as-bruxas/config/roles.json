@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "limits": {
+    "max_workers": 2,
+    "max_total_agents": 3,
+    "operation_token_budget": null,
+    "worker_timeout_minutes": 15,
+    "memory_reserve_mb": 2048
+  },
+  "providers": {
+    "codex-native": {
+      "transport": "native-subagent",
+      "status": "tested-in-session"
+    },
+    "claude": {
+      "transport": "manual-files",
+      "status": "not-tested"
+    },
+    "opencode": {
+      "transport": "manual-files",
+      "status": "not-tested"
+    },
+    "antigravity": {
+      "transport": "manual-files",
+      "status": "configured-in-t3-not-tested"
+    },
+    "t3": {
+      "transport": "manual-files",
+      "status": "installed-no-connector-in-session"
+    }
+  },
+  "roles": {
+    "inquisidor": {
+      "provider": "codex-native",
+      "model": null
+    },
+    "cartografo": {
+      "provider": "codex-native",
+      "model": null
+    },
+    "sentinela": {
+      "provider": "codex-native",
+      "model": null
+    },
+    "maquinista": {
+      "provider": "codex-native",
+      "model": null
+    },
+    "vigia": {
+      "provider": "codex-native",
+      "model": null
+    },
+    "ferreiro": {
+      "provider": "codex-native",
+      "model": null
+    },
+    "cirurgiao": {
+      "provider": "codex-native",
+      "model": null
+    },
+    "cacador": {
+      "provider": "codex-native",
+      "model": null
+    },
+    "juiz": {
+      "provider": "codex-native",
+      "model": null
+    }
+  }
+}

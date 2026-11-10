@@ -1,0 +1,19 @@
+{
+  "player": {
+    "key": "altaria:player",
+    "controller": "flying_player",
+    "eye_height": 1.65,
+    "height": 1.8,
+    "width": 0.6,
+    "fly_speed": 20,
+    "walk_speed": 6,
+    "sprint_multiplier": 3,
+    "jump_speed": 10,
+    "gravity": 28,
+    "mouse_sensitivity": 0.0022,
+    "reach": 9
+  },
+  "entities": [
+    {"key":"altaria:marker","controller":"static_box","name":"Marker","size":[0.6,1.2,0.6],"color":[0.95,0.60,0.16]}
+  ]
+}

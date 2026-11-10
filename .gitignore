@@ -1,0 +1,19 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Local C++ dependencies and build output
+/.venv/
+/native/godot-cpp/
+/native/third_party/
+/native/build/
+/game/temp/*
+/tests/bin/
+/native/.sconsign.dblite
+/native/.sconsign*.dblite
+/compile_commands.json
+*.os
+*.o
+/bin/*.so
+/bin/*.dll
+/bin/*.dylib
