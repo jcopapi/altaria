@@ -53,6 +53,9 @@ private:
 protected:
     static void _bind_methods() {}
 public:
+    struct Base {bool valid=false;Vector3 position,cap_position;uint8_t shape=0;uint64_t built=0;altaria::IVec3 cell{};};
+    Base base_for(uint64_t built,altaria::IVec3 cell,bool exposed=true) const;
+    bool can_apply(uint64_t built,altaria::IVec3 cell) const {return base_for(built,cell).valid;}
     ~TerrainSurface();
     void configure(VoxelWorld *w,BuiltWorld *b);
     void changed_at(Vector3 p);

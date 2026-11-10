@@ -21,6 +21,43 @@ void TerrainSurface::configure(VoxelWorld *w,BuiltWorld *b) {
     building->set_terrain_callback([this](Vector3 p){changed_at(p);});
     worker=std::thread([this]{run();});
 }
+TerrainSurface::Base TerrainSurface::base_for(uint64_t id,IVec3 cell,bool exposed) const {
+    Base result;Vector3 origin(cell.x,cell.y,cell.z);uint8_t shape;
+    if(id) {auto b=building->get(id);if(!b)return result;origin=vector(b->position());shape=pack_shape(b->appearance.shape,b->appearance.rotation);}
+    else {if(!world->registry().get(world->block_at(cell.x,cell.y,cell.z)).solid)return result;shape=world->base_shape_at(cell.x,cell.y,cell.z);}
+    if(shape_type(shape)!=0 && shape_type(shape)!=1)return result;
+    auto bounds=shape_bounds(shape);auto lo=origin+vector(bounds.first),hi=origin+vector(bounds.second);
+    result.cap_position=origin;
+    Vector3 probe((lo.x+hi.x)*.5f,lo.y-.001f,(lo.z+hi.z)*.5f);
+    auto covers=[&](Vector3 p,uint8_t code) {
+        if(shape_type(code)!=0 && shape_type(code)!=1)return false;
+        auto b=shape_bounds(code);Vector3 a=p+vector(b.first),z=p+vector(b.second);
+        return std::abs(z.y-lo.y)<.002f && a.x<=lo.x+.001f && z.x>=hi.x-.001f && a.z<=lo.z+.001f && z.z>=hi.z-.001f;
+    };
+    IVec3 wp{int(std::floor(probe.x)),int(std::floor(probe.y)),int(std::floor(probe.z))};
+    auto def=world->registry().get(world->block_at(wp.x,wp.y,wp.z));auto code=world->base_shape_at(wp.x,wp.y,wp.z);
+    if(def.solid && !def.foliage && covers(Vector3(wp.x,wp.y,wp.z),code)) {result.valid=true;result.position=Vector3(wp.x,wp.y,wp.z);result.cell=wp;result.shape=code;}
+    if(!result.valid)for(auto other:building->construction().nearby(point(probe-Vector3(.01,.01,.01)),point(probe+Vector3(.01,.01,.01)))) {
+        auto b=building->get(other);if(!b || other==id)continue;
+        auto p=vector(b->position());auto code=pack_shape(b->appearance.shape,b->appearance.rotation);
+        if(covers(p,code)) {result.valid=true;result.position=p;result.built=other;result.shape=code;break;}
+    }
+    if(!result.valid || !exposed)return result;
+    // Only the exposed top cell is a cap. Buried cells remain ordinary blocks.
+    for(float z:{.1f,.9f})for(float x:{.1f,.9f}) {
+        Vector3 p(lo.x+(hi.x-lo.x)*x,hi.y+.002f,lo.z+(hi.z-lo.z)*z);
+        IVec3 q{int(std::floor(p.x)),int(std::floor(p.y)),int(std::floor(p.z))};
+        if((id || !(q==cell)) && world->registry().get(world->block_at(q.x,q.y,q.z)).solid) {
+            auto local=p-Vector3(q.x,q.y,q.z);Point a{local.x-.001f,local.y-.001f,local.z-.001f},b{local.x+.001f,local.y+.001f,local.z+.001f};
+            if(shape_intersects(world->base_shape_at(q.x,q.y,q.z),a,b)){result.valid=false;return result;}
+        }
+        for(auto other:building->construction().nearby(point(p),point(p)))if(other!=id) {
+            auto b=building->get(other);auto local=p-vector(b->position());
+            if(shape_intersects(b->shape(),point(local-Vector3(.001,.001,.001)),point(local+Vector3(.001,.001,.001)))) {result.valid=false;return result;}
+        }
+    }
+    return result;
+}
 void TerrainSurface::changed_at(Vector3 p) {++change_epoch;changed=true;events.insert({int(std::floor(p.x)),int(std::floor(p.y)),int(std::floor(p.z))});}
 void TerrainSurface::refresh() {
     auto refresh_started=std::chrono::steady_clock::now();
@@ -35,17 +72,17 @@ void TerrainSurface::refresh() {
     // Quantized residency is deterministic and avoids rebuilding on every
     // sub-metre movement. Procedural modifiers use the identical patch pipeline.
     Vector3 center(viewer_region.x+4,viewer_region.y+4,viewer_region.z+4);
-    for(auto p:world->nearby_natural_terrain(center,natural_distance))if(world->terrain_enabled(p)) {
+    for(auto p:world->nearby_natural_terrain(center,natural_distance))if(world->terrain_enabled(p) && can_apply(0,p)) {
         sources->insert(p);add(Vector3(p.x,p.y,p.z));
     }
     for(auto &[p,a]:world->authored_surfaces())if(a.terrain>0 && world->registry().get(world->block_at(p.x,p.y,p.z)).solid) {
         float dx=p.x-viewer.x,dz=p.z-viewer.z;
-        if(dx*dx+dz*dz<=near*near){sources->insert(p);add(Vector3(p.x,p.y,p.z));}
+        if(dx*dx+dz*dz<=near*near && can_apply(0,p)){sources->insert(p);add(Vector3(p.x,p.y,p.z));}
     }
     built_dependencies.clear();
     for(auto &[id,b]:building->construction().blocks)if(b.appearance.terrain>0) {
         auto p=vector(b.position());
-        if(p.distance_to(viewer)<=world->settings().view_distance+32) {
+        if(p.distance_to(viewer)<=world->settings().view_distance+32 && can_apply(id,{})) {
             add(p);auto lo=region(p-Vector3(1,1,1)),hi=region(p+Vector3(2,2,2));
             for(int z=lo.z;z<=hi.z;z+=8)for(int y=lo.y;y<=hi.y;y+=8)for(int x=lo.x;x<=hi.x;x+=8)built_dependencies[{x,y,z}].push_back(id);
         }
@@ -107,7 +144,7 @@ TerrainSurface::Job TerrainSurface::snapshot(Key key,uint64_t version) const {
     auto &store=building->construction();
     for(auto id:store.nearby(lo,hi)) {
         const auto &b=store.blocks.at(id);auto p=b.position();auto bounds=shape_bounds(pack_shape(b.appearance.shape,b.appearance.rotation));
-        SmoothCell c;c.owner=id;c.block=b.block;c.appearance=b.appearance;c.modified=b.appearance.terrain>0;c.anchor=p;
+        SmoothCell c;c.owner=id;c.block=b.block;c.appearance=b.appearance;c.modified=b.appearance.terrain>0 && can_apply(id,{});c.anchor=p;
         for(int a=0;a<3;a++){c.origin[a]=p[a]+bounds.first[a];c.size[a]=bounds.second[a]-bounds.first[a];}
         job.built.push_back(c);
     }
@@ -129,13 +166,24 @@ TerrainSurface::Result TerrainSurface::build(Job job) {
             const auto &b=r.get(id);if(!b.solid || b.foliage)continue;
             auto style=job.styles->find(p);Appearance a=style==job.styles->end() ? Appearance() : style->second;
             uint8_t shape=a.shape!=255 ? pack_shape(a.shape,a.rotation) : edit!=job.edits->end() ? 0 : g.surface_shape(x,y,z,col);
-            auto bounds=shape_bounds(shape);SmoothCell c;c.anchor={float(x),float(y),float(z)};c.block=id;c.appearance=a;c.modified=a.terrain==0 ? false : (a.terrain>0 || (job.world_sources && job.world_sources->count(p)));c.column=col;
+            auto bounds=shape_bounds(shape);SmoothCell c;c.anchor={float(x),float(y),float(z)};c.block=id;c.appearance=a;c.modified=a.terrain!=0 && job.world_sources && job.world_sources->count(p);c.column=col;
             for(int axis=0;axis<3;axis++){c.origin[axis]=c.anchor[axis]+bounds.first[axis];c.size[axis]=bounds.second[axis]-bounds.first[axis];}
             sources.push_back(c);
         }
     }
     for(auto &c:sources)if(c.owner)c.column=g.column(int(std::floor(c.anchor[0])),int(std::floor(c.anchor[2])));
-    SmoothField field(std::move(sources));Vector3 origin(job.key.x,job.key.y,job.key.z);
+    // Retain just the cap and its contact collar. Buried world volume never
+    // enters the smoothing field; normal terrain keeps its existing renderer.
+    std::vector<SmoothCell> shell;
+    for(const auto &c:sources) {
+        bool needed=c.modified;
+        if(!needed)for(const auto &cap:sources)if(cap.modified) {
+            bool touches=c.origin[0]+c.size[0]>=cap.origin[0]-.001f && c.origin[0]<=cap.origin[0]+cap.size[0]+.001f && c.origin[2]+c.size[2]>=cap.origin[2]-.001f && c.origin[2]<=cap.origin[2]+cap.size[2]+.001f;
+            if(touches && c.origin[1]+c.size[1]>=cap.origin[1]-.001f && c.origin[1]<=cap.origin[1]+cap.size[1]+.001f){needed=true;break;}
+        }
+        if(needed)shell.push_back(c);
+    }
+    SmoothField field(std::move(shell),cfg.terrain_max_height);Vector3 origin(job.key.x,job.key.y,job.key.z);
     auto raw=TerrainMesherBridge::build_surface(field,origin,Vector3i(8,8,8),4);
     std::unordered_map<const SmoothCell*,uint32_t> owners;
     std::unordered_map<const SmoothCell*,Surface> styles;
@@ -307,6 +355,7 @@ Ref<ArrayMesh> TerrainSurface::preview(uint64_t built,IVec3 cell) {
     } else {appearance=world->appearance_at(cell);block=world->block_at(cell.x,cell.y,cell.z);shape=world->base_shape_at(cell.x,cell.y,cell.z);}
     if(!world->registry().get(block).solid)return {};
     bool enabled=built ? appearance.terrain<=0 : !world->terrain_enabled(cell);
+    if(enabled && !can_apply(built,cell))return {};
     preview_epoch=change_epoch;preview_owner=built;preview_cell=cell;preview_valid=true;++preview_version;
     preview_mesh.unref();preview_surface={};preview_received=0;preview_cells=1;
     std::unordered_set<Key,CoordHash> regions;
@@ -330,6 +379,8 @@ Ref<ArrayMesh> TerrainSurface::preview(uint64_t built,IVec3 cell) {
             for(auto &c:job.built)if(c.owner==built){c.modified=enabled;c.appearance.terrain=enabled?1:0;}
         } else {
             auto styles=std::make_shared<AppearanceMap>(*job.styles);auto a=appearance;a.terrain=enabled?1:0;(*styles)[cell]=a;job.styles=styles;
+            auto sources=std::make_shared<std::unordered_set<Key,CoordHash>>(job.world_sources ? *job.world_sources : std::unordered_set<Key,CoordHash>());
+            if(enabled)sources->insert(cell);else sources->erase(cell);job.world_sources=sources;
         }
         for(auto &c:job.built)if(c.modified)affected_built.insert(c.owner);
         for(auto &[p,a]:*job.styles)if(a.terrain>0 && std::abs(p.x-position.x)<=2 && std::abs(p.y-position.y)<=2 && std::abs(p.z-position.z)<=2)affected_world.insert(p);

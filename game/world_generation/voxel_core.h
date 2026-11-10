@@ -111,7 +111,7 @@ struct Settings {
     float mountain_region_scale = 1900, mountain_threshold = .72f, mountain_blend = .18f;
     bool testing_biomes = true;
     bool procedural_terrain = false;
-    float terrain_distance = 32;
+    float terrain_distance = 32, terrain_max_height = 1;
     bool vegetation = false, surface_shapes = false; // Old saved worlds retain their original surface.
     float upload_time_budget_ms = 2;
     int tree_spacing = 14, tree_lod_max = 2, grass_tufts = 9;

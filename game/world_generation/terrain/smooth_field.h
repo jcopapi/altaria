@@ -16,9 +16,11 @@ struct SmoothCoordHash {
 };
 class SmoothField {
     std::vector<SmoothCell> sources;
+    std::vector<std::array<float,9>> heights;
+    float cell_distance(size_t index,std::array<float,3> p) const;
     std::unordered_map<IVec3,std::vector<size_t>,SmoothCoordHash> bins;
 public:
-    explicit SmoothField(std::vector<SmoothCell> cells);
+    explicit SmoothField(std::vector<SmoothCell> cells,float maximum_height=1);
     float distance(std::array<float,3> p) const;
     bool modified_surface(std::array<float,3> p) const;
     const std::vector<SmoothCell>& cells() const {return sources;}

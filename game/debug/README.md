@@ -79,3 +79,7 @@ removes it and the preview shows the affected neighbors. Smooth triangles use th
 original owner for selection, paint and mining. `stats` exposes `terrain_patches`,
 `terrain_pending`, `terrain_triangles`, `terrain_max_build_ms`,
 `terrain_max_upload_ms` and `terrain_max_refresh_ms`. See [Terrain](../world_generation/terrain/README.md).
+
+Terrain applies only to an exposed cube/floor slab with a normal base underneath.
+It is a surface cap, up to one block high. Ordinary construction replaces the cap
+from the base plane; mining it frees the cell and leaves the base ordinary.

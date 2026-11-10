@@ -67,6 +67,7 @@ class AltariaGame : public Node {
     void update_target(bool edit = false, bool place = false);
     uint64_t target_built() const;
     bool build_against(Vector3 hit, Vector3 normal, Vector3 source, uint8_t source_shape);
+    bool build_over_terrain(uint64_t built,altaria::IVec3 cell);
     bool release_built(uint64_t id);
     void show_selection(altaria::BlockId block, uint8_t shape, const Transform3D &transform);
     void show_terrain_preview(altaria::IVec3 center, altaria::BlockId center_block);

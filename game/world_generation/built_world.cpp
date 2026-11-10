@@ -277,6 +277,17 @@ uint64_t BuiltWorld::attach(Vector3 hit, Vector3 normal, Vector3 preferred, Vect
         }
     return 0;
 }
+bool BuiltWorld::replace_cap(uint64_t id,int block,int shape,int rotation,String &error) {
+    auto source=get(id);if(!source || source->appearance.terrain<=0 || !world->registry().valid(block) || !world->registry().get(block).placeable || !valid_shape_id(shape) || shape==8 || rotation<0 || rotation>3)return false;
+    auto replacement=*source;replacement.block=block;replacement.appearance=Appearance();
+    replacement.appearance.shape=shape;replacement.appearance.rotation=rotation;replacement.appearance.terrain=0;
+    replacement.connected_shape=store.connection_shape(replacement,&replacement);
+    if(guard && !guard(replacement)){error="Building intersects player";return false;}
+    std::string message;
+    if(!store.can_place(replacement,world->registry(),world->settings(),[this](int x,int y,int z){return std::make_pair(world->block_at(x,y,z),world->shape_at(x,y,z));},message)){error=String(message.c_str());return false;}
+    if(!record('P',replacement,error))return false;
+    apply('P',replacement);return true;
+}
 bool BuiltWorld::remove(uint64_t id, String &error) {
     auto b = get(id);
     if (!b) {

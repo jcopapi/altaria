@@ -11,6 +11,7 @@ func run() -> void:
     check(game.execute_command("shape terrain")=="Selected shape: terrain","Terrain available in shape selection")
     # General 3D Terrain now has its own full acceptance test. Here verify that
     # its independent state coexists with the original manual ramp connections.
+    check(game.set_voxel(20,219,0,2),"Normal base for surface cap")
     check(game.set_voxel(20,220,0,1) and game.paint_voxel(20,220,0,"#44aa88",.4,1.1),"Painted original cube")
     check(game.execute_command("terrain at 20 220 0 on")=="Terrain modifier updated.","Enable independent Terrain modifier")
     await settle()

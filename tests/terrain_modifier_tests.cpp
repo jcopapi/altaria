@@ -12,25 +12,30 @@ static int checks=0;
 static void check(bool condition,const char *message) {++checks;if(!condition){std::cerr<<"FAIL: "<<message<<"\n";std::exit(1);}}
 int main() {
     std::vector<SmoothCell> staircase;
-    for(int x=0;x<4;x++)for(int y=0;y<=x;y++) {SmoothCell c;c.origin={float(x),float(y),0};c.block=3;c.owner=staircase.size()+1;c.modified=true;staircase.push_back(c);}
+    for(int x=0;x<4;x++)for(int z=0;z<3;z++)for(int y=-1;y<=x;y++) {
+        SmoothCell c;c.origin={float(x),float(y),float(z)};c.block=3;c.owner=staircase.size()+1;c.modified=y==x;staircase.push_back(c);
+    }
     SmoothField slope(staircase);
-    check(slope.distance({.9f,1.1f,.5f})<0,"Smoothing fills the diagonal between steps, beyond rounded stair corners");
-    for(auto &c:staircase)c.modified=false;
-    SmoothField cubic(staircase);
-    check(cubic.distance({.9f,1.1f,.5f})>0,"Removing modifier recovers the cubic staircase");
-    for(auto &c:staircase)c.modified=true;
+    check(slope.distance({.9f,1.1f,1.5f})>0,"Cap carves its own upper corner instead of filling another cell");
+    check(slope.distance({1.5f,1.8f,1.5f})<0,"Cap bridges upward inside its own cell");
+    check(slope.distance({1.1f,.9f,1.5f})<0,"Ordinary support stays solid");
+
     std::reverse(staircase.begin(),staircase.end());SmoothField reordered(staircase);
     for(int z=-2;z<6;z++)for(int y=-2;y<18;y++)for(int x=-2;x<18;x++) {
         std::array<float,3> p{x*.25f,y*.25f,z*.25f};
-        check(slope.distance(p)==reordered.distance(p),"Density is independent of source insertion order");
+        check(slope.distance(p)==reordered.distance(p),"Surface is independent of insertion order");
     }
     SmoothCell c;c.block=3;c.modified=true;
-    SmoothField isolated({c});
-    check(isolated.distance({.5f,.5f,.5f})<0,"Isolated modified cube retains a solid core");
-    check(isolated.distance({.03f,.03f,.5f})>0,"Isolated cube corners are rounded in all axes");
-    auto owner=isolated.owner_at({.5f,.5f,.5f});check(owner && owner->block==3,"Mesh ownership retains block identity");
-    c.modified=false;SmoothField ordinary({c});
-    check(ordinary.distance({.03f,.03f,.5f})<0,"Ordinary block preserves its cube corners");
+    SmoothCell base=c;base.modified=false;base.origin[1]=-1;
+    SmoothField isolated({c,base});
+    check(isolated.distance({.5f,.5f,.5f})<0,"Cap retains its own solid centre");
+    check(isolated.distance({.03f,.5f,.5f})>0,"Cap rounds down to its base at the edge");
+    check(isolated.distance({.5f,1.01f,.5f})>0,"Cap cannot exceed one block above its base");
+    SmoothField short_cap({c,base},.5f);
+    check(short_cap.distance({.5f,.6f,.5f})>0,"Configured cap height is respected");
+    auto owner=isolated.owner_at({.5f,.5f,.5f});check(owner && owner->block==3,"Cap retains source ownership");
+    c.modified=false;SmoothField ordinary({c,base});
+    check(ordinary.distance({.03f,.5f,.5f})<0,"Removing Terrain restores the original block");
     Registry registry;std::string error;
     for(int i=0;i<8;i++){BlockDef b;b.id=i;b.key="block:"+std::to_string(i);b.solid=i!=0 && i!=5;check(registry.add(b,error),"Registry fixture");}
     Settings settings;WorldModel model(std::make_shared<Generator>(settings,registry,1337));

@@ -6,9 +6,9 @@ func _initialize() -> void:
     var backend=ClassDB.instantiate("TerrainMesherBridge")
     var cells: Array=[]
     for x in range(4):
-        for y in range(x+1):cells.append({"position":Vector3(x,y,0),"terrain":true,"block":3,"owner":cells.size()+1})
+        for y in range(-1,x+1):cells.append({"position":Vector3(x,y,0),"terrain":y==x,"block":3,"owner":cells.size()+1})
     var start:=Time.get_ticks_usec()
-    var result: Dictionary=backend.build(cells,Vector3(-1,-1,-1),Vector3i(6,6,3),4)
+    var result: Dictionary=backend.build(cells,Vector3(-1,-2,-1),Vector3i(6,7,3),4)
     print("NATIVE_TRANSVOXEL triangles=",result.triangles," elapsed_ms=",(Time.get_ticks_usec()-start)/1000.0)
     var mesh: ArrayMesh=result.mesh
     if mesh==null:
@@ -16,8 +16,17 @@ func _initialize() -> void:
         quit(1)
         return
     check(result.owners.size()==result.triangles,"Each triangle carries an original block owner")
-    for owner in result.owners:check(owner>=1 and owner<=10,"Owner points to an original source block")
-    for block in result.blocks:check(block==3,"Triangle retains original block material ID")
+    var cap_faces:=0
+    var base_faces:=0
+    for i in range(result.owners.size()):
+        var owner: int=result.owners[i]
+        if owner==0:
+            base_faces+=1
+            continue # Ordinary supporting volume is outside cap ownership.
+        cap_faces+=1
+        check(owner>=1 and owner<=14,"Cap owner points to an original source block")
+        check(result.blocks[i]==3,"Cap triangle retains original material ID")
+    check(cap_faces>0 and base_faces>0,"Only the surface receives cap ownership")
     check(mesh.get_surface_count()>0,"Native bulk SDF produces Transvoxel mesh")
     var faces:=mesh.get_faces()
     var edges: Dictionary={}
@@ -33,6 +42,6 @@ func _initialize() -> void:
     for count in edges.values():
         if count!=2:open_edges+=1
     check(open_edges==0,"Native staircase is closed")
-    check(cells.size()==10 and cells[0].block==3,"Meshing preserves authoritative block identity")
+    check(cells.size()==14 and cells[0].block==3,"Meshing preserves authoritative block identity")
     print("NATIVE_TERRAIN_MESHER_PASS" if failures.is_empty() else "NATIVE_TERRAIN_MESHER_FAIL")
     quit(0 if failures.is_empty() else 1)

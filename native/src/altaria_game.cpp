@@ -625,7 +625,8 @@ int64_t AltariaGame::place_block(Vector3 position, int block, const String &name
         return 0;
     int shape = shape_id(name.utf8().get_data());
     String error;
-    auto id = built_world->place(position, block, shape, rotation, error);
+    auto id = built_world->place(position, block, shape==8 ? 0 : shape, rotation, error);
+    if(id && shape==8 && !terrain_built(id,1)){built_world->remove(id,error);return 0;}
     if (!id)
         console.print(error);
     return int64_t(id);
@@ -664,9 +665,27 @@ bool AltariaGame::build_against(Vector3 hit, Vector3 normal, Vector3 source, uin
     String error;
     auto id = built_world->attach(hit, normal, preferred, source, source_shape, hotbar[selected_block],
                                   selected_shape, shape_rotation, error);
+    if(id && selected_shape==8 && !terrain_surface->can_apply(id,{})){built_world->remove(id,error);id=0;error="Terrain needs an exposed block with a normal base.";}
     if (!id)
         console.print(error);
     return id != 0;
+}
+bool AltariaGame::build_over_terrain(uint64_t id,IVec3 cell) {
+    if(hotbar.empty() || selected_shape==8 || !terrain_surface)return false;
+    auto base=terrain_surface->base_for(id,cell);if(!base.valid)return false;
+    // Fill the cap's cell from the ordinary support plane, never from the
+    // curved hit height. This punches through/replaces the cosmetic surface.
+    String error;
+    if(id) {
+        bool ok=built_world->replace_cap(id,hotbar[selected_block],selected_shape,shape_rotation,error);
+        if(!ok)console.print(error);return ok;
+    }
+    // Use the same player occupancy guard as ordinary construction.
+    auto body=player->body_bounds();auto player_lo=body.position,player_hi=body.position+body.size;
+    Vector3 p(cell.x,cell.y,cell.z);
+    if(shape_intersects(pack_shape(selected_shape,shape_rotation),{player_lo.x-p.x,player_lo.y-p.y,player_lo.z-p.z},{player_hi.x-p.x,player_hi.y-p.y,player_hi.z-p.z}))return false;
+    if(!set_voxel(cell.x,cell.y,cell.z,hotbar[selected_block]))return false;
+    return selected_shape==0 || shape_voxel(cell.x,cell.y,cell.z,String(shape_name(selected_shape)),shape_rotation);
 }
 bool AltariaGame::release_built(uint64_t id) {
     auto b = built_world ? built_world->get(id) : nullptr;
@@ -727,12 +746,14 @@ Dictionary AltariaGame::terrain_hit(Vector3 origin,Vector3 direction,double dist
     Dictionary d;if(!terrain_surface || !origin.is_finite() || !direction.is_finite() || direction.length_squared()<.0001 || distance<0 || distance>10000)return d;
     auto hit=terrain_surface->pick(origin,direction.normalized(),distance);if(!hit.hit)return d;
     d["position"]=origin+direction.normalized()*hit.distance;d["normal"]=hit.normal;d["built_id"]=int64_t(hit.built);
-    d["cell"]=Vector3i(hit.cell.x,hit.cell.y,hit.cell.z);d["block"]=int(hit.block);return d;
+    d["cell"]=Vector3i(hit.cell.x,hit.cell.y,hit.cell.z);d["block"]=int(hit.block);
+    auto base=terrain_surface->base_for(hit.built,hit.cell);d["has_base"]=base.valid;d["base_position"]=base.position;d["cap_origin"]=base.cap_position;return d;
 }
 bool AltariaGame::terrain_built(int64_t id,int mode) {
     auto b=built_world ? built_world->get(id) : nullptr;
     if(!b || mode < -1 || mode > 1)return false;
     auto a=b->appearance;a.terrain=mode<0 ? (a.terrain>0 ? 0:1) : mode;
+    if(a.terrain>0 && !terrain_surface->can_apply(id,{})){console.print("Terrain needs an exposed block with a normal base.");return false;}
     String error;
     if(!built_world->appearance(id,a,error)){console.print(error);return false;}
     return true;
@@ -743,6 +764,7 @@ bool AltariaGame::toggle_terrain_at(IVec3 cell, int mode) {
     auto a = world->appearance_at(cell);
     if (!world->registry().get(world->block_at(cell.x,cell.y,cell.z)).solid) return false;
     a.terrain = mode < 0 ? (world->terrain_enabled(cell) ? 0 : 1) : (mode != 0 ? 1 : 0);
+    if(a.terrain>0 && !terrain_surface->can_apply(0,cell)){console.print("Terrain needs an exposed block with a normal base.");return false;}
     String error;
     if (!world->edit_surface({1,++sequence,cell,a},error)) { console.print(error); return false; }
     return true;
@@ -935,9 +957,9 @@ void AltariaGame::show_smooth_preview(uint64_t built,IVec3 cell) {
         selection->set_visible(!menu->is_visible() && !console.is_open());
     } else if(built) {
         auto source=built_world->get(built);if(!source)return;
-        if(source->appearance.terrain>0)show_smooth_selection(built,{});
+        if(built_world->terrain_meshed(built))show_smooth_selection(built,{});
         else {auto p=source->position();show_selection(source->block,source->shape(),Transform3D(Basis(),Vector3(p[0],p[1],p[2])));}
-    } else if(world->terrain_enabled(cell))show_smooth_selection(0,cell);
+    } else if(world->terrain_meshed(cell))show_smooth_selection(0,cell);
     else show_selection(world->block_at(cell.x,cell.y,cell.z),world->shape_at(cell.x,cell.y,cell.z),Transform3D(Basis(),Vector3(cell.x,cell.y,cell.z)));
 }
 void AltariaGame::show_terrain_preview(IVec3 center,BlockId) {show_smooth_preview(0,center);}
@@ -959,18 +981,16 @@ void AltariaGame::update_target(bool edit, bool place) {
         Vector3 origin(p[0], p[1], p[2]);
         uint8_t form = piece->shape();
         if(selected_shape==int(BlockShape::Terrain))show_smooth_preview(constructed.id,{});
-        else if(piece->appearance.terrain>0)show_smooth_selection(constructed.id,{});
+        else if(built_world->terrain_meshed(constructed.id))show_smooth_selection(constructed.id,{});
         else show_selection(piece->block,form,Transform3D(Basis(),origin));
         if (edit) {
             if (place) {
                 if (selected_shape == int(BlockShape::Terrain) &&
                     !Input::get_singleton()->is_physical_key_pressed(Key::KEY_SHIFT)) {
-                    auto a = piece->appearance;
-                    a.terrain = a.terrain > 0 ? 0 : 1;
-                    String error;
-                    if (!built_world->appearance(constructed.id, a, error))
-                        console.print(error);
-                } else
+                    terrain_built(constructed.id);
+                } else if(piece->appearance.terrain>0 && selected_shape!=8 && terrain_surface->can_apply(constructed.id,{}))
+                    build_over_terrain(constructed.id,{});
+                else
                     build_against(camera->get_global_position() + direction * constructed.distance,
                                   Vector3(constructed.normal[0], constructed.normal[1], constructed.normal[2]),
                                   origin, form);
@@ -1005,7 +1025,7 @@ void AltariaGame::update_target(bool edit, bool place) {
         return;
     auto shape = world->shape_at(hit.cell.x, hit.cell.y, hit.cell.z);
     if (selected_shape == int(BlockShape::Terrain)) show_terrain_preview(hit.cell,hit.block);
-    else if (world->terrain_enabled(hit.cell)) show_smooth_selection(0,hit.cell);
+    else if (world->terrain_meshed(hit.cell)) show_smooth_selection(0,hit.cell);
     else
         show_selection(hit.block, shape, Transform3D(Basis(), Vector3(hit.cell.x, hit.cell.y, hit.cell.z)));
     if (edit) {
@@ -1017,11 +1037,14 @@ void AltariaGame::update_target(bool edit, bool place) {
             }
             if (hotbar.empty())
                 return;
+            if(world->terrain_enabled(hit.cell) && selected_shape!=8 && terrain_surface->can_apply(0,hit.cell)) {
+                build_over_terrain(0,hit.cell);return;
+            }
             auto position = camera->get_global_position() + direction * hit.distance;
             auto source = Vector3(hit.cell.x, hit.cell.y, hit.cell.z);
             std::array<float, 3> normal;
             auto local = camera->get_global_position() - source;
-            if(world->terrain_enabled(hit.cell) && terrain_surface) {
+            if(world->terrain_meshed(hit.cell) && terrain_surface) {
                 auto smooth=terrain_surface->pick(camera->get_global_position(),direction,reach);
                 normal={smooth.normal.x,smooth.normal.y,smooth.normal.z};
             } else shape_ray(shape, {local.x, local.y, local.z}, {direction.x, direction.y, direction.z}, reach,&normal);
@@ -1142,13 +1165,7 @@ void AltariaGame::_input(const Ref<InputEvent> &event) {
             shape_rotation = (shape_rotation + 1) % 4;
         if (k == Key::KEY_T) {
             if (auto id = target_built()) {
-                if (auto piece = built_world->get(id)) {
-                    auto a = piece->appearance;
-                    a.terrain = a.terrain > 0 ? 0 : 1;
-                    String error;
-                    if (!built_world->appearance(id, a, error))
-                        console.print(error);
-                }
+                terrain_built(id);
             } else {
                 auto hit = target_block();
                 if (hit.hit)

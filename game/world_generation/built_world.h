@@ -56,6 +56,7 @@ class BuiltWorld : public Node3D {
     uint64_t place(Vector3 position, int block, int shape, int rotation, String &error);
     uint64_t attach(Vector3 hit, Vector3 normal, Vector3 preferred, Vector3 source, uint8_t source_shape,
                     int block, int shape, int rotation, String &error);
+    bool replace_cap(uint64_t id,int block,int shape,int rotation,String &error);
     bool remove(uint64_t id, String &error);
     bool appearance(uint64_t id, const altaria::Appearance &value, String &error);
     bool collides_box(Vector3 minimum, Vector3 maximum) const;

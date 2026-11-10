@@ -195,6 +195,8 @@ bool parse_settings(const Dictionary &d, Settings &s, String &error) {
     s.surface_shapes = d.get("surface_shapes", false);
     s.procedural_terrain = d.get("procedural_terrain", false);
     LOAD(terrain_distance);
+    LOAD(terrain_max_height);
+    if(s.terrain_max_height<.25f || s.terrain_max_height>1) {error="Terrain maximum height must be .25..1 block";return false;}
     if(s.terrain_distance<8 || s.terrain_distance>96) {error="Terrain distance must be 8..96 metres";return false;}
     // Retire both experimental generators, including snapshots in existing saves.
     if (bool(d.get("surface_ramps", false)) || bool(d.get("terrain_smoothing", false)))

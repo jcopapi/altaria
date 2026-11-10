@@ -33,3 +33,7 @@ The HUD reports apparent environment temperature in °C.
 and toggle it with right-click. Neighboring modified pieces join automatically;
 walking and selection follow the rendered Transvoxel triangles. Toggling it off
 restores the original block form. Procedural Terrain uses the same tools.
+
+Terrain applies only to an exposed cube/floor slab with a normal base underneath.
+It is a surface cap, up to one block high. Ordinary construction replaces the cap
+from the base plane; mining it frees the cell and leaves the base ordinary.

@@ -156,6 +156,18 @@ static std::shared_ptr<Volume> make_volume(TileKey key, const Generator &g,
                 }
             }
     }
+    // Derive the natural modifier only on the original exposed top layer.
+    // This runs BEFORE edits: mining a cap must not promote the buried base.
+    if(s.procedural_terrain && key.level==0) {
+        auto natural=[&](int x,int y,int z) {
+            const auto &b=r.get(v->at(x,y,z));return b.solid && !b.wood && !b.foliage;
+        };
+        for(int z=0;z<32;z++)for(int x=0;x<32;x++)for(int y=1;y<ny-2;y++) {
+            IVec3 p{key.x+x,s.min_y+y,key.z+z};
+            if(edits->count(p) || !natural(x,y,z))continue;
+            if(natural(x,y-1,z) && !r.get(v->at(x,y+1,z)).solid)v->terrain_candidates.push_back(p);
+        }
+    }
     // Stable ordering makes downsampled edits independent of hash table iteration order.
     std::vector<std::pair<IVec3, BlockId>> sorted(edits->begin(), edits->end());
     std::sort(sorted.begin(), sorted.end(), [](auto &a, auto &b) {
@@ -173,21 +185,6 @@ static std::shared_ptr<Volume> make_volume(TileKey key, const Generator &g,
             auto i = voxel_index(*v, ix, iy, iz);
             v->data[i] = e.second;
             v->shapes.erase(i); // Placed materials start as cubes, independent of terrain caps.
-        }
-    }
-    // Derive the natural modifier from the same immutable voxel volume used by
-    // gameplay. Keep its source shape intact; explicit edits opt out by default.
-    if(s.procedural_terrain && key.level==0) {
-        auto natural=[&](int x,int y,int z) {
-            const auto &b=r.get(v->at(x,y,z));return b.solid && !b.wood && !b.foliage;
-        };
-        for(int z=0;z<32;z++)for(int x=0;x<32;x++)for(int y=1;y<ny-2;y++) {
-            IVec3 p{key.x+x,s.min_y+y,key.z+z};
-            if(edits->count(p) || !natural(x,y,z))continue;
-            bool exposed=!natural(x,y+1,z) || !natural(x,y-1,z) || !natural(x+1,y,z) || !natural(x-1,y,z) || !natural(x,y,z+1) || !natural(x,y,z-1);
-            // One supporting layer removes full-height stair risers and keeps
-            // the smooth/cubic interface buried inside the original volume.
-            if(exposed || !natural(x,y+2,z))v->terrain_candidates.push_back(p);
         }
     }
     std::vector<std::pair<IVec3, Appearance>> appearance_sorted(surfaces->begin(), surfaces->end());

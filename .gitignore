@@ -17,3 +17,9 @@
 /bin/*.so
 /bin/*.dll
 /bin/*.dylib
+
+# Local caches and private runtime configuration
+__pycache__/
+*.pyc
+.env
+.env.*

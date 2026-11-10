@@ -1,4 +1,8 @@
 extends "res://tests/cartoon_visual.gd"
+func block_by_id(id: int) -> Dictionary:
+    for b in game.get_built_blocks():
+        if b.id==id:return b
+    return {}
 func capture_scene(label: String) -> Image:
     hide_ui()
     game.find_child("BlockSelection",true,false).hide()
@@ -47,7 +51,11 @@ func run() -> void:
     aim(Vector3(266,157,139),Vector3(259,150,128))
     await settle()
     await capture_scene("terrain_gameplay_cubes")
-    for id in ids:check(game.terrain_built(id,1),"Apply actual Terrain modifier")
+    var caps: Array[int]=[]
+    for id in ids:
+        var b:=block_by_id(id)
+        if (b.position.x<260 and b.position.y==149+(b.position.x-256)) or (b.position.x==262 and b.position.y==152):caps.append(id)
+    for id in caps:check(game.terrain_built(id,1),"Apply only the exposed Terrain cap")
     await settle()
     await capture_scene("terrain_gameplay_smooth_day")
     var grass:=0
@@ -64,8 +72,15 @@ func run() -> void:
             if absf(p.y-2)<.01:transitions+=1
         for i in range(0,indices.size(),3):
             check(uv[indices[i]].x==uv[indices[i+1]].x and uv[indices[i]].x==uv[indices[i+2]].x,"Material identity stays constant inside each smooth triangle")
+    for node in game.find_children("*","MeshInstance3D",true,false):
+        if node.get_parent().get_class()!="BuiltWorld" or node.mesh==null:continue
+        for surface in range(node.mesh.get_surface_count()):
+            var layers: PackedVector2Array=node.mesh.surface_get_arrays(surface)[Mesh.ARRAY_TEX_UV2]
+            for layer in layers:
+                if absf(layer.x-7)<.01:stone+=1
+                if absf(layer.y-2)<.01:transitions+=1
     print("TERRAIN_TEXTURES grass=",grass," stone=",stone," transitions=",transitions)
-    check(grass>30 and stone>30,"New grass and stone textures reach the actual smooth meshes")
+    check(grass>30 and stone>30,"Grass cap and ordinary stone retain their texture layers")
     check(transitions>12,"Grass side transition reaches the neighboring smooth stone")
     check(game.get_debug_state().grass_instances==0 and game.get_debug_state().bushes==0,"Removed vegetation remains absent")
     game.execute_command("shape terrain")
@@ -80,7 +95,7 @@ func run() -> void:
     game.execute_command("time 22")
     await create_timer(.4).timeout
     await capture_scene("terrain_gameplay_smooth_night")
-    for id in ids:check(game.terrain_built(id,0),"Restore source cubes")
+    for id in caps:check(game.terrain_built(id,0),"Restore source cubes")
     await settle()
     game.execute_command("time 9")
     await create_timer(.2).timeout
