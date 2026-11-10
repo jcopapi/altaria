@@ -69,11 +69,10 @@ struct Appearance {
     bool painted = false;
     uint8_t shape = 255, rotation = 0; // 255 = generated shape; material IDs remain independent.
     bool derived_ramp = false; // Render snapshot only; never written to authoritative journals.
-    int8_t terrain = -1; // -1: generation default, 0: explicitly cubic, 1: smooth modifier.
     bool operator==(const Appearance &v) const {
         return tint == v.tint && preserve == v.preserve && brightness == v.brightness &&
                overlay == v.overlay && decoration == v.decoration && painted == v.painted &&
-               shape == v.shape && rotation == v.rotation && terrain == v.terrain;
+               shape == v.shape && rotation == v.rotation;
     }
 };
 using AppearanceMap = std::unordered_map<IVec3, Appearance, CoordHash>;
@@ -110,8 +109,6 @@ struct Settings {
           snow_temperature = .22f;
     float mountain_region_scale = 1900, mountain_threshold = .72f, mountain_blend = .18f;
     bool testing_biomes = true;
-    bool procedural_terrain = false;
-    float terrain_distance = 32, terrain_max_height = 1;
     bool vegetation = false, surface_shapes = false; // Old saved worlds retain their original surface.
     float upload_time_budget_ms = 2;
     int tree_spacing = 14, tree_lod_max = 2, grass_tufts = 9;
@@ -218,23 +215,6 @@ class WorldModel {
     bool apply(const EditCommand &command, std::string &error);
     BlockId block_at(int x, int y, int z) const;
 };
-class EditJournal {
-    std::string filename;
-
-  public:
-    explicit EditJournal(std::string path) : filename(std::move(path)) {}
-    bool load(EditMap &out, const Registry &registry, int min_y, int max_y, std::string &error) const;
-    bool append(const EditCommand &command, std::string &error) const;
-};
-class SurfaceJournal {
-    std::string filename;
-
-  public:
-    explicit SurfaceJournal(std::string path) : filename(std::move(path)) {}
-    bool load(AppearanceMap &out, const Registry &registry, const Settings &settings,
-              std::string &error) const;
-    bool append(const SurfaceCommand &command, std::string &error) const;
-};
 struct RayHit {
     bool hit = false;
     IVec3 cell, previous;
@@ -277,7 +257,6 @@ struct Volume {
     std::unordered_map<size_t, Appearance> surfaces;
     std::vector<BlockId> data;
     std::unordered_map<size_t, uint8_t> shapes;
-    std::vector<IVec3> terrain_candidates; // Generated source cells, never journaled.
     BlockId at(int x, int y, int z) const;
 };
 struct GrassInstance {

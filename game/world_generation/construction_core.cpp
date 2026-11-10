@@ -162,31 +162,6 @@ uint8_t ConstructionStore::neighbor_ramp(int x8,int z8,float plane,uint64_t excl
 }
 uint8_t ConstructionStore::connection_shape(const BuiltBlock &b,const BuiltBlock *preview) const {
     auto authored=pack_shape(b.appearance.shape,b.appearance.rotation);
-    if (shape_type(authored) == 8) {
-        auto pos = b.position();
-        return connect_terrain([&](int dx, int dy, int dz) {
-            Point q{pos[0] + dx, pos[1] + dy, pos[2] + dz};
-            if (preview && preview->id != b.id) {
-                auto pp = preview->position();
-                if (std::abs(pp[0] - q[0]) < .125f && std::abs(pp[1] - q[1]) < .125f &&
-                    std::abs(pp[2] - q[2]) < .125f)
-                    return true;
-            }
-            for (auto id : nearby({q[0] + .1f, q[1] + .1f, q[2] + .1f}, {q[0] + .9f, q[1] + .9f, q[2] + .9f})) {
-                if (id == b.id || (preview && id == preview->id))
-                    continue;
-                return true;
-            }
-            if (terrain_lookup) {
-                int tx = int(std::floor(q[0] + .5f)), ty = int(std::floor(q[1] + .5f)),
-                    tz = int(std::floor(q[2] + .5f));
-                auto [tid, tshape] = terrain_lookup(tx, ty, tz);
-                if (tid != 0 && tshape != 255)
-                    return true;
-            }
-            return false;
-        });
-    }
     auto source=ramp_spec(authored);
     if(!source.valid)return authored;
     float plane=b.position()[1]+source.low();
@@ -225,7 +200,7 @@ std::vector<uint64_t> ConstructionStore::nearby(Point lo, Point hi) const {
 bool ConstructionStore::collides(Point lo, Point hi, const Registry &r) const {
     for (auto id : nearby(lo, hi)) {
         const auto &b = blocks.at(id);
-        if (!r.get(b.block).solid || b.appearance.terrain>0)
+        if (!r.get(b.block).solid)
             continue;
         auto p = b.position();
         if (shape_intersects(b.shape(), sub(lo, p), sub(hi, p)))

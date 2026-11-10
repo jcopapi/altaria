@@ -80,26 +80,6 @@ bool VoxelWorld::configure(const Settings &s, const Registry &r, int seed, const
     }
     auto gen = std::make_shared<Generator>(s, r, seed);
     model = std::make_unique<WorldModel>(gen);
-    journal = std::make_unique<EditJournal>(
-        ProjectSettings::get_singleton()->globalize_path(path).utf8().get_data());
-    EditMap edits;
-    std::string e;
-    if (!journal->load(edits, r, s.min_y, s.max_y, e)) {
-        error = String(e.c_str());
-        return false;
-    }
-    model->restore(std::move(edits));
-    surface_journal =
-        std::make_unique<SurfaceJournal>(ProjectSettings::get_singleton()
-                                             ->globalize_path(path.get_base_dir() + String("/surfaces.log"))
-                                             .utf8()
-                                             .get_data());
-    AppearanceMap surfaces;
-    if (!surface_journal->load(surfaces, r, s, e)) {
-        error = String(e.c_str());
-        return false;
-    }
-    model->restore_surfaces(std::move(surfaces));
     texture_array = build_texture_array(r, error);
     if (texture_array.is_null())
         return false;
@@ -237,11 +217,6 @@ void VoxelWorld::upload(MeshResult result) {
     // Clearing here made an entire chunk flash bare after every block edit.
     tile.node = node;
     tile.material = material;
-    if(result.key.level==0) {
-        std::unordered_set<IVec3,CoordHash> next(result.volume->terrain_candidates.begin(),result.volume->terrain_candidates.end());
-        bool difference=!tile.volume || tile.volume->terrain_candidates!=result.volume->terrain_candidates;
-        if(difference) {forget_procedural(tile);for(auto p:next)procedural_cells.insert(p);++procedural_epoch;}
-    }
     tile.volume = std::move(result.volume);
     tile.version = result.version;
     tile.triangles = triangles;
@@ -478,7 +453,6 @@ void VoxelWorld::reconcile() {
     for (auto &key : retire) {
         tiles[key].node->hide();
         if(retired_count++>=2)continue;
-        if(key.level==0)forget_procedural(tiles[key]);
         tiles[key].node->queue_free();
         tiles.erase(key);
     }
@@ -603,45 +577,6 @@ bool VoxelWorld::collision_ready(Vector3 p) const {
         }
     return true;
 }
-void VoxelWorld::forget_procedural(const Tile &tile) {
-    if(!tile.volume)return;
-    for(auto p:tile.volume->terrain_candidates)procedural_cells.erase(p);
-    ++procedural_epoch;
-}
-std::vector<IVec3> VoxelWorld::nearby_natural_terrain(Vector3 center,float radius) const {
-    std::vector<IVec3> result;
-    for(const auto &[key,tile]:tiles)if(key.level==0 && tile.volume) {
-        float dx=std::max(0.f,std::max(key.x-float(center.x),float(center.x)-key.x-32)),dz=std::max(0.f,std::max(key.z-float(center.z),float(center.z)-key.z-32));
-        if(dx*dx+dz*dz>radius*radius)continue;
-        for(auto p:tile.volume->terrain_candidates)if(Vector3(p.x+.5f,p.y+.5f,p.z+.5f).distance_squared_to(center)<=radius*radius)result.push_back(p);
-    }
-    return result;
-}
-bool VoxelWorld::terrain_enabled(IVec3 p) const {
-    auto a=model->appearance_at(p);return a.terrain>=0 ? a.terrain>0 : procedural_cells.count(p);
-}
-void VoxelWorld::update_terrain_meshed(const std::vector<IVec3> &add,const std::vector<IVec3> &remove) {
-    std::unordered_set<TileKey,TileHash> affected;
-    auto mark=[&](IVec3 p) {
-        // Only LOD0 depends on this presentation state. Coalesce thousands of
-        // generated source changes into at most four tile invalidations.
-        for(int dz:{-1,0,1})for(int dx:{-1,0,1})affected.insert({int(std::floor((p.x+dx)/32.f))*32,int(std::floor((p.z+dz)/32.f))*32,0});
-    };
-    for(auto p:add)if(meshed_terrain.insert(p).second)mark(p);
-    for(auto p:remove)if(meshed_terrain.erase(p))mark(p);
-    for(auto key:affected)if(tiles.count(key) || pending.count(key) || wanted.count(key))++versions[key];
-}
-void VoxelWorld::clear_terrain_meshed(IVec3 p) {update_terrain_meshed({}, {p});}
-void VoxelWorld::set_terrain_meshed(IVec3 p) {update_terrain_meshed({p}, {});}
-bool VoxelWorld::source_rendered(IVec3 p) const {
-    TileKey key{int(std::floor(p.x/32.f))*32,int(std::floor(p.z/32.f))*32,0};
-    auto it=tiles.find(key);if(it==tiles.end())return true;
-    auto v=versions.find(key);return v==versions.end() || it->second.version==v->second;
-}
-bool VoxelWorld::near_visible(IVec3 p) const {
-    TileKey key{int(std::floor(p.x/32.f))*32,int(std::floor(p.z/32.f))*32,0};
-    auto it=tiles.find(key);return it!=tiles.end() && it->second.node->is_visible();
-}
 uint8_t VoxelWorld::shape_at(int x, int y, int z) const {
     auto connected=ramp_connections.find({x,y,z});
     if(connected!=ramp_connections.end())return connected->second;
@@ -649,23 +584,6 @@ uint8_t VoxelWorld::shape_at(int x, int y, int z) const {
 }
 uint8_t VoxelWorld::natural_shape_at(int x,int y,int z) const {
     auto base=base_shape_at(x,y,z);
-    if (shape_type(base) == 8) {
-        auto resolved = connect_terrain([&](int dx, int dy, int dz) {
-            BlockId id = block_at(x + dx, y + dy, z + dz);
-            const auto &def = registry().get(id);
-            if (!def.solid || def.foliage)
-                return false;
-            if (def.wood) {
-                auto a = model->appearance_at({x + dx, y + dy, z + dz});
-                return a.shape != 255 && shape_type(pack_shape(a.shape, a.rotation)) == 8;
-            }
-            return true;
-        });
-        auto a = model->appearance_at({x, y, z});
-        if (a.shape == 255 && resolved == terrain_shape({2, 2, 2, 2}))
-            return 0;
-        return resolved;
-    }
     auto source=ramp_spec(base);
     if(!source.valid)return base;
     return connect_ramp(base,[&](int dx,int dz) {
@@ -684,7 +602,6 @@ uint8_t VoxelWorld::base_shape_at(int x, int y, int z) const {
         return pack_shape(a.shape, a.rotation);
     if (model->snapshot()->count({x, y, z}))
         return 0;
-    if(a.terrain>=0 || terrain_meshed({x,y,z})) {auto column=generator()->column(x,z);return generator()->surface_shape(x,y,z,column);}
     auto original=ramp_base_shapes.find({x,y,z});
     if(original!=ramp_base_shapes.end())return original->second;
     TileKey key{int(std::floor(double(x) / 32)) * 32, int(std::floor(double(z) / 32)) * 32, 0};
@@ -706,7 +623,7 @@ bool VoxelWorld::collides_box(Vector3 lo, Vector3 hi) const {
     for (int z = int(std::floor(lo.z)); z <= int(std::floor(hi.z)); z++)
         for (int y = int(std::floor(lo.y)); y <= int(std::floor(hi.y)); y++)
             for (int x = int(std::floor(lo.x)); x <= int(std::floor(hi.x)); x++)
-                if (registry().get(block_at(x, y, z)).solid && !terrain_meshed({x,y,z}) &&
+                if (registry().get(block_at(x, y, z)).solid &&
                     shape_intersects(shape_at(x, y, z), {lo.x - x, lo.y - y, lo.z - z},
                                      {hi.x - x, hi.y - y, hi.z - z}))
                     return true;
@@ -758,15 +675,10 @@ bool VoxelWorld::edit(const EditCommand &cmd, String &error) {
         error = String(e.c_str());
         return false;
     }
-    if (!journal->append(cmd, e)) {
-        error = String(e.c_str());
-        return false;
-    }
     if (!model->apply(cmd, e)) {
         error = String(e.c_str());
         return false;
     }
-    meshed_terrain.erase(cmd.position);
     ramp_base_shapes.erase(cmd.position);
     ramp_connections.erase(cmd.position);
     invalidate(cmd.position);
@@ -778,11 +690,10 @@ bool VoxelWorld::edit_surface(const SurfaceCommand &command, String &error) {
         error = String(e.c_str());
         return false;
     }
-    if (!surface_journal->append(command, e) || !model->apply_surface(command, e)) {
+    if (!model->apply_surface(command, e)) {
         error = String(e.c_str());
         return false;
     }
-    if(command.appearance.terrain<=0)meshed_terrain.erase(command.position);
     ramp_base_shapes.erase(command.position);
     ramp_connections.erase(command.position);
     invalidate(command.position);
@@ -790,16 +701,11 @@ bool VoxelWorld::edit_surface(const SurfaceCommand &command, String &error) {
 }
 std::shared_ptr<const AppearanceMap> VoxelWorld::render_surfaces(const TileKey &key) const {
     auto base=model->surfaces_for(key);
-    bool waiting=false;for(auto &[p,a]:*base)if(a.terrain>0 && !terrain_meshed(p)){waiting=true;break;}
-    if(ramp_connections.empty() && !waiting && meshed_terrain.empty())return base;
+    if(ramp_connections.empty())return base;
     auto result=std::make_shared<AppearanceMap>(*base);int pad=1<<key.level;
     for(auto &[p,shape]:ramp_connections)if(p.x>=key.x-pad && p.x<key.x+key.size()+pad && p.z>=key.z-pad && p.z<key.z+key.size()+pad) {
         auto a=model->appearance_at(p);unpack_shape(shape,a);a.derived_ramp=true;(*result)[p]=a;
     }
-    if(key.level==0)for(auto p:meshed_terrain)if(p.x>=key.x-1 && p.x<key.x+33 && p.z>=key.z-1 && p.z<key.z+33) {
-        auto a=model->appearance_at(p);a.terrain=1;(*result)[p]=a;
-    }
-    for(auto &[p,a]:*result)if(a.terrain>0 && !terrain_meshed(p))a.terrain=0;
     return result;
 }
 void VoxelWorld::set_ramp_connection(IVec3 p,uint8_t shape) {
@@ -814,7 +720,6 @@ void VoxelWorld::set_ramp_connection(IVec3 p,uint8_t shape) {
 }
 void VoxelWorld::invalidate(IVec3 position,bool notify) {
     if(notify && edit_callback)edit_callback(position);
-    if(notify && terrain_callback)terrain_callback(Vector3(position.x,position.y,position.z));
     // Invalidate all affected LODs and their meshing halos, including unloaded jobs.
     std::unordered_set<TileKey, TileHash> affected;
     for (auto &key : ordered)
@@ -902,16 +807,3 @@ Dictionary VoxelWorld::stats() const {
     return d;
 }
 } // namespace godot
-
-namespace godot {
-std::unordered_map<altaria::TileKey,std::shared_ptr<const altaria::Volume>,altaria::TileHash>
-VoxelWorld::volume_snapshot(altaria::IVec3 key) const {
-    std::unordered_map<altaria::TileKey,std::shared_ptr<const altaria::Volume>,altaria::TileHash> result;
-    for(int z=int(std::floor((key.z-2)/32.f))*32;z<=key.z+10;z+=32)
-        for(int x=int(std::floor((key.x-2)/32.f))*32;x<=key.x+10;x+=32) {
-            altaria::TileKey tile{x,z,0};auto it=tiles.find(tile);
-            if(it!=tiles.end() && it->second.volume)result.emplace(tile,it->second.volume);
-        }
-    return result;
-}
-}

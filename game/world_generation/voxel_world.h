@@ -33,19 +33,12 @@ class VoxelWorld : public Node3D {
     std::vector<altaria::TileKey> ordered;
     std::unique_ptr<altaria::TerrainWorkers> workers;
     std::unique_ptr<altaria::WorldModel> model;
-    std::unique_ptr<altaria::EditJournal> journal;
-    std::unique_ptr<altaria::SurfaceJournal> surface_journal;
     Ref<Texture2DArray> texture_array;
     Ref<ShaderMaterial> overlay_material;
     Ref<ShaderMaterial> grass_material, bush_material;
     Ref<ArrayMesh> grass_template_mesh;
     altaria::StageTimings stages;
     std::function<void(altaria::IVec3)> edit_callback;
-    std::function<void(Vector3)> terrain_callback;
-    std::unordered_set<altaria::IVec3,altaria::CoordHash> meshed_terrain;
-    std::unordered_set<altaria::IVec3,altaria::CoordHash> procedural_cells;
-    uint64_t procedural_epoch=0;
-    void forget_procedural(const Tile &tile);
     std::unordered_map<altaria::IVec3,uint8_t,altaria::CoordHash> ramp_connections;
     std::unordered_map<altaria::IVec3,uint8_t,altaria::CoordHash> ramp_base_shapes;
     void invalidate(altaria::IVec3 position,bool notify=true);
@@ -53,7 +46,7 @@ class VoxelWorld : public Node3D {
     Ref<ShaderMaterial> solid_material, physical_material;
     Vector3 viewer;
     bool fullbright = false;
-    bool smooth_colliders = false, retirement_pending=false;
+    bool retirement_pending=false;
     float stream_timer = 1, last_mesh_ms = 0;
     std::chrono::steady_clock::time_point started;
     double first_tile_ms = -1, world_ready_ms = -1;
@@ -71,12 +64,6 @@ class VoxelWorld : public Node3D {
     static void _bind_methods() {}
 
   public:
-    void set_terrain_callback(std::function<void(Vector3)> callback) {terrain_callback=std::move(callback);}
-    const altaria::AppearanceMap &authored_surfaces() const {return model->all_surfaces();}
-    std::shared_ptr<const altaria::Generator> generator_snapshot() const {return model->generator;}
-    std::shared_ptr<const altaria::EditMap> edit_snapshot() const {return model->snapshot();}
-    std::shared_ptr<const altaria::AppearanceMap> style_snapshot(altaria::TileKey key) const {return model->surfaces_for(key);}
-    std::unordered_map<altaria::TileKey,std::shared_ptr<const altaria::Volume>,altaria::TileHash> volume_snapshot(altaria::IVec3 key) const;
     void set_edit_callback(std::function<void(altaria::IVec3)> callback) {edit_callback=std::move(callback);}
     ~VoxelWorld();
     bool configure(const altaria::Settings &settings, const altaria::Registry &blocks, int seed,
@@ -90,18 +77,6 @@ class VoxelWorld : public Node3D {
     }
     altaria::BlockId block_at(int x, int y, int z) const;
     bool collision_ready(Vector3 position) const;
-    bool near_visible(altaria::IVec3 position) const;
-    bool source_rendered(altaria::IVec3 position) const;
-    bool smooth_colliders_active() const {return smooth_colliders;}
-    void set_smooth_colliders_active(bool value) {smooth_colliders=value;}
-    std::vector<altaria::IVec3> nearby_natural_terrain(Vector3 center,float radius) const;
-    const auto &natural_terrain_cells() const {return procedural_cells;}
-    uint64_t natural_terrain_epoch() const {return procedural_epoch;}
-    bool terrain_enabled(altaria::IVec3 p) const;
-    void update_terrain_meshed(const std::vector<altaria::IVec3> &add,const std::vector<altaria::IVec3> &remove);
-    bool terrain_meshed(altaria::IVec3 p) const {return meshed_terrain.count(p);}
-    void set_terrain_meshed(altaria::IVec3 p);
-    void clear_terrain_meshed(altaria::IVec3 p);
     uint8_t shape_at(int x, int y, int z) const;
     uint8_t base_shape_at(int x,int y,int z) const;
     uint8_t natural_shape_at(int x,int y,int z) const;

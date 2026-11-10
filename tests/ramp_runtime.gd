@@ -8,16 +8,6 @@ func run() -> void:
     game.execute_command("time pause")
     game.execute_command("tp 0 225 3")
     await settle()
-    check(game.execute_command("shape terrain")=="Selected shape: terrain","Terrain available in shape selection")
-    # General 3D Terrain now has its own full acceptance test. Here verify that
-    # its independent state coexists with the original manual ramp connections.
-    check(game.set_voxel(20,219,0,2),"Normal base for surface cap")
-    check(game.set_voxel(20,220,0,1) and game.paint_voxel(20,220,0,"#44aa88",.4,1.1),"Painted original cube")
-    check(game.execute_command("terrain at 20 220 0 on")=="Terrain modifier updated.","Enable independent Terrain modifier")
-    await settle()
-    var original: Dictionary=game.get_voxel_appearance(20,220,0)
-    check(original.terrain and original.painted and game.get_voxel(20,220,0)==1,"Terrain preserves original material and paint")
-    check(not game.terrain_hit(Vector3(20.5,224,.5),Vector3.DOWN,8).is_empty(),"Terrain uses the integrated Transvoxel surface")
     for x in [0,5]:
         check(game.set_voxel(x,220,0,3),"Floor material fixture")
         check(game.shape_voxel(x,220,0,"slab",0),"Half-height floor fixture")
@@ -70,7 +60,6 @@ func run() -> void:
     var path: String=game.get_world_path()
     check(game.open_world(path),"Reload connected ramps")
     find_player()
-    check(game.get_voxel_appearance(20,220,0).terrain and game.get_voxel_appearance(20,220,0).painted,"Independent Terrain state and paint persist beside manual ramps")
     check(block_by_id(inner).ramp_corner=="inner_right","Corner re-derived after journal reload")
     check(game.get_voxel_appearance(10,230,10).ramp_corner=="outer_right","World/construction connection re-derived after reload")
     check(game.remove_built_block(terrain_front) and game.get_voxel_appearance(10,230,10).ramp_corner=="straight","World ramp returns to straight after construction neighbor removal")

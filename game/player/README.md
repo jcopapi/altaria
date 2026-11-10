@@ -28,12 +28,3 @@ Block forms and physics: hold **R + wheel** to choose the held block's shape,
 cut a tree; click a fallen tree part to detach it. Walking collision follows the
 actual slab/ramp/stair/pillar geometry and supports small step-up transitions.
 The HUD reports apparent environment temperature in °C.
-
-**T** toggles the reversible Terrain modifier. Select `shape terrain` to preview
-and toggle it with right-click. Neighboring modified pieces join automatically;
-walking and selection follow the rendered Transvoxel triangles. Toggling it off
-restores the original block form. Procedural Terrain uses the same tools.
-
-Terrain applies only to an exposed cube/floor slab with a normal base underneath.
-It is a surface cap, up to one block high. Ordinary construction replaces the cap
-from the base plane; mining it frees the cell and leaves the base ordinary.

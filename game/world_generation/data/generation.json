@@ -41,8 +41,5 @@
   "surface_shapes": true,
   "upload_time_budget_ms": 2,
   "tree_spacing": 14,
-  "tree_lod_max": 2,
-  "procedural_terrain": true,
-  "terrain_distance": 32,
-  "terrain_max_height": 1
+  "tree_lod_max": 2
 }

@@ -1,6 +1,4 @@
 #include "altaria_game.h"
-#include "game/world_generation/terrain/terrain_mesher_bridge.h"
-#include "game/world_generation/terrain/terrain_surface.h"
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/godot.hpp>
@@ -10,8 +8,6 @@ namespace {
 void initialize_altaria(godot::ModuleInitializationLevel level) {
     if (level == godot::MODULE_INITIALIZATION_LEVEL_SCENE) {
         GDREGISTER_CLASS(godot::AltariaGame);
-        GDREGISTER_CLASS(godot::TerrainMesherBridge);
-        GDREGISTER_CLASS(godot::TerrainSurface);
         GDREGISTER_CLASS(godot::VoxelWorld);
         GDREGISTER_CLASS(godot::FlyingPlayer);
         GDREGISTER_CLASS(godot::WorldAtmosphere);

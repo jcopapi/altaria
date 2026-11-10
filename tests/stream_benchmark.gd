@@ -8,7 +8,7 @@ func report(name: String,samples: Array[float]) -> void:
         if value>33.33:very_slow+=1
     print("STREAM_BENCHMARK ",name," frames=",samples.size()," median_ms=",samples[samples.size()/2]," p95_ms=",samples[int(samples.size()*.95)]," p99_ms=",samples[int(samples.size()*.99)]," max_ms=",samples[-1]," over_16ms=",slow," over_33ms=",very_slow," max_upload_ms=",game.get_debug_state().max_upload_ms)
     var s: Dictionary=game.get_debug_state()
-    print("UPLOAD_PHASES mesh_ms=",s.max_mesh_upload_ms," collider_ms=",s.max_collider_ms," terrain_upload_ms=",s.terrain_max_upload_ms," terrain_refresh_ms=",s.terrain_max_refresh_ms," terrain_worker_ms=",s.terrain_max_build_ms," terrain_triangles=",s.terrain_triangles)
+    print("UPLOAD_PHASES mesh_ms=",s.max_mesh_upload_ms," collider_ms=",s.max_collider_ms)
 func run() -> void:
     root.size=Vector2i(1280,720)
     root.position=Vector2i(60,60)
@@ -53,7 +53,6 @@ func run() -> void:
     check(edit_cells.size()==8,"Benchmark has eight real natural source cells")
     aim(Vector3(256,maximum_top+8,140),Vector3(258,maximum_top,128))
     await settle()
-    check(game.get_debug_state().terrain_triangles>100,"Mining benchmark has active natural Terrain")
     await create_timer(1).timeout
     samples.clear()
     previous=Time.get_ticks_usec()

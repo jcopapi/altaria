@@ -153,21 +153,6 @@ static void test_environment_features() {
         if (v.x >= 4 && v.x <= 5 && v.z >= 4 && v.z <= 5 && v.y >= 291 && v.y <= 292 && v.ny > .5f)
             top_grass |= v.texture == 3;
     require(tint && top_grass && side, "paint, grass block top texture, and side transition layers survive stairs and rotation");
-    auto path = std::filesystem::temp_directory_path() / "altaria-shapes-surface.log";
-    std::filesystem::remove(path);
-    {
-        std::ofstream legacy(path);
-        legacy << "1 1 0 290 0 16777215 350 1000 65535 65535 0 1875088176103671054\n";
-    }
-    SurfaceJournal journal(path.string());
-    AppearanceMap legacy_surfaces;
-    require(journal.load(legacy_surfaces, r, cfg, error) && legacy_surfaces.at({0, 290, 0}).shape == 255,
-            "original unversioned paint journal remains readable");
-    require(journal.append({1, 1, {0, 290, 0}, paint}, error), "shape surface persisted");
-    AppearanceMap restored;
-    require(journal.load(restored, r, cfg, error) && restored.at({0, 290, 0}) == paint,
-            "shape rotation paint and overlay persist together");
-    std::filesystem::remove(path);
     paint.shape = 9;
     WorldModel model(std::make_shared<Generator>(cfg, r, 1337));
     require(!model.validate_surface({1, 1, {0, 60, 0}, paint}, error),

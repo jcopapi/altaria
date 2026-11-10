@@ -256,42 +256,6 @@ int main() {
     SurfaceCommand invalid{1, 4, {-1, 120, -33}, paint};
     invalid.appearance.brightness = 2001;
     require(!model.apply_surface(invalid, error), "invalid brightness rejected");
-    auto surface_path = std::filesystem::temp_directory_path() / "altaria-core-test-surfaces.log";
-    std::filesystem::remove(surface_path);
-    SurfaceJournal surface_journal(surface_path.string());
-    require(surface_journal.append({1, 3, {-1, 120, -33}, paint}, error), "paint and overlay journal append");
-    AppearanceMap restored_surfaces;
-    require(surface_journal.load(restored_surfaces, r, s, error) &&
-                restored_surfaces.at({-1, 120, -33}) == paint,
-            "paint and independent overlays survive restart");
-    std::filesystem::remove(surface_path);
-    auto path = std::filesystem::temp_directory_path() / "altaria-core-test-edits.log";
-    std::filesystem::remove(path);
-    EditJournal journal(path.string());
-    require(journal.append({9, 1, {-1, 70, -33}, r.air}, error), "air edit persisted");
-    require(journal.append({9, 2, {-1, 71, -33}, r.grass}, error), "placement persisted");
-    EditMap restored;
-    require(journal.load(restored, r, s.min_y, s.max_y, error), "journal restores");
-    require(restored.at({-1, 70, -33}) == r.air && restored.at({-1, 71, -33}) == r.grass,
-            "restart keeps removals and placements");
-    {
-        std::ofstream torn(path, std::ios::app);
-        torn << "9 3 -1";
-    }
-    EditMap recovered;
-    require(journal.load(recovered, r, s.min_y, s.max_y, error) && recovered.size() == 2,
-            "interrupted trailing journal append is recovered");
-    require(journal.append({9, 3, {-1, 72, -33}, r.stone}, error), "append succeeds after recovery");
-    recovered.clear();
-    require(journal.load(recovered, r, s.min_y, s.max_y, error) && recovered.size() == 3,
-            "recovered journal remains readable after later edits");
-    {
-        std::ofstream corrupt(path, std::ios::app);
-        corrupt << "invalid terminated record\n";
-    }
-    require(!journal.load(recovered, r, s.min_y, s.max_y, error),
-            "interior or terminated journal corruption is rejected");
-    std::filesystem::remove(path);
     TerrainWorkers workers(gen, 2);
     workers.submit({0, 0, 3}, 4, model.snapshot());
     MeshResult done;

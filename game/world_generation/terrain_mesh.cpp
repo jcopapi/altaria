@@ -156,18 +156,6 @@ static std::shared_ptr<Volume> make_volume(TileKey key, const Generator &g,
                 }
             }
     }
-    // Derive the natural modifier only on the original exposed top layer.
-    // This runs BEFORE edits: mining a cap must not promote the buried base.
-    if(s.procedural_terrain && key.level==0) {
-        auto natural=[&](int x,int y,int z) {
-            const auto &b=r.get(v->at(x,y,z));return b.solid && !b.wood && !b.foliage;
-        };
-        for(int z=0;z<32;z++)for(int x=0;x<32;x++)for(int y=1;y<ny-2;y++) {
-            IVec3 p{key.x+x,s.min_y+y,key.z+z};
-            if(edits->count(p) || !natural(x,y,z))continue;
-            if(natural(x,y-1,z) && !r.get(v->at(x,y+1,z)).solid)v->terrain_candidates.push_back(p);
-        }
-    }
     // Stable ordering makes downsampled edits independent of hash table iteration order.
     std::vector<std::pair<IVec3, BlockId>> sorted(edits->begin(), edits->end());
     std::sort(sorted.begin(), sorted.end(), [](auto &a, auto &b) {
@@ -184,7 +172,7 @@ static std::shared_ptr<Volume> make_volume(TileKey key, const Generator &g,
         if (ix >= -1 && ix <= 32 && iz >= -1 && iz <= 32 && iy >= 0 && iy < ny) {
             auto i = voxel_index(*v, ix, iy, iz);
             v->data[i] = e.second;
-            v->shapes.erase(i); // Placed materials start as cubes, independent of terrain caps.
+            v->shapes.erase(i); // Placed materials start as ordinary cubes.
         }
     }
     std::vector<std::pair<IVec3, Appearance>> appearance_sorted(surfaces->begin(), surfaces->end());
@@ -202,7 +190,6 @@ static std::shared_ptr<Volume> make_volume(TileKey key, const Generator &g,
         if (ix >= -1 && ix <= 32 && iz >= -1 && iz <= 32 && iy >= 0 && iy < ny) {
             auto i = voxel_index(*v, ix, iy, iz);
             v->surfaces[i] = e.second;
-            if (e.second.terrain > 0 && key.level==0) {v->shapes[i]=32;continue;}
             if (key.level == 0 && e.second.shape != 255) {
                 if (e.second.shape)
                     v->shapes[i] = pack_shape(e.second.shape, e.second.rotation);
@@ -211,47 +198,11 @@ static std::shared_ptr<Volume> make_volume(TileKey key, const Generator &g,
             }
         }
     }
-    auto solid_terrain_at = [&](int qx, int qy, int qz) -> bool {
-        if (qy < 0 || qy >= ny)
-            return false;
-        BlockId id;
-        if (qx >= -1 && qx <= 32 && qz >= -1 && qz <= 32) {
-            id = v->at(qx, qy, qz);
-        } else {
-            IVec3 wp{key.x + qx * step, s.min_y + qy * ystep, key.z + qz * step};
-            auto eit = edits->find(wp);
-            id = eit != edits->end() ? eit->second : g.terrain_sample(wp.x, wp.y, wp.z);
-        }
-        const auto &def = r.get(id);
-        if (!def.solid || def.foliage)
-            return false;
-        if (def.wood) {
-            if (qx >= -1 && qx <= 32 && qz >= -1 && qz <= 32) {
-                auto sit = v->surfaces.find(voxel_index(*v, qx, qy, qz));
-                return sit != v->surfaces.end() && shape_type(pack_shape(sit->second.shape, sit->second.rotation)) == 8;
-            }
-            return false;
-        }
-        return true;
-    };
-    // Resolve authored world ramps and Terrain blocks after edits as well as generated caps.
+    // Resolve authored world ramps after edits.
     std::vector<std::pair<size_t,uint8_t>> connected;
-    std::vector<size_t> flat_natural;
     for(auto &[index,code]:v->shapes) {
         auto style=v->surfaces.find(index);if(style!=v->surfaces.end() && style->second.derived_ramp)continue;
         int ix=int(index%34)-1,iy=int(index/34%(ny+2))-1,iz=int(index/(34*(ny+2)))-1;
-        if(style!=v->surfaces.end() && style->second.terrain>0)continue;
-        if (shape_type(code) == 8) {
-            uint8_t resolved = connect_terrain([&](int dx, int dy, int dz) {
-                return solid_terrain_at(ix + dx, iy + dy, iz + dz);
-            });
-            bool authored = (style != v->surfaces.end() && style->second.shape != 255);
-            if (!authored && resolved == terrain_shape({2, 2, 2, 2}))
-                flat_natural.push_back(index);
-            else
-                connected.push_back({index, resolved});
-            continue;
-        }
         auto spec=ramp_spec(code);if(!spec.valid)continue;
         if(ix<0 || ix>=32 || iz<0 || iz>=32)continue;
         auto shape=connect_ramp(code,[&](int dx,int dz) {
@@ -266,7 +217,6 @@ static std::shared_ptr<Volume> make_volume(TileKey key, const Generator &g,
         connected.push_back({index,shape});
     }
     for(auto &[index,shape]:connected)v->shapes[index]=shape;
-    for(auto index:flat_natural)v->shapes.erase(index);
     timings.surface_ms += elapsed(clock);
     return v;
 }
@@ -374,7 +324,7 @@ static void greedy(MeshResult &mesh, const Volume &v, const Registry &r) {
                     if(d==1 && shape_b && !shape_a) {
                         auto packed=v.shapes.at(voxel_index(v,p[0],p[1]+1,p[2]));
                         int type=shape_type(packed);
-                        if((type==1 || type==3 || type==4 || type==5 || type==8) && appearance(v,p[0],p[1]+1,p[2]).terrain<=0)
+                        if((type==1 || type==3 || type==4 || type==5))
                             b=v.at(p[0],p[1]+1,p[2]); // Full-footprint base hides the cube below.
                     }
                     const auto &ba = r.get(a);
@@ -501,7 +451,6 @@ static void partial_blocks(MeshResult &mesh, const Volume &v, const Registry &r)
                     continue;
                 const auto &c = v.columns[(z + 1) * 34 + x + 1];
                 auto a = appearance(v, x, y, z);
-                if(a.terrain>0)continue;
                 BlockId id = v.at(x, y, z);
                 int transition_overlay = 0;
                 if (y + 1 < v.height) {
@@ -548,19 +497,6 @@ static void partial_blocks(MeshResult &mesh, const Volume &v, const Registry &r)
                             auto q_it = v.shapes.find(voxel_index(v, q[0], q[1], q[2]));
                             if (q_it == v.shapes.end()) {
                                 covered = true;
-                            } else if (shape_type(it->second) == 8 && shape_type(q_it->second) == 8) {
-                                auto h_self = terrain_heights(it->second);
-                                auto h_nb = terrain_heights(q_it->second);
-                                if (axis == 0 && normal > 0)
-                                    covered = h_nb[0] >= h_self[3] - .001f && h_nb[1] >= h_self[2] - .001f;
-                                else if (axis == 0 && normal < 0)
-                                    covered = h_nb[3] >= h_self[0] - .001f && h_nb[2] >= h_self[1] - .001f;
-                                else if (axis == 2 && normal > 0)
-                                    covered = h_nb[0] >= h_self[1] - .001f && h_nb[3] >= h_self[2] - .001f;
-                                else if (axis == 2 && normal < 0)
-                                    covered = h_nb[1] >= h_self[0] - .001f && h_nb[2] >= h_self[3] - .001f;
-                                else if (axis == 1 && normal < 0)
-                                    covered = q_it->second == terrain_shape({2, 2, 2, 2});
                             }
                         }
                     }
@@ -623,10 +559,6 @@ static void decorations(MeshResult &mesh, const Volume &v, const Generator &g) {
                 float startx = x + .5f - size / 2, startz = z + .5f - size / 2, top = world_y + 1.012f;
                 auto shape_it = v.shapes.find(voxel_index(v, x, y, z));
                 if (shape_it != v.shapes.end()) {
-                    if (a.decoration == 65535 && shape_type(shape_it->second) == 8 &&
-                        shape_it->second != terrain_shape({1, 1, 1, 1}) &&
-                        shape_it->second != terrain_shape({2, 2, 2, 2}))
-                        continue;
                     top = world_y + shape_top(shape_it->second, .5f, .5f) + .012f;
                 }
                 quad(mesh.decorations,

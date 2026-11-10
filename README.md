@@ -1,7 +1,7 @@
 # Altaria
 
 C++ voxel world prototype for **GDstudio / Godot 4.7**, using GDExtension and
-**FastNoise2** and **Voxel Tools**, six voxel LODs through a ~6 km fogged horizon, five configurable
+**FastNoise2**, six voxel LODs through a ~6 km fogged horizon, five configurable
 biomes, independent overlays and persistent per-block HSV paint. Cartoon silhouette
 contours, a low-resolution SubViewport with nearest upscaling, subtle extra
 distance pixelation and colored biome sky/fog shape the world view.
@@ -12,9 +12,7 @@ fractional stacking, including cubes directly on slabs. Voxel trees use Jolt
 physics; the procedural sky and gameplay temperatures follow the day cycle and
 biomes. Runtime UI defaults to English; Portuguese is available in the menu.
 
-Terrain is a supported **surface cap**, up to one block high, that rounds folds
-between ordinary surfaces. Buried blocks stay normal. Mining a cap frees its
-whole cell; building on it replaces the cap from the ordinary base plane.
+World generation uses ordinary full blocks and slab caps.
 3D grass tufts and bushes remain disabled. Silhouette contours and biome lighting
 continue to use the existing voxel world renderer.
 
@@ -22,14 +20,14 @@ continue to use the existing voxel world renderer.
 
 Dependencies and the Linux x86_64 debug library are already installed locally.
 Open `project.godot` in GDstudio and press **F5**: a new world with a random seed
-is created immediately. **Esc** opens the saved-world menu.
+is created immediately. **Esc** opens the test menu.
 Use WASD and the mouse to explore. F toggles flight/walking; Space supports double
 jump on foot. Left/right click remove/place blocks. **F1** opens the plain console;
 type **`fullbright`** and press Enter to toggle it. Look at a block and run
 `paint #cc33ff` to tint it, or `overlay pebbles2` to add a decoration.
 `biome enchanted` teleports to the purple-grass biome. Run **`world new`** to generate
 another random world during play, or **`world new 12345`** to choose a seed. The
-previous world is saved. The HUD/console show first-tile and total generation times.
+previous world is discarded. The HUD/console show first-tile and total generation times.
 
 Hold **R + wheel** to choose a block shape and **Q** to rotate it. Left-click wood
 to cut a tree; click fallen parts to detach them. **G** releases any solid block
@@ -37,13 +35,6 @@ into physics. Try `time 19`, `weather storm`, `temperature` or `light #a055ff`.
 `outline off` and `pixelation off` toggle the visual effects. `fog #b08adc 80 900`
 overrides fog color/range; `fog biome` returns to automatic biome/day-night fog.
 Try `shape ramp` for manual construction and `godrays on|off`.
-**T** toggles Terrain on a targeted source. `shape terrain` + right-click does the
-same with a neighbor-aware smooth preview. Build ordinary stairs, apply Terrain,
-round the exposed top layer, then toggle it off to recover the original cubes.
-Terrain needs a normal base directly underneath. Constructing on it fills its cell
-instead of resting on the curved height.
-`terrain at x y z on|off|toggle` edits an explicit world cell. See the
-[Terrain implementation and validation](game/world_generation/terrain/README.md).
 
 ## Edit game data
 
@@ -56,8 +47,8 @@ instead of resting on the curved height.
 
 See the [generation guide](game/world_generation/README.md),
 [player controls](game/player/README.md) and [console commands](game/debug/README.md).
-Terrain/biome settings are snapshotted per world; create a new world to try changed
-defaults. New blocks with new IDs can be added to existing worlds.
+Each run starts a fresh world. Edits and construction exist only in memory;
+world saving and loading are disabled during development.
 
 ## Build
 
@@ -80,7 +71,6 @@ On another Ubuntu/Pop!_OS machine, install GCC/G++, Git and `python3-venv`, then
 
 ```bash
 ./tools/setup_cpp.sh
-./tools/setup_voxel_tools.sh
 ```
 
 This fetches pinned dependencies, installs the local Python build tools, compiles
@@ -98,17 +88,11 @@ GODOT="$HOME/.local/bin/gdstudio" ./tests/run_runtime_tests.sh
 ./tests/run_environment_tests.sh
 ./tests/run_cartoon_tests.sh
 ./tests/run_subviewport_tests.sh
-./tests/run_terrain_modifier_tests.sh
-./tests/run_voxel_tools_tests.sh
-./tests/run_terrain_surface.sh
-./tests/run_terrain_procedural.sh
-./tests/run_terrain_scale.sh
 # Real Vulkan visual checks in a graphical session:
 ./tests/run_cartoon_visual.sh
 ./tests/run_ramp_tests.sh
 ./tests/run_ramp_visual.sh
 ./tests/run_silhouette_visual.sh
-./tests/run_terrain_gameplay_visual.sh
 ```
 
 Core tests cover determinism, greedy meshing, chunk borders, LOD coverage, raycasts,
@@ -120,5 +104,7 @@ input for future LAN/online multiplayer. **Network play is not implemented yet.*
 
 Third-party sources: [FastNoise2](https://github.com/Auburn/FastNoise2),
 [FastSIMD](https://github.com/Auburn/FastSIMD),
-[godot-cpp](https://github.com/godotengine/godot-cpp),
-[Voxel Tools](https://github.com/Zylann/godot_voxel).
+[godot-cpp](https://github.com/godotengine/godot-cpp).
+
+Current development check: `./tests/run_ephemeral_tests.sh`. Older persistence
+fixtures are obsolete while world saving is disabled.

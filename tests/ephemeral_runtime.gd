@@ -1,0 +1,22 @@
+extends "res://tests/cartoon_runtime.gd"
+func run() -> void:
+    game=load("res://scenes/main.tscn").instantiate()
+    root.add_child(game)
+    await process_frame
+    find_player()
+    actor.position=Vector3(0,235,5)
+    await settle()
+    check(not ClassDB.class_exists("TerrainSurface") and not ClassDB.class_exists("VoxelBuffer"),"Removed Terrain and dependency absent")
+    check(not game.has_method("save_world") and not game.has_method("open_world"),"No saving/loading API")
+    check(game.execute_command("terrain").begins_with("Unknown"),"Removed Terrain command")
+    check(game.set_voxel(0,220,0,3),"Edit current temporary world")
+    check(game.place_block(Vector3(3,220,0),1,"slab",0)>0,"Ordinary construction works")
+    check(game.paint_voxel(0,220,0,"#aa44cc",.4,1.1),"In-memory paint works")
+    check(game.execute_command("world new 1337").begins_with("Generating"),"Generate fresh test world")
+    find_player()
+    actor.position=Vector3(0,235,5)
+    await settle()
+    check(game.get_debug_state().edits==0 and game.get_built_blocks().is_empty(),"New test starts with a clean world")
+    check(not DirAccess.dir_exists_absolute("user://worlds"),"No saved-world directories created")
+    print("EPHEMERAL_RUNTIME_PASS" if failures.is_empty() else "EPHEMERAL_RUNTIME_FAIL "+str(failures))
+    quit(0 if failures.is_empty() else 1)

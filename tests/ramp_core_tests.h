@@ -1,6 +1,5 @@
 static void test_ramp_connections() {
-    require(SHAPE_COUNT == 9 && shape_id("terrain") == 8 && std::string(shape_name(8)) == "terrain",
-            "Terrain registered as selectable surface modifier");
+    require(SHAPE_COUNT == 8 && shape_id("terrain") == -1, "Only ordinary block forms are selectable");
     for(int scale=0;scale<3;scale++)for(int corner=0;corner<5;corner++)for(int turn=0;turn<4;turn++) {
         auto shape=ramp_shape(RampScale(scale),RampCorner(corner),turn);
         Appearance a;unpack_shape(shape,a);
@@ -12,57 +11,6 @@ static void test_ramp_connections() {
             if(top>.03f)require(shape_intersects(shape,{x-.001f,top-.02f,z-.001f},{x+.001f,top-.01f,z+.001f}),"Ramp collision matches cap");
         }
     }
-    // Verify all 81 Terrain corner-height combinations (codes 32..112) for raycast, top height, collision, and rotational symmetry.
-    for (int c0 = 0; c0 < 3; c0++)
-        for (int c1 = 0; c1 < 3; c1++)
-            for (int c2 = 0; c2 < 3; c2++)
-                for (int c3 = 0; c3 < 3; c3++) {
-                    uint8_t tshape = terrain_shape({c0, c1, c2, c3});
-                    require(shape_type(tshape) == 8 && terrain_spec(tshape).valid, "Terrain profile code is valid");
-                    for (float x : {.2f, .5f, .8f})
-                        for (float z : {.2f, .5f, .8f}) {
-                            float top = shape_top(tshape, x, z);
-                            require(std::abs(shape_ray(tshape, {x, 2, z}, {0, -1, 0}, 3) - (2 - top)) < .001f,
-                                    "Terrain raycast matches exact triangulated surface top");
-                            require(!shape_intersects(tshape, {x - .001f, top + .015f, z - .001f},
-                                                      {x + .001f, top + .025f, z + .001f}),
-                                    "No phantom collision above Terrain surface");
-                            if (top > .04f)
-                                require(shape_intersects(tshape, {x - .001f, top - .025f, z - .001f},
-                                                         {x + .001f, top - .015f, z + .001f}),
-                                        "Terrain collision matches surface cap");
-                        }
-                }
-    // Verify connect_terrain geometric cases: isolated block, 2x2 platform, 3x3 platform, staircase-to-ramp, and 4-way corner symmetry.
-    uint8_t isolated = connect_terrain([](int dx, int dy, int dz) { return dx == 0 && dy == 0 && dz == 0; });
-    require(isolated == terrain_shape({1, 1, 1, 1}), "Isolated Terrain block bevels all four corners to 0.5");
-    uint8_t center3x3 = connect_terrain([](int, int dy, int) { return dy == 0; });
-    require(center3x3 == terrain_shape({2, 2, 2, 2}), "Interior of 3x3 Terrain platform stays flat at 1.0");
-    uint8_t corner2x2 = connect_terrain([](int dx, int dy, int dz) { return dy == 0 && dx >= 0 && dz >= 0; });
-    require(corner2x2 == terrain_shape({0, 1, 2, 1}), "2x2 Terrain platform raises shared center vertex to 1.0");
-    uint8_t stair_step = connect_terrain([](int dx, int dy, int) {
-        return (dy == 0 && dx >= 0) || (dy == 1 && dx >= 1);
-    });
-    require(stair_step == terrain_shape({0, 0, 2, 2}),
-            "Staircase Terrain step connects low edge at 0.0 to upper step at 1.0 as a continuous ramp");
-    uint8_t outer_corner = connect_terrain([](int dx, int dy, int dz) {
-        return (dy == 0 && dx >= 0 && dz >= 0) || (dy == 1 && dx >= 1 && dz >= 1);
-    });
-    require(outer_corner == terrain_shape({0, 0, 2, 0}),
-            "Diagonal upper neighbor creates smooth outer corner ramp");
-    uint8_t inner_corner = connect_terrain([](int dx, int dy, int dz) {
-        return (dy == 0 && (dx >= 0 || dz >= 0)) || (dy == 1 && (dx >= 1 || dz >= 1));
-    });
-    require(inner_corner == terrain_shape({0, 2, 2, 2}),
-            "Two perpendicular upper neighbors create smooth inner corner ramp");
-    // Rotational symmetry check for inner and outer corners across all 4 orientations:
-    uint8_t outer_rot[4] = {terrain_shape({2, 0, 0, 0}), terrain_shape({0, 2, 0, 0}),
-                            terrain_shape({0, 0, 2, 0}), terrain_shape({0, 0, 0, 2})};
-    float center_top = shape_top(outer_rot[0], .5f, .5f);
-    for (int rot = 1; rot < 4; rot++)
-        require(std::abs(shape_top(outer_rot[rot], .5f, .5f) - center_top) < .0001f,
-                "Outer corner diagonal split is rotationally symmetric at cell center");
-
     auto r=registry(); Settings cfg; std::string error;
     auto empty=[](int,int,int){return std::make_pair(BlockId(0),uint8_t(0));};
     for(int turn=0;turn<4;turn++)for(int side:{1,3})for(int direction:{-1,1}) {
@@ -104,38 +52,6 @@ static void test_ramp_connections() {
         auto sa=a.volume->shapes.find(ia),sb=b.volume->shapes.find(ib);
         require((sa==a.volume->shapes.end())==(sb==b.volume->shapes.end()),"Ramp chunk halo presence agrees");
         if(sa!=a.volume->shapes.end())require(sa->second==sb->second,"Ramp chunk halo geometry agrees");
-    }
-    // Cross-chunk Terrain connectivity and reversibility test (x=31 in chunk 0 and x=32 in chunk 32):
-    {
-        auto tedits = std::make_shared<EditMap>();
-        auto tsurfaces = std::make_shared<AppearanceMap>();
-        (*tedits)[{31, 220, 10}] = r.stone;
-        (*tedits)[{32, 220, 10}] = r.stone;
-        (*tedits)[{32, 221, 10}] = r.stone;
-        Appearance ta;
-        ta.shape = 8; // BlockShape::Terrain
-        ta.painted = true;
-        ta.tint = 0x33aa77;
-        (*tsurfaces)[{31, 220, 10}] = ta;
-        (*tsurfaces)[{32, 220, 10}] = ta;
-        (*tsurfaces)[{32, 221, 10}] = ta;
-        auto chunk_left = build_tile({0, 0, 0}, 1, gen, tedits, tsurfaces, false);
-        auto chunk_right = build_tile({32, 0, 0}, 1, gen, tedits, tsurfaces, false);
-        int iy = 220 - cfg.min_y;
-        size_t idx_left = ((10 + 1) * (chunk_left.volume->height + 2) + (iy + 1)) * 34 + (31 + 1);
-        size_t idx_right_halo = ((10 + 1) * (chunk_right.volume->height + 2) + (iy + 1)) * 34 + (-1 + 1);
-        require(chunk_left.volume->shapes.count(idx_left) && chunk_right.volume->shapes.count(idx_right_halo),
-                "Terrain shapes exist across chunk boundary and halo");
-        require(chunk_left.volume->shapes.at(idx_left) == chunk_right.volume->shapes.at(idx_right_halo) &&
-                    chunk_left.volume->shapes.at(idx_left) == terrain_shape({0, 0, 2, 2}),
-                "Cross-chunk Terrain step resolves identically in both chunks");
-        // Revert Terrain back to Cube (shape = 0) and verify neighbor recalculation:
-        Appearance cube_app = ta;
-        cube_app.shape = 0;
-        (*tsurfaces)[{31, 220, 10}] = cube_app;
-        auto reverted = build_tile({0, 0, 0}, 2, gen, tedits, tsurfaces, false);
-        require(!reverted.volume->shapes.count(idx_left) && reverted.volume->at(31, iy, 10) == r.stone,
-                "Removing Terrain restores cubic geometry while preserving block material");
     }
     // Hierarchical procedural geography verification:
     {

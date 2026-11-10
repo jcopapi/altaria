@@ -8,8 +8,6 @@ uniform bool distance_limited = false;
 uniform vec3 vegetation_center = vec3(0.0);
 uniform float vegetation_limit = 64.0;
 instance uniform float terrain_lod = 0.0;
-instance uniform bool smooth_patch = false;
-instance uniform bool smooth_world_visible = true;
 instance uniform vec3 texture_anchor = vec3(0.0);
 uniform float horizon_start = 4500.0;
 uniform float horizon_end = 5775.0;
@@ -38,9 +36,6 @@ void vertex() {
     side_top=CUSTOM1.w+(local_textures?texture_anchor.y:0.0);
 }
 void fragment() {
-    // World edits use fine smooth patches nearby and existing voxel LODs beyond.
-    // Construction triangles remain visible independently of world LOD coverage.
-    if(smooth_patch && !smooth_world_visible && UV.x<.5)discard;
     if(distance_limited){
         float weight=1.0-smoothstep(vegetation_limit-8.0,vegetation_limit,distance(world_position,vegetation_center));
         if(weight<=0.0||grass_hash(floor(world_position.xz*16.0)+vec2(floor(world_position.y*16.0)))>weight)discard;

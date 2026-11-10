@@ -18,17 +18,5 @@
     "commit": "f7e9ce6fca475731c0a3c115ec29dcfd36886b2a",
     "license": "MIT",
     "managed_by": "FastNoise2 CMake"
-  },
-  "voxel_tools": {
-    "repository": "https://github.com/Zylann/godot_voxel",
-    "commit": "dfb0f81c7fd766f68d78715b2138f4e336cd9737",
-    "version": "1.7.1-dev",
-    "edition": "GDExtension",
-    "api_version": "4.5",
-    "license": "MIT",
-    "local_adaptations": [
-      "native/patches/voxel_cpu_arrays.py: expose upstream CPU surface arrays without RenderingServer readback",
-      "Linux system C++ runtime and entry-point-only export map"
-    ]
   }
 }

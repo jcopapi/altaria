@@ -18,7 +18,7 @@ void PhysicsBlocks::configure(VoxelWorld *w, const EnvironmentSettings &s) {
     player_box.instantiate();
     player_query.instantiate();
     player_query->set_shape(player_box);
-    player_query->set_collision_mask(18);
+    player_query->set_collision_mask(2);
     player_query->set_collide_with_areas(false);
     player_query->set_collide_with_bodies(true);
     player_query->set_margin(.001);
@@ -83,7 +83,7 @@ bool PhysicsBlocks::add(std::vector<std::pair<IVec3, BlockId>> parts, std::vecto
     d.body = memnew(RigidBody3D);
     d.body->set_name("PhysicsDebris");
     d.body->set_collision_layer(2);
-    d.body->set_collision_mask(23);
+    d.body->set_collision_mask(7);
     d.body->set_linear_damp(.08);
     d.body->set_angular_damp(.10);
     d.body->set_use_continuous_collision_detection(true);
@@ -126,7 +126,7 @@ void PhysicsBlocks::_physics_process(double) {
     }
 }
 bool PhysicsBlocks::collides_box(Vector3 minimum, Vector3 maximum) {
-    if (!is_inside_tree() || (debris.empty() && !world->smooth_colliders_active()))
+    if (!is_inside_tree() || debris.empty())
         return false;
     auto size = maximum - minimum;
     if (!player_box->get_size().is_equal_approx(size))
@@ -140,9 +140,6 @@ bool PhysicsBlocks::release_piece(BlockId block, Appearance appearance, Vector3 
         error = "Invalid physical material or body budget reached";
         return false;
     }
-    // A detached piece is no longer part of a connected Terrain field.
-    // Release its preserved source form; never bake a neighbor-dependent profile.
-    appearance.terrain=0;
     auto column = world->generator()->column(int(std::floor(origin.x)), int(std::floor(origin.z)));
     if (!add({{{0, 0, 0}, block}}, {appearance}, origin, column, Vector3()))
         return false;
@@ -186,7 +183,6 @@ bool PhysicsBlocks::release(IVec3 p, bool tree, String &error) {
         auto a = world->appearance_at(c);
         uint8_t shape = world->shape_at(c.x, c.y, c.z);
         unpack_shape(shape,a);
-        a.terrain=0;
         parts.push_back({c, block});
         appearances.push_back(a);
         if (parts.size() > size_t(settings.max_parts)) {

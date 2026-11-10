@@ -36,14 +36,10 @@ namespace godot {
 void AltariaGame::_bind_methods() {
     ClassDB::bind_method(D_METHOD("place_block", "position", "block", "shape", "rotation"),
                          &AltariaGame::place_block, DEFVAL("cube"), DEFVAL(0));
-    ClassDB::bind_method(D_METHOD("terrain_hit", "origin", "direction", "distance"), &AltariaGame::terrain_hit, DEFVAL(100));
-    ClassDB::bind_method(D_METHOD("terrain_built", "id", "mode"), &AltariaGame::terrain_built, DEFVAL(-1));
     ClassDB::bind_method(D_METHOD("get_built_blocks"), &AltariaGame::get_built_blocks);
     ClassDB::bind_method(D_METHOD("remove_built_block", "id"), &AltariaGame::remove_built_block);
     ClassDB::bind_method(D_METHOD("start_world", "name", "seed"), &AltariaGame::start_world);
     ClassDB::bind_method(D_METHOD("start_random_world"), &AltariaGame::start_random_world);
-    ClassDB::bind_method(D_METHOD("open_world", "path"), &AltariaGame::open_world);
-    ClassDB::bind_method(D_METHOD("save_world"), &AltariaGame::save_world);
     ClassDB::bind_method(D_METHOD("shape_voxel", "x", "y", "z", "shape", "rotation"),
                          &AltariaGame::shape_voxel, DEFVAL(0));
     ClassDB::bind_method(D_METHOD("get_temperature", "position"), &AltariaGame::get_temperature);
@@ -69,7 +65,7 @@ String AltariaGame::local(const String &key) const {
         {"name", {"World name", "Nome do mundo"}},
         {"seed", {"Seed (integer or random)", "Seed (inteiro ou random)"}},
         {"quit", {"Quit", "Sair"}},
-        {"back", {"Save & return to worlds", "Salvar e voltar aos mundos"}},
+        {"back", {"New world", "Novo mundo"}},
         {"intro", {"Voxel world generation / FastNoise2", "Geração de mundo voxel / FastNoise2"}},
         {"controls",
          {"WASD move | Mouse look | Shift sprint | Space / Ctrl up / down\nF fly / walk | Space double jump "
@@ -77,7 +73,7 @@ String AltariaGame::local(const String &key) const {
           "WASD mover | Mouse olhar | Shift acelerar | Espaço / Ctrl subir / descer\nF voar / andar | Espaço "
           "pulo duplo a pé | Esq. remover | Dir. colocar\n1–8 / Roda selecionar bloco | F1 ou ` console | "
           "Esc menu"}},
-        {"empty", {"No saved worlds. Create one below.", "Nenhum mundo salvo. Crie um abaixo."}},
+        {"empty", {"Generate a new test world.", "Gere um novo mundo de teste."}},
         {"ready", {"Choose a world or create a new one.", "Selecione um mundo ou crie um novo."}}};
     auto it = texts.find(key.utf8().get_data());
     if (it == texts.end())
@@ -154,9 +150,9 @@ void AltariaGame::build_menu() {
     }
     label(box, local("worlds"));
     world_list = memnew(ItemList);
+    world_list->hide();
     world_list->set_custom_minimum_size(Vector2(510, 115));
     box->add_child(world_list);
-    button(local("load"), callable_mp(this, &AltariaGame::on_load));
     world_name = memnew(LineEdit);
     world_name->set_placeholder(local("name"));
     world_name->set_text("New World");
@@ -207,30 +203,8 @@ void AltariaGame::build_hud() {
     hud->add_child(hotbar_label);
     hud->hide();
 }
-void AltariaGame::refresh_worlds() {
-    world_list->clear();
-    saved_worlds.clear();
-    DirAccess::make_dir_recursive_absolute(ProjectSettings::get_singleton()->globalize_path("user://worlds"));
-    auto dirs = DirAccess::get_directories_at("user://worlds");
-    dirs.sort();
-    for (int i = 0; i < dirs.size(); i++) {
-        String path = "user://worlds/" + dirs[i];
-        if (!FileAccess::file_exists(path + String("/world.json")))
-            continue;
-        String error;
-        auto d = read_json(path + String("/world.json"), error);
-        if (!error.is_empty())
-            continue;
-        d["path"] = path;
-        saved_worlds.push_back(d);
-        world_list->add_item(String(d.get("name", dirs[i])) + "   [" +
-                             String::num_int64(int64_t(d.get("seed", 0))) + "]");
-    }
-    if (!saved_worlds.is_empty())
-        world_list->select(0);
-    else
-        status->set_text(local("empty"));
-}
+void AltariaGame::refresh_worlds() {world_list->clear();}
+
 void AltariaGame::on_language(int64_t index) {
     language = index == 1 ? "pt_BR" : "en";
     Dictionary p;
@@ -253,15 +227,7 @@ void AltariaGame::on_create() {
     }
     start_world(world_name->get_text().strip_edges(), seed);
 }
-void AltariaGame::on_load() {
-    auto indices = world_list->get_selected_items();
-    if (indices.is_empty()) {
-        status->set_text("Select a world first.");
-        return;
-    }
-    Dictionary entry = saved_worlds[indices[0]];
-    load_world(entry["path"]);
-}
+
 void AltariaGame::set_game_input(bool active) {
     if (player)
         player->set_active(active);
@@ -278,19 +244,13 @@ void AltariaGame::on_resume() {
     set_game_input(true);
 }
 void AltariaGame::on_worlds() {
-    if (world && !save_world()) {
-        status->set_text("Save failed. World kept open.");
-        return;
-    }
+
     stop_world();
     build_menu();
     set_game_input(false);
 }
 void AltariaGame::on_quit() {
-    if (world && !save_world()) {
-        status->set_text("Save failed. Check disk permissions before quitting.");
-        return;
-    }
+
     exiting = true;
     get_tree()->quit();
 }
@@ -306,7 +266,6 @@ void AltariaGame::_notification(int what) {
         set_game_input(true);
 }
 void AltariaGame::stop_world() {
-    if(terrain_surface){stage->remove_child(terrain_surface);memdelete(terrain_surface);terrain_surface=nullptr;}
     if (player)
         player->set_active(false);
     world = nullptr;
@@ -317,9 +276,6 @@ void AltariaGame::stop_world() {
     built_world = nullptr;
     selected_built_id = 0;
     selection_shape = -1;
-    selection_preview_hash = 0;
-    selection_preview_shape = -1;
-    selection_preview_cells = 0;
     selection = nullptr;
     sun = nullptr;
     world_environment = nullptr;
@@ -358,16 +314,6 @@ bool AltariaGame::start_world(const String &name, int64_t seed) {
         status->set_text(error);
         return false;
     }
-    if (world && !save_world())
-        return false;
-    String id = String::num_uint64(Time::get_singleton()->get_unix_time_from_system() * 1000000) + "_" +
-                String::num_int64(seed);
-    String path = "user://worlds/" + id;
-    if (DirAccess::make_dir_recursive_absolute(ProjectSettings::get_singleton()->globalize_path(path)) !=
-        OK) {
-        status->set_text("Cannot create world directory.");
-        return false;
-    }
     Dictionary meta;
     meta["format_version"] = 1;
     meta["name"] = name;
@@ -385,19 +331,14 @@ bool AltariaGame::start_world(const String &name, int64_t seed) {
             overlay_ids[String(o.key.c_str())] = o.id;
     meta["overlay_ids"] = overlay_ids;
     meta["entities"] = Array();
-    if (!write_json_atomic(path + String("/world.json"), meta, error)) {
-        status->set_text(error);
-        return false;
-    }
-    return load_world(path);
+    return load_world(meta);
 }
-bool AltariaGame::load_world(const String &path) {
+bool AltariaGame::load_world(const Dictionary &input) {
     if (!data_ready)
         return false;
-    if (world && !save_world())
-        return false;
     String error;
-    Dictionary data = read_json(path + String("/world.json"), error);
+    Dictionary data=input;
+    String path;
     Settings settings;
     Registry registry;
     auto current_blocks = load_block_data(error);
@@ -408,54 +349,7 @@ bool AltariaGame::load_world(const String &path) {
         status->set_text(error.is_empty() ? String("Unsupported or corrupt world file.") : error);
         return false;
     }
-    Dictionary ids = data.get("block_ids", Dictionary());
-    Array keys = ids.keys();
-    for (int i = 0; i < keys.size(); i++) {
-        String key = keys[i];
-        auto it = registry.keys.find(key.utf8().get_data());
-        if (it == registry.keys.end() || it->second != int(ids[key])) {
-            status->set_text("Saved block IDs changed. Restore blocks.json before opening this world.");
-            return false;
-        }
-    }
-    Dictionary overlay_ids = data.get("overlay_ids", Dictionary());
-    Array overlay_keys = overlay_ids.keys();
-    for (int i = 0; i < overlay_keys.size(); i++) {
-        String key = overlay_keys[i];
-        auto it = registry.overlay_keys.find(key.utf8().get_data());
-        if (it == registry.overlay_keys.end() || it->second != int(overlay_ids[key])) {
-            status->set_text("Saved overlay IDs changed. Restore overlays.json first.");
-            return false;
-        }
-    }
-    bool new_ids = false;
-    for (const auto &o : registry.overlays)
-        if (!o.key.empty() && !overlay_ids.has(String(o.key.c_str()))) {
-            overlay_ids[String(o.key.c_str())] = o.id;
-            new_ids = true;
-        }
-    data["overlay_ids"] = overlay_ids;
-    for (const auto &block : registry.blocks)
-        if (!block.key.empty() && !ids.has(String(block.key.c_str()))) {
-            ids[String(block.key.c_str())] = block.id;
-            new_ids = true;
-        }
-    if (new_ids) {
-        data["block_ids"] = ids;
-        if (!write_json_atomic(path + String("/world.json"), data, error)) {
-            status->set_text(error);
-            return false;
-        }
-    }
     auto candidate = memnew(VoxelWorld);
-    Dictionary saved_generation=data.get("generation",Dictionary());
-    bool migrate_surface=saved_generation.has("terrain_smoothing") || saved_generation.has("surface_ramps");
-    if(migrate_surface) {
-        saved_generation.erase("terrain_smoothing");saved_generation.erase("terrain_lod_max");
-        saved_generation.erase("surface_ramps");saved_generation.erase("ramp_lod_max");
-        saved_generation["surface_shapes"]=settings.surface_shapes;
-        data["generation"]=saved_generation;
-    }
     if (!candidate->configure(settings, registry, int(data.get("seed", 0)), path + String("/edits.log"),
                               error)) {
         memdelete(candidate);
@@ -471,19 +365,17 @@ bool AltariaGame::load_world(const String &path) {
     }
     stop_world();
     built_world = candidate_building;
-    world_path = path;
+    world_path = String();
     metadata = data;
     world = candidate;
     sequence = 0;
     generation_reported = false;
-    save_timer = 0;
     stage = memnew(Node3D);
     stage->set_name("WorldSession");
     add_child(stage);
     stage->add_child(world);
     stage->add_child(built_world);
     create_stage();
-    terrain_surface=memnew(TerrainSurface);terrain_surface->configure(world,built_world);stage->add_child(terrain_surface);
     for (auto &b : registry.blocks)
         if (!b.key.empty() && b.placeable && b.id != registry.air)
             hotbar.push_back(b.id);
@@ -532,22 +424,12 @@ bool AltariaGame::load_world(const String &path) {
     player->set_position(spawn);
     player->set_view(float(saved.get("yaw", -.65)), float(saved.get("pitch", -.28)));
     player->set_flying(saved.get("flying", true));
-    // A legacy generated-surface layout may have a different cap height after
-    // migration back to slabs. Preserve the save while restoring safe headroom.
-    for(int attempt=0;migrate_surface && attempt<32;attempt++) {
-        auto bounds=player->body_bounds();
-        if(!world->collides_box(bounds.position,bounds.position+bounds.size) &&
-           !built_world->collides_box(bounds.position,bounds.position+bounds.size))break;
-        spawn.y+=.125f;player->set_position(spawn);
-    }
     world->update_viewer(spawn);
     built_world->update_viewer(spawn);
     physics_blocks = memnew(PhysicsBlocks);
     physics_blocks->configure(world, atmosphere->get_settings());
     stage->add_child(physics_blocks);
     physics_blocks->update_viewer(spawn);
-    if (!physics_blocks->restore(metadata.get("debris", Array()), error))
-        console.print("Debris restore failed: " + error);
     Array entities = metadata.get("entities", Array());
     for (int i = 0; i < entities.size(); i++)
         if (entities[i].get_type() == Variant::DICTIONARY) {
@@ -594,39 +476,13 @@ void AltariaGame::create_stage() {
     stage->add_child(selection);
     selection->hide();
 }
-bool AltariaGame::save_world() {
-    if (!world || !player)
-        return true;
-    Dictionary p;
-    auto position = player->get_position();
-    Array xyz;
-    xyz.push_back(position.x);
-    xyz.push_back(position.y);
-    xyz.push_back(position.z);
-    p["position"] = xyz;
-    p["yaw"] = player->get_rotation().y;
-    p["pitch"] = player->get_pitch();
-    p["flying"] = player->is_flying();
-    metadata["player"] = p;
-    if (atmosphere)
-        metadata["atmosphere"] = atmosphere->save();
-    if (physics_blocks)
-        metadata["debris"] = physics_blocks->save();
-    metadata["last_played"] = Time::get_singleton()->get_datetime_string_from_system(true);
-    String error;
-    if (!write_json_atomic(world_path + String("/world.json"), metadata, error)) {
-        console.print(error);
-        return false;
-    }
-    return true;
-}
+
 int64_t AltariaGame::place_block(Vector3 position, int block, const String &name, int rotation) {
     if (!built_world)
         return 0;
     int shape = shape_id(name.utf8().get_data());
     String error;
-    auto id = built_world->place(position, block, shape==8 ? 0 : shape, rotation, error);
-    if(id && shape==8 && !terrain_built(id,1)){built_world->remove(id,error);return 0;}
+    auto id = built_world->place(position, block, shape, rotation, error);
     if (!id)
         console.print(error);
     return int64_t(id);
@@ -658,34 +514,16 @@ uint64_t AltariaGame::target_built() const {
 bool AltariaGame::build_against(Vector3 hit, Vector3 normal, Vector3 source, uint8_t source_shape) {
     if (hotbar.empty())
         return false;
-    auto from = shape_bounds(source_shape), to = shape_bounds(pack_shape(selected_shape==int(BlockShape::Terrain)?0:selected_shape, shape_rotation));
+    auto from = shape_bounds(source_shape), to = shape_bounds(pack_shape(selected_shape, shape_rotation));
     Vector3 preferred = source + Vector3((from.first[0] + from.second[0] - to.first[0] - to.second[0]) * .5f,
                                          (from.first[1] + from.second[1] - to.first[1] - to.second[1]) * .5f,
                                          (from.first[2] + from.second[2] - to.first[2] - to.second[2]) * .5f);
     String error;
     auto id = built_world->attach(hit, normal, preferred, source, source_shape, hotbar[selected_block],
                                   selected_shape, shape_rotation, error);
-    if(id && selected_shape==8 && !terrain_surface->can_apply(id,{})){built_world->remove(id,error);id=0;error="Terrain needs an exposed block with a normal base.";}
     if (!id)
         console.print(error);
     return id != 0;
-}
-bool AltariaGame::build_over_terrain(uint64_t id,IVec3 cell) {
-    if(hotbar.empty() || selected_shape==8 || !terrain_surface)return false;
-    auto base=terrain_surface->base_for(id,cell);if(!base.valid)return false;
-    // Fill the cap's cell from the ordinary support plane, never from the
-    // curved hit height. This punches through/replaces the cosmetic surface.
-    String error;
-    if(id) {
-        bool ok=built_world->replace_cap(id,hotbar[selected_block],selected_shape,shape_rotation,error);
-        if(!ok)console.print(error);return ok;
-    }
-    // Use the same player occupancy guard as ordinary construction.
-    auto body=player->body_bounds();auto player_lo=body.position,player_hi=body.position+body.size;
-    Vector3 p(cell.x,cell.y,cell.z);
-    if(shape_intersects(pack_shape(selected_shape,shape_rotation),{player_lo.x-p.x,player_lo.y-p.y,player_lo.z-p.z},{player_hi.x-p.x,player_hi.y-p.y,player_hi.z-p.z}))return false;
-    if(!set_voxel(cell.x,cell.y,cell.z,hotbar[selected_block]))return false;
-    return selected_shape==0 || shape_voxel(cell.x,cell.y,cell.z,String(shape_name(selected_shape)),shape_rotation);
 }
 bool AltariaGame::release_built(uint64_t id) {
     auto b = built_world ? built_world->get(id) : nullptr;
@@ -704,7 +542,7 @@ bool AltariaGame::release_built(uint64_t id) {
         console.print(error);
         return false;
     }
-    return save_world();
+    return true;
 }
 bool AltariaGame::set_voxel(int x, int y, int z, int block) {
     if (!world || block < 0 || block > 4095)
@@ -716,10 +554,6 @@ bool AltariaGame::set_voxel(int x, int y, int z, int block) {
         return false;
     }
     auto appearance=world->appearance_at({x,y,z});
-    if(world->terrain_enabled({x,y,z})) {
-        appearance.terrain=0;
-        if(!world->edit_surface({1,++sequence,{x,y,z},appearance},error)){console.print(error);return false;}
-    }
     if (block != world->registry().air && appearance.shape != 255)
         return shape_voxel(x, y, z, "cube", 0);
     return true;
@@ -731,7 +565,6 @@ bool AltariaGame::shape_voxel(int x, int y, int z, const String &name, int rotat
     int shape = shape_id(name.utf8().get_data());
     if (!world || shape < 0 || rotation < 0 || rotation > 3)
         return false;
-    if (shape == int(BlockShape::Terrain)) return toggle_terrain_at({x,y,z},1);
     auto a = world->appearance_at({x, y, z});
     a.shape = shape;
     a.rotation = rotation;
@@ -740,33 +573,6 @@ bool AltariaGame::shape_voxel(int x, int y, int z, const String &name, int rotat
         console.print(error);
         return false;
     }
-    return true;
-}
-Dictionary AltariaGame::terrain_hit(Vector3 origin,Vector3 direction,double distance) const {
-    Dictionary d;if(!terrain_surface || !origin.is_finite() || !direction.is_finite() || direction.length_squared()<.0001 || distance<0 || distance>10000)return d;
-    auto hit=terrain_surface->pick(origin,direction.normalized(),distance);if(!hit.hit)return d;
-    d["position"]=origin+direction.normalized()*hit.distance;d["normal"]=hit.normal;d["built_id"]=int64_t(hit.built);
-    d["cell"]=Vector3i(hit.cell.x,hit.cell.y,hit.cell.z);d["block"]=int(hit.block);
-    auto base=terrain_surface->base_for(hit.built,hit.cell);d["has_base"]=base.valid;d["base_position"]=base.position;d["cap_origin"]=base.cap_position;return d;
-}
-bool AltariaGame::terrain_built(int64_t id,int mode) {
-    auto b=built_world ? built_world->get(id) : nullptr;
-    if(!b || mode < -1 || mode > 1)return false;
-    auto a=b->appearance;a.terrain=mode<0 ? (a.terrain>0 ? 0:1) : mode;
-    if(a.terrain>0 && !terrain_surface->can_apply(id,{})){console.print("Terrain needs an exposed block with a normal base.");return false;}
-    String error;
-    if(!built_world->appearance(id,a,error)){console.print(error);return false;}
-    return true;
-}
-bool AltariaGame::toggle_terrain_at(IVec3 cell, int mode) {
-    if (!world)
-        return false;
-    auto a = world->appearance_at(cell);
-    if (!world->registry().get(world->block_at(cell.x,cell.y,cell.z)).solid) return false;
-    a.terrain = mode < 0 ? (world->terrain_enabled(cell) ? 0 : 1) : (mode != 0 ? 1 : 0);
-    if(a.terrain>0 && !terrain_surface->can_apply(0,cell)){console.print("Terrain needs an exposed block with a normal base.");return false;}
-    String error;
-    if (!world->edit_surface({1,++sequence,cell,a},error)) { console.print(error); return false; }
     return true;
 }
 Dictionary AltariaGame::get_temperature(Vector3 p) const {
@@ -804,7 +610,7 @@ bool AltariaGame::release_voxel(int x, int y, int z, bool tree) {
         console.print(error);
         return false;
     }
-    return save_world();
+    return true;
 }
 static bool parse_hex_color(const String &value, uint32_t &out) {
     String hex = value.begins_with("#") ? value.substr(1) : value;
@@ -886,7 +692,6 @@ Dictionary AltariaGame::get_voxel_appearance(int x, int y, int z) const {
     d["brightness"] = a.brightness / 1000.;
     d["overlay_id"] = a.overlay;
     d["decoration_id"] = a.decoration;
-    d["terrain"] = world->terrain_enabled({x,y,z});
     d["original_shape"] = String(a.shape==255 ? "generated" : shape_name(a.shape));
     auto shape = world->shape_at(x, y, z);
     d["shape"] = shape_name(shape_type(shape));
@@ -894,13 +699,6 @@ Dictionary AltariaGame::get_voxel_appearance(int x, int y, int z) const {
     d["shape_code"] = int(shape);
     auto ramp=ramp_spec(shape);
     if(ramp.valid) {d["ramp_corner"]=ramp_corner_name(ramp.corner);d["ramp_rise"]=ramp.rise();d["ramp_low"]=ramp.low();}
-    auto terrain = terrain_spec(shape);
-    if (terrain.valid) {
-        Array h;
-        for (int v : terrain.h)
-            h.push_back(v);
-        d["terrain_heights"] = h;
-    }
     return d;
 }
 RayHit AltariaGame::target_block() const {
@@ -911,58 +709,26 @@ RayHit AltariaGame::target_block() const {
     auto dir = -camera->get_global_basis().get_column(2);
     auto hit=raycast_shapes(
         {origin.x, origin.y, origin.z}, {dir.x, dir.y, dir.z}, reach,
-        [this](int x, int y, int z) { return world->terrain_meshed({x,y,z}) ? world->registry().air : world->block_at(x, y, z); },
+        [this](int x, int y, int z) { return world->block_at(x, y, z); },
         [this](int x, int y, int z) { return world->shape_at(x, y, z); }, world->registry());
-    if(terrain_surface) {auto smooth=terrain_surface->pick(origin,dir,reach);
-        if(smooth.hit && !smooth.built && (!hit.hit || smooth.distance<hit.distance))
-            hit={true,smooth.cell,smooth.cell,smooth.distance,smooth.block};
-    }
     return hit;
 }
 BuiltWorld::Hit AltariaGame::pick_built(Vector3 origin,Vector3 direction,float distance) const {
     auto hit=built_world->pick(origin,direction,distance);
-    if(terrain_surface){auto smooth=terrain_surface->pick(origin,direction,distance);
-        if(smooth.hit && smooth.built && smooth.distance<hit.distance)
-            hit={smooth.built,smooth.distance,{smooth.normal.x,smooth.normal.y,smooth.normal.z}};
-    }
     return hit;
 }
-void AltariaGame::show_smooth_selection(uint64_t built,IVec3 cell) {
-    if(!terrain_surface)return;
-    selection->set_mesh(terrain_surface->selection_mesh(built,cell));
-    selection->set_global_transform(Transform3D());selection_shape=-2;selection_preview_hash=0;
-    selection->set_visible(!menu->is_visible() && !console.is_open());
-}
 void AltariaGame::show_selection(BlockId block, uint8_t shape, const Transform3D &transform) {
-    if (selection_shape != shape || selection_preview_hash != 0) {
+    if(selection_shape!=shape) {
         Appearance a;
         unpack_shape(shape,a);
         selection->set_mesh(world->block_mesh({{{0, 0, 0}, block}}, {a}, Column()));
         selection_shape = shape;
-        selection_preview_hash = 0;
-        selection_preview_shape = int(shape);
-        selection_preview_cells = 1;
     }
     // Expand in the selected cell's local space so rotated physical forms fit exactly.
     selection->set_global_transform(transform * Transform3D(Basis().scaled(Vector3(1.006f, 1.006f, 1.006f)),
                                                             Vector3(-.003f, -.003f, -.003f)));
     selection->set_visible(!menu->is_visible() && !console.is_open());
 }
-void AltariaGame::show_smooth_preview(uint64_t built,IVec3 cell) {
-    auto mesh=terrain_surface ? terrain_surface->preview(built,cell) : Ref<ArrayMesh>();
-    if(mesh.is_valid()) {
-        selection->set_mesh(mesh);selection->set_global_transform(Transform3D());selection_shape=-3;
-        auto state=terrain_surface->stats();selection_preview_hash=int64_t(state["terrain_preview_version"]);
-        selection_preview_cells=state["terrain_preview_cells"];selection_preview_shape=8;
-        selection->set_visible(!menu->is_visible() && !console.is_open());
-    } else if(built) {
-        auto source=built_world->get(built);if(!source)return;
-        if(built_world->terrain_meshed(built))show_smooth_selection(built,{});
-        else {auto p=source->position();show_selection(source->block,source->shape(),Transform3D(Basis(),Vector3(p[0],p[1],p[2])));}
-    } else if(world->terrain_meshed(cell))show_smooth_selection(0,cell);
-    else show_selection(world->block_at(cell.x,cell.y,cell.z),world->shape_at(cell.x,cell.y,cell.z),Transform3D(Basis(),Vector3(cell.x,cell.y,cell.z)));
-}
-void AltariaGame::show_terrain_preview(IVec3 center,BlockId) {show_smooth_preview(0,center);}
 void AltariaGame::update_target(bool edit, bool place) {
     if (!world || !player || !selection)
         return;
@@ -980,20 +746,12 @@ void AltariaGame::update_target(bool edit, bool place) {
         selected_built_id = piece->id;
         Vector3 origin(p[0], p[1], p[2]);
         uint8_t form = piece->shape();
-        if(selected_shape==int(BlockShape::Terrain))show_smooth_preview(constructed.id,{});
-        else if(built_world->terrain_meshed(constructed.id))show_smooth_selection(constructed.id,{});
-        else show_selection(piece->block,form,Transform3D(Basis(),origin));
+        show_selection(piece->block,form,Transform3D(Basis(),origin));
         if (edit) {
             if (place) {
-                if (selected_shape == int(BlockShape::Terrain) &&
-                    !Input::get_singleton()->is_physical_key_pressed(Key::KEY_SHIFT)) {
-                    terrain_built(constructed.id);
-                } else if(piece->appearance.terrain>0 && selected_shape!=8 && terrain_surface->can_apply(constructed.id,{}))
-                    build_over_terrain(constructed.id,{});
-                else
-                    build_against(camera->get_global_position() + direction * constructed.distance,
-                                  Vector3(constructed.normal[0], constructed.normal[1], constructed.normal[2]),
-                                  origin, form);
+                build_against(camera->get_global_position() + direction * constructed.distance,
+                              Vector3(constructed.normal[0], constructed.normal[1], constructed.normal[2]),
+                              origin, form);
             } else {
                 String error;
                 if (!built_world->remove(constructed.id, error))
@@ -1013,9 +771,7 @@ void AltariaGame::update_target(bool edit, bool place) {
             selection->hide();
         if (edit && !place) {
             String error;
-            if (physics_blocks->detach(physical, direction * 2.0f, error))
-                save_world();
-            else
+            if (!physics_blocks->detach(physical, direction * 2.0f, error))
                 console.print(error);
         }
         return;
@@ -1024,30 +780,16 @@ void AltariaGame::update_target(bool edit, bool place) {
     if (!hit.hit)
         return;
     auto shape = world->shape_at(hit.cell.x, hit.cell.y, hit.cell.z);
-    if (selected_shape == int(BlockShape::Terrain)) show_terrain_preview(hit.cell,hit.block);
-    else if (world->terrain_meshed(hit.cell)) show_smooth_selection(0,hit.cell);
-    else
-        show_selection(hit.block, shape, Transform3D(Basis(), Vector3(hit.cell.x, hit.cell.y, hit.cell.z)));
+    show_selection(hit.block, shape, Transform3D(Basis(), Vector3(hit.cell.x, hit.cell.y, hit.cell.z)));
     if (edit) {
         if (place) {
-            if (selected_shape == int(BlockShape::Terrain) &&
-                !Input::get_singleton()->is_physical_key_pressed(Key::KEY_SHIFT)) {
-                toggle_terrain_at(hit.cell);
-                return;
-            }
             if (hotbar.empty())
                 return;
-            if(world->terrain_enabled(hit.cell) && selected_shape!=8 && terrain_surface->can_apply(0,hit.cell)) {
-                build_over_terrain(0,hit.cell);return;
-            }
             auto position = camera->get_global_position() + direction * hit.distance;
             auto source = Vector3(hit.cell.x, hit.cell.y, hit.cell.z);
             std::array<float, 3> normal;
             auto local = camera->get_global_position() - source;
-            if(world->terrain_meshed(hit.cell) && terrain_surface) {
-                auto smooth=terrain_surface->pick(camera->get_global_position(),direction,reach);
-                normal={smooth.normal.x,smooth.normal.y,smooth.normal.z};
-            } else shape_ray(shape, {local.x, local.y, local.z}, {direction.x, direction.y, direction.z}, reach,&normal);
+            shape_ray(shape, {local.x, local.y, local.z}, {direction.x, direction.y, direction.z}, reach,&normal);
             build_against(position, Vector3(normal[0], normal[1], normal[2]), source, shape);
         } else if (world->registry().get(hit.block).wood)
             release_voxel(hit.cell.x, hit.cell.y, hit.cell.z, true);
@@ -1103,7 +845,7 @@ void AltariaGame::update_hud() {
     hotbar_label->set_text(
         bar + "\nShape: " + String(shape_name(selected_shape)) + " | rotation " +
         String::num_int64(shape_rotation * 90) +
-        "° | Hold R + wheel: shape | T: terrain | Q: rotate | G: physics | LMB: cut tree / detach part\n" +
+        "° | Hold R + wheel: shape | Q: rotate | G: physics | LMB: cut tree / detach part\n" +
         local("controls"));
 }
 void AltariaGame::_process(double delta) {
@@ -1113,15 +855,11 @@ void AltariaGame::_process(double delta) {
     built_world->update_viewer(player->get_position());
     physics_blocks->update_viewer(player->get_position());
     hud_timer += delta;
-    save_timer += delta;
     if (hud_timer > .2) {
         hud_timer = 0;
         update_hud();
     }
-    if (save_timer > world->settings().autosave_seconds) {
-        save_timer = 0;
-        save_world();
-    }
+
     update_target();
 }
 void AltariaGame::on_console_gui_input(const Ref<InputEvent> &event) {
@@ -1163,15 +901,6 @@ void AltariaGame::_input(const Ref<InputEvent> &event) {
             return;
         if (k == Key::KEY_Q)
             shape_rotation = (shape_rotation + 1) % 4;
-        if (k == Key::KEY_T) {
-            if (auto id = target_built()) {
-                terrain_built(id);
-            } else {
-                auto hit = target_block();
-                if (hit.hit)
-                    toggle_terrain_at(hit.cell);
-            }
-        }
         if (k == Key::KEY_G) {
             auto id = target_built();
             if (id)
@@ -1232,11 +961,11 @@ String AltariaGame::execute_command(const String &text) {
         command = command.substr(1);
     if (command == "help")
         return "world new [seed] | fullbright [on|off] | fly [on|off] | speed <1..150> | tp <x> <y> "
-               "<z>\nseed | stats | save | "
+               "<z>\nseed | stats | "
                "paint <#RRGGBB|reset> [preserve brightness] | overlay <key|clear|reset> | biome [key]\nblock "
                "<namespace:key> | spawn <namespace:key> | fog <#RRGGBB> [start end] | fog biome\noutline "
                "<on|off> | pixelation <on|off> | godrays <on|off> | help\nshape <name> | shape at x y z <name> "
-               "[rotation] | terrain [at x y z] [on|off|toggle] | cut | physics [at x y z|clear]\ntime "
+               "[rotation] | cut | physics [at x y z|clear]\ntime "
                "<hour|pause|resume> | weather <clear|rain|storm> | wind <0..3> | temperature | light <#RRGGBB> "
                "[energy radius]";
     if (command == "world") {
@@ -1261,7 +990,7 @@ String AltariaGame::execute_command(const String &text) {
             set_game_input(false);
         }
         return "Generating new world. Seed: " + String::num_int64(seed) +
-               ". Previous world saved; timing appears on completion.";
+               ". Timing appears on completion.";
     }
     if (!world)
         return "No world is open.";
@@ -1328,44 +1057,7 @@ String AltariaGame::execute_command(const String &text) {
         auto camera = player->get_camera();
         atmosphere->add_light(camera->get_global_position() - camera->get_global_basis().get_column(2) * 3,
                               Color::html(args[1]), energy, radius);
-        save_world();
         return "Colored light placed.";
-    }
-    if (command == "terrain") {
-        IVec3 p;
-        int mode = -1;
-        if (args.size() >= 5 && args[1] == "at" && args[2].is_valid_int() && args[3].is_valid_int() &&
-            args[4].is_valid_int()) {
-            int64_t x = args[2].to_int(), y = args[3].to_int(), z = args[4].to_int();
-            if (std::abs(x) > 1000000 || std::abs(z) > 1000000 || y <= world->settings().min_y ||
-                y >= world->settings().max_y)
-                return "Coordinates outside world bounds.";
-            p = {int(x), int(y), int(z)};
-            if (args.size() == 6) {
-                if (args[5] == "on")
-                    mode = 1;
-                else if (args[5] == "off")
-                    mode = 0;
-                else if (args[5] != "toggle")
-                    return "Usage: terrain [at x y z] [on|off|toggle]";
-            } else if (args.size() > 6)
-                return "Usage: terrain [at x y z] [on|off|toggle]";
-        } else if (args.size() <= 2) {
-            if (args.size() == 2) {
-                if (args[1] == "on")
-                    mode = 1;
-                else if (args[1] == "off")
-                    mode = 0;
-                else if (args[1] != "toggle")
-                    return "Usage: terrain [at x y z] [on|off|toggle]";
-            }
-            auto hit = target_block();
-            if (!hit.hit)
-                return "Look at a block within reach, or use terrain at x y z [on|off|toggle].";
-            p = hit.cell;
-        } else
-            return "Usage: terrain [at x y z] [on|off|toggle]";
-        return toggle_terrain_at(p, mode) ? "Terrain modifier updated." : "Invalid supporting block.";
     }
     if (command == "shape") {
         if (args.size() >= 2 && args[1] == "at") {
@@ -1383,7 +1075,7 @@ String AltariaGame::execute_command(const String &text) {
                        : "Invalid shape or supporting block.";
         }
         if (args.size() != 2)
-            return "Usage: shape <cube|slab|vertical_slab|ramp|stairs|roof|pillar|mini_pillar|terrain>";
+            return "Usage: shape <cube|slab|vertical_slab|ramp|stairs|roof|pillar|mini_pillar>";
         int value = shape_id(args[1].utf8().get_data());
         if (value < 0)
             return "Unknown shape.";
@@ -1393,8 +1085,7 @@ String AltariaGame::execute_command(const String &text) {
     if (command == "cut" || command == "physics") {
         if (command == "physics" && args.size() == 2 && args[1] == "clear") {
             physics_blocks->clear();
-            save_world();
-            return "Physics debris cleared.";
+                return "Physics debris cleared.";
         }
         IVec3 p;
         if (args.size() == 5 && args[1] == "at" && args[2].is_valid_int() && args[3].is_valid_int() &&
@@ -1569,8 +1260,7 @@ String AltariaGame::execute_command(const String &text) {
         return "Seed: " + String::num_int64(int64_t(metadata["seed"]));
     if (command == "stats")
         return Variant(get_debug_state()).stringify();
-    if (command == "save")
-        return save_world() ? String("World saved.") : String("Save failed.");
+
     if (command == "speed") {
         float speed = 0;
         if (args.size() != 2 || !number(args[1], speed) || speed < 1 || speed > 150)
@@ -1671,7 +1361,6 @@ Dictionary AltariaGame::get_debug_state() const {
         d.merge(built_world->stats(), true);
         d["pending"] = int(d["pending"]) + int(d["building_pending"]);
     }
-    if(terrain_surface) {d.merge(terrain_surface->stats(),true);d["pending"]=int(d["pending"])+int(d["terrain_pending"]);}
     d["selection_built_id"] = int64_t(selected_built_id);
     d["selection_visible"] = selection && selection->is_visible_in_tree();
     d["selection_physical"] = selection_is_physical;
@@ -1679,8 +1368,6 @@ Dictionary AltariaGame::get_debug_state() const {
         d["selection_transform"] = selection->get_global_transform();
     d["selected_shape"] = shape_name(selected_shape);
     d["shape_rotation"] = shape_rotation;
-    d["selection_preview_shape"] = selection_preview_shape;
-    d["selection_preview_cells"] = selection_preview_cells;
     if (player) {
         d["player_position"] = player->get_position();
         d["flying"] = player->is_flying();
@@ -1716,8 +1403,6 @@ Dictionary AltariaGame::get_debug_state() const {
     return d;
 }
 void AltariaGame::_exit_tree() {
-    if (world && !exiting)
-        save_world();
     if (player)
         player->set_active(false);
     if (world) {

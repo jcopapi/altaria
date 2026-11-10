@@ -14,43 +14,7 @@ static IVec3 region_of(const BuiltBlock &b) {
     auto p = b.position();
     return {int(std::floor(p[0] / 32)) * 32, 0, int(std::floor(p[2] / 32)) * 32};
 }
-static uint64_t hash_value(uint64_t v) {
-    v = (v ^ (v >> 30)) * 0xbf58476d1ce4e5b9ULL;
-    v = (v ^ (v >> 27)) * 0x94d049bb133111ebULL;
-    return v ^ (v >> 31);
-}
-static uint64_t checksum(char op, const BuiltBlock &b) {
-    uint64_t h = hash_value(b.id) ^ uint64_t(op);
-    uint64_t values[] = {
-        uint32_t(b.origin8.x),   uint32_t(b.origin8.y), uint32_t(b.origin8.z),   b.block,
-        b.appearance.tint,       b.appearance.preserve, b.appearance.brightness, b.appearance.overlay,
-        b.appearance.decoration, b.appearance.painted,  b.appearance.shape,      b.appearance.rotation};
-    for (auto value : values)
-        h = hash_value(h ^ value);
-    if (b.appearance.terrain != -1) h = hash_value(h ^ (0x54455200ULL + unsigned(b.appearance.terrain)));
-    return h;
-}
-bool BuiltWorld::record(char op, const BuiltBlock &b, String &error) {
-    FILE *f = std::fopen(journal.c_str(), "ab");
-    if (!f) {
-        error = "Cannot open construction journal";
-        return false;
-    }
-    auto &a = b.appearance;
-    int n =
-        std::fprintf(f, "B2 %c %llu %d %d %d %u %u %u %u %u %u %u %u %u %u %llu\n", op, (unsigned long long)b.id,
-                     b.origin8.x, b.origin8.y, b.origin8.z, unsigned(b.block), a.tint, unsigned(a.preserve),
-                     unsigned(a.brightness), unsigned(a.overlay), unsigned(a.decoration), unsigned(a.painted),
-                     unsigned(a.shape), unsigned(a.rotation), unsigned(a.terrain+1), (unsigned long long)checksum(op, b));
-    bool ok = n > 0 && std::fflush(f) == 0;
-    if (std::fclose(f) != 0)
-        ok = false;
-    if (!ok)
-        error = "Cannot persist construction change";
-    return ok;
-}
 void BuiltWorld::apply(char op, const BuiltBlock &b) {
-    if(op!='P' || b.appearance.terrain<=0)meshed_terrain.erase(b.id);
     if (auto previous = get(b.id)) {
         auto region = region_of(*previous);
         auto &ids = regions[region];
@@ -70,36 +34,14 @@ void BuiltWorld::apply(char op, const BuiltBlock &b) {
     refresh_world_ramps(b.position());
     store.refresh_connections(b.position());
     mark_shape_changes();
-    if(terrain_callback){auto p=b.position();terrain_callback(Vector3(p[0],p[1],p[2]));}
 }
 void BuiltWorld::refresh_world_ramps(Point center) {
     int cx=int(std::floor(center[0])),cz=int(std::floor(center[2])),cy=int(std::floor(center[1]));
     for(int z=cz-1;z<=cz+1;z++)for(int x=cx-1;x<=cx+1;x++)for(int y=cy-1;y<=cy+1;y++) {
         IVec3 p{x,y,z};
-        if(world->appearance_at(p).terrain>0){world->set_ramp_connection(p,255);continue;}
         auto id=world->block_at(x,y,z);
         if(!world->registry().get(id).solid) {world->set_ramp_connection(p,255);continue;}
         auto base=world->base_shape_at(x,y,z);
-        if (shape_type(base) == 8) {
-            auto shape = connect_terrain([&](int dx, int dy, int dz) {
-                int qx = x + dx, qy = y + dy, qz = z + dz;
-                BlockId tid = world->block_at(qx, qy, qz);
-                const auto &def = world->registry().get(tid);
-                if (def.solid && !def.foliage && !def.wood)
-                    return true;
-                for (auto bid : store.nearby({float(qx) + .1f, float(qy) + .1f, float(qz) + .1f},
-                                             {float(qx) + .9f, float(qy) + .9f, float(qz) + .9f}))
-                    if (world->registry().get(store.blocks.at(bid).block).solid)
-                        return true;
-                return false;
-            });
-            for(auto other:store.nearby({float(x),float(y),float(z)},{float(x+1),float(y+1),float(z+1)})) {
-                auto &block=store.blocks.at(other);
-                if(shapes_overlap(shape,{float(x),float(y),float(z)},block.shape(),block.position())) {shape=world->shape_at(x,y,z);break;}
-            }
-            world->set_ramp_connection(p,shape==world->natural_shape_at(x,y,z) ? uint8_t(255) : shape);
-            continue;
-        }
         auto source=ramp_spec(base);
         if(!source.valid) {world->set_ramp_connection(p,255);continue;}
         auto shape=connect_ramp(base,[&](int dx,int dz){return store.neighbor_ramp((x+dx)*8,(z+dz)*8,y+source.low());});
@@ -124,80 +66,7 @@ bool BuiltWorld::configure(VoxelWorld *w, const String &path, String &error) {
         Point center{float(p.x),float(p.y),float(p.z)};
         refresh_world_ramps(center);store.refresh_connections(center);mark_shape_changes();
     });
-    journal = ProjectSettings::get_singleton()->globalize_path(path).utf8().get_data();
-    FILE *f = std::fopen(journal.c_str(), "rb");
-    if (!f) {
-        if (errno == ENOENT)
-            return true;
-        error = "Cannot read construction journal";
-        return false;
-    }
-    char line[768];
-    uintmax_t valid = 0;
-    while (std::fgets(line, sizeof(line), f)) {
-        size_t length = std::strlen(line);
-        if (!length || line[length - 1] != '\n') {
-            bool torn = std::feof(f);
-            std::fclose(f);
-            if (!torn) {
-                error = "Oversized construction record";
-                return false;
-            }
-            std::error_code ec;
-            std::filesystem::resize_file(journal, valid, ec);
-            if (ec) {
-                error = "Cannot recover interrupted construction";
-                return false;
-            }
-            return true;
-        }
-        valid += length;
-        char op, extra;
-        unsigned long long id, sum;
-        long long x, y, z;
-        unsigned block, tint, preserve, brightness, overlay, deco, paint, shape, rotation, terrain=0;
-        bool v2 = std::strncmp(line,"B2 ",3)==0;
-        int count;
-        if (v2) count=std::sscanf(line,"B2 %c %llu %lld %lld %lld %u %u %u %u %u %u %u %u %u %u %llu %c", &op,
-                                  &id,&x,&y,&z,&block,&tint,&preserve,&brightness,&overlay,&deco,&paint,&shape,&rotation,&terrain,&sum,&extra);
-        else count = std::sscanf(line, "B1 %c %llu %lld %lld %lld %u %u %u %u %u %u %u %u %u %llu %c", &op,
-                                &id, &x, &y, &z, &block, &tint, &preserve, &brightness, &overlay, &deco,
-                                &paint, &shape, &rotation, &sum, &extra);
-        if (count != (v2 ? 16 : 15) || terrain > 2 || (op != 'P' && op != 'D') || !id || id > 1000000000000ULL ||
-            std::abs(x) > 8000000 || std::abs(z) > 8000000 || y <= world->settings().min_y * 8 ||
-            y >= world->settings().max_y * 8 || block > 4095 || !world->registry().valid(block) ||
-            block == world->registry().air || tint > 0xffffff || preserve > 1000 || brightness > 2000 ||
-            overlay > 65535 || deco > 65535 || paint > 1 || !valid_shape_id(shape) || rotation > 3) {
-            std::fclose(f);
-            error = "Corrupt construction journal";
-            return false;
-        }
-        for (auto value : {overlay, deco})
-            if (value != 65535 && (value >= world->registry().overlays.size() ||
-                                   world->registry().overlays[value].key.empty())) {
-                std::fclose(f);
-                error = "Unknown construction overlay";
-                return false;
-            }
-        BuiltBlock b{id,
-                     {int(x), int(y), int(z)},
-                     BlockId(block),
-                     {tint, uint16_t(preserve), uint16_t(brightness), uint16_t(overlay), uint16_t(deco),
-                      paint != 0, uint8_t(shape), uint8_t(rotation)}};
-        b.appearance.terrain = int8_t(terrain)-1;
-        if (checksum(op, b) != sum) {
-            std::fclose(f);
-            error = "Construction checksum mismatch";
-            return false;
-        }
-        if (!v2 && b.appearance.shape==8) { b.appearance.shape=0; b.appearance.terrain=1; }
-        apply(op, b);
-    }
-    bool ok = !std::ferror(f);
-    std::fclose(f);
-    if (!ok)
-        error = "Cannot read construction journal";
-    return ok;
+    return true;
 }
 const BuiltBlock *BuiltWorld::get(uint64_t id) const {
     auto it = store.blocks.find(id);
@@ -216,7 +85,6 @@ uint64_t BuiltWorld::place(Vector3 p, int block, int shape, int rotation, String
     b.block = block;
     b.appearance.shape = shape;
     b.appearance.rotation = rotation;
-    if (shape==8) { b.appearance.shape=0; b.appearance.terrain=1; }
     b.connected_shape=store.connection_shape(b,&b);
     if (guard && !guard(b)) {
         error = "Building intersects player";
@@ -232,14 +100,12 @@ uint64_t BuiltWorld::place(Vector3 p, int block, int shape, int rotation, String
         error = String(message.c_str());
         return 0;
     }
-    if (!record('P', b, error))
-        return 0;
     apply('P', b);
     return b.id;
 }
 uint64_t BuiltWorld::attach(Vector3 hit, Vector3 normal, Vector3 preferred, Vector3 source,
                             uint8_t source_shape, int block, int shape, int rotation, String &error) {
-    int placement_shape=shape==int(BlockShape::Terrain) ? 0 : shape;
+    int placement_shape=shape;
     if(shape_type(pack_shape(shape,rotation))==3 && shape_type(source_shape)==1) {
         bool top=normal.y>.99f;
         shape=ramp_shape(top ? RampScale::Half : RampScale::Raised,RampCorner::Straight,0);
@@ -247,7 +113,7 @@ uint64_t BuiltWorld::attach(Vector3 hit, Vector3 normal, Vector3 preferred, Vect
         if(std::abs(normal.x)>.5f || std::abs(normal.z)>.5f)
             rotation=normal.x>.5f ? 0 : normal.z>.5f ? 1 : normal.x<-.5f ? 2 : 3;
     }
-    if(shape!=int(BlockShape::Terrain))placement_shape=shape;
+    placement_shape=shape;
     // Try centered support first, then nearby half-block offsets for narrow stair
     // treads and pillars. Contact is solved from the clicked face's actual plane.
     int axis = 0;
@@ -277,17 +143,6 @@ uint64_t BuiltWorld::attach(Vector3 hit, Vector3 normal, Vector3 preferred, Vect
         }
     return 0;
 }
-bool BuiltWorld::replace_cap(uint64_t id,int block,int shape,int rotation,String &error) {
-    auto source=get(id);if(!source || source->appearance.terrain<=0 || !world->registry().valid(block) || !world->registry().get(block).placeable || !valid_shape_id(shape) || shape==8 || rotation<0 || rotation>3)return false;
-    auto replacement=*source;replacement.block=block;replacement.appearance=Appearance();
-    replacement.appearance.shape=shape;replacement.appearance.rotation=rotation;replacement.appearance.terrain=0;
-    replacement.connected_shape=store.connection_shape(replacement,&replacement);
-    if(guard && !guard(replacement)){error="Building intersects player";return false;}
-    std::string message;
-    if(!store.can_place(replacement,world->registry(),world->settings(),[this](int x,int y,int z){return std::make_pair(world->block_at(x,y,z),world->shape_at(x,y,z));},message)){error=String(message.c_str());return false;}
-    if(!record('P',replacement,error))return false;
-    apply('P',replacement);return true;
-}
 bool BuiltWorld::remove(uint64_t id, String &error) {
     auto b = get(id);
     if (!b) {
@@ -295,8 +150,6 @@ bool BuiltWorld::remove(uint64_t id, String &error) {
         return false;
     }
     auto copy = *b;
-    if (!record('D', copy, error))
-        return false;
     apply('D', copy);
     return true;
 }
@@ -306,7 +159,7 @@ bool BuiltWorld::appearance(uint64_t id, const Appearance &value, String &error)
         return false;
     auto copy = *b;
     copy.appearance = value;
-    if (value.terrain < -1 || value.terrain > 1 || value.tint > 0xffffff || value.preserve > 1000 || value.brightness > 2000 || !valid_shape_id(value.shape) ||
+    if (value.tint > 0xffffff || value.preserve > 1000 || value.brightness > 2000 || !valid_shape_id(value.shape) ||
         value.rotation > 3) {
         error = "Invalid construction appearance";
         return false;
@@ -327,8 +180,6 @@ bool BuiltWorld::appearance(uint64_t id, const Appearance &value, String &error)
         error = String(e.c_str());
         return false;
     }
-    if (!record('P', copy, error))
-        return false;
     apply('P', copy);
     return true;
 }
@@ -344,7 +195,6 @@ BuiltWorld::Hit BuiltWorld::pick(Vector3 origin, Vector3 direction, float reach)
         return hit;
     for (auto id : store.nearby(lo, hi)) {
         const auto &b = store.blocks.at(id);
-        if(b.appearance.terrain>0 && terrain_meshed(b.id))continue;
         auto p = b.position();
         Point normal;
         float d = shape_ray(b.shape(), {origin.x - p[0], origin.y - p[1], origin.z - p[2]},
@@ -357,20 +207,11 @@ BuiltWorld::Hit BuiltWorld::pick(Vector3 origin, Vector3 direction, float reach)
 bool BuiltWorld::collides_box(Vector3 lo, Vector3 hi) const {
     for(auto id:store.nearby({lo.x,lo.y,lo.z},{hi.x,hi.y,hi.z})) {
         const auto &b=store.blocks.at(id);
-        if(!world->registry().get(b.block).solid || (b.appearance.terrain>0 && terrain_meshed(id)))continue;
+        if(!world->registry().get(b.block).solid)continue;
         auto p=b.position();
         if(shape_intersects(b.shape(),{lo.x-p[0],lo.y-p[1],lo.z-p[2]},{hi.x-p[0],hi.y-p[1],hi.z-p[2]}))return true;
     }
     return false;
-}
-bool BuiltWorld::source_rendered(Vector3 p) const {
-    return !dirty.count({int(std::floor(p.x/32))*32,0,int(std::floor(p.z/32))*32});
-}
-void BuiltWorld::clear_terrain_meshed(uint64_t id) {
-    if(meshed_terrain.erase(id))if(auto source=get(id))dirty.insert(region_of(*source));
-}
-void BuiltWorld::set_terrain_meshed(uint64_t id) {
-    if(meshed_terrain.insert(id).second)if(auto source=get(id))dirty.insert(region_of(*source));
 }
 void BuiltWorld::rebuild(IVec3 key) {
     auto &region = meshes[key];
@@ -388,7 +229,6 @@ void BuiltWorld::rebuild(IVec3 key) {
     Surface surface, collision;
     for (auto id : ids->second) {
         const auto &b = store.blocks.at(id);
-        if(b.appearance.terrain>0 && terrain_meshed(b.id))continue;
         auto p = b.position();
         auto c = world->generator()->column(int(std::floor(p[0])), int(std::floor(p[2])));
         int transition_overlay = 0;
@@ -517,17 +357,10 @@ Array BuiltWorld::describe() const {
         d["block"] = b.block;
         d["shape"] = shape_name(shape_type(b.shape()));
         d["original_shape"] = shape_name(b.appearance.shape);
-        d["terrain"] = b.appearance.terrain>0;
         d["shape_code"] = int(b.shape());
         d["rotation"] = b.appearance.rotation;
         auto ramp=ramp_spec(b.shape());
         if(ramp.valid) {d["ramp_corner"]=ramp_corner_name(ramp.corner);d["ramp_rise"]=ramp.rise();d["ramp_low"]=ramp.low();}
-        if (shape_type(b.shape()) == 8) {
-            Array th;
-            for (float h : terrain_heights(b.shape()))
-                th.push_back(h);
-            d["terrain_heights"] = th;
-        }
         d["painted"] = b.appearance.painted;
         d["color"] = int64_t(b.appearance.tint);
         values.push_back(d);

@@ -5,101 +5,22 @@
 namespace altaria {
 using P = std::array<float, 3>;
 static const char *names[] = {"cube",   "slab", "vertical_slab", "ramp",
-                              "stairs", "roof", "pillar",        "mini_pillar", "terrain"};
+                              "stairs", "roof", "pillar",        "mini_pillar"};
 bool valid_shape_id(int shape) {
-    return (shape >= 0 && shape <= 8) || (shape >= 32 && shape <= 112) || (shape >= 128 && shape < 188);
+    return (shape>=0 && shape<8) || (shape>=128 && shape<188);
 }
-int shape_type(uint8_t packed) {
-    if (packed >= 128 && packed < 188)
-        return 3;
-    if ((packed >= 32 && packed <= 112) || packed == 8)
-        return 8;
-    return packed & 7;
+int shape_type(uint8_t packed) {return packed>=128 && packed<188 ? 3 : packed<32 ? packed&7 : 0;}
+int shape_rotation(uint8_t packed) {return packed>=128 && packed<188 ? (packed-128)%4 : packed<32 ? (packed>>3)&3 : 0;}
+uint8_t pack_shape(int shape,int rotation) {
+    if(shape>=128 && shape<188)return uint8_t(128+(shape-128)/4*4+((shape-128+rotation)&3));
+    return shape>=0 && shape<8 ? uint8_t(shape|((rotation&3)<<3)) : 0;
 }
-int shape_rotation(uint8_t packed) { return packed >= 128 ? (packed-128)%4 : packed >= 32 ? 0 : (packed >> 3) & 3; }
-uint8_t terrain_shape(std::array<int, 4> heights) {
-    int code = 0, power = 1;
-    for (int h : heights) { code += std::clamp(h, 0, 2) * power; power *= 3; }
-    return uint8_t(32 + code);
-}
-std::array<float, 4> terrain_heights(uint8_t packed) {
-    if (packed == 8)
-        return {0.f, .5f, .5f, 0.f};
-    int code = std::clamp(int(packed) - 32, 0, 80);
-    std::array<float, 4> h;
-    for (auto &v : h) { v = (code % 3) * .5f; code /= 3; }
-    return h;
-}
-TerrainSpec terrain_spec(uint8_t packed) {
-    if (packed == 8)
-        return {true, {0, 1, 1, 0}};
-    if (packed < 32 || packed > 112)
-        return {};
-    TerrainSpec spec{true, {}};
-    int code = int(packed) - 32;
-    for (int &v : spec.h) {
-        v = code % 3;
-        code /= 3;
-    }
-    return spec;
-}
-uint8_t connect_terrain(const std::function<bool(int, int, int)> &solid) {
-    if (solid(0, 1, 0))
-        return terrain_shape({2, 2, 2, 2});
-    std::array<int, 4> h{};
-    const int sx_table[4] = {-1, -1, 1, 1};
-    const int sz_table[4] = {-1, 1, 1, -1};
-    for (int c = 0; c < 4; c++) {
-        int sx = sx_table[c], sz = sz_table[c];
-        bool up_x = solid(sx, 1, 0), up_z = solid(0, 1, sz), up_d = solid(sx, 1, sz);
-        bool same_x = solid(sx, 0, 0), same_z = solid(0, 0, sz), same_d = solid(sx, 0, sz);
-        bool opp_x = solid(-sx, 0, 0) || solid(-sx, 1, 0);
-        bool opp_z = solid(0, 0, -sz) || solid(0, 1, -sz);
-        bool down_x = !same_x && !up_x && solid(sx, -1, 0);
-        bool down_z = !same_z && !up_z && solid(0, -1, sz);
-        bool down_d = !same_d && !up_d && solid(sx, -1, sz);
-        if (up_x || up_z || up_d || (same_x && same_z && same_d)) {
-            h[c] = 2;
-        } else if (same_x && same_z) {
-            h[c] = (down_d || solid(-sx, 1, 0) || solid(0, 1, -sz)) ? 0 : 1;
-        } else if (same_x && !same_z) {
-            h[c] = ((down_z && opp_z) || solid(0, 1, -sz) || solid(sx, 1, -sz)) ? 0 : 1;
-        } else if (!same_x && same_z) {
-            h[c] = ((down_x && opp_x) || solid(-sx, 1, 0) || solid(-sx, 1, sz)) ? 0 : 1;
-        } else {
-            h[c] = 0;
-        }
-    }
-    if (h[0] == 0 && h[1] == 0 && h[2] == 0 && h[3] == 0)
-        return terrain_shape({1, 1, 1, 1});
-    return terrain_shape(h);
-}
-uint8_t pack_shape(int shape, int rotation) {
-    if (shape == 255) return 0;
-    if(shape>=128 && shape<188) return uint8_t(128+(shape-128)/4*4+((shape-128+rotation)&3));
-    if (shape < 8) return uint8_t(shape | ((rotation & 3) << 3));
-    auto h = shape == 8 ? std::array<float,4>{0,.5f,.5f,0} : terrain_heights(uint8_t(shape));
-    std::array<int,4> rotated;
-    for (int i=0;i<4;i++) rotated[(i + 4 - (rotation & 3)) % 4] = int(std::round(h[i]*2));
-    return terrain_shape(rotated);
-}
-void unpack_shape(uint8_t packed, Appearance &a) {
-    a.shape=packed>=128 ? uint8_t(128+(packed-128)/4*4) : packed>=32 ? packed : shape_type(packed);
+void unpack_shape(uint8_t packed,Appearance &a) {
+    a.shape=packed>=128 && packed<188 ? uint8_t(128+(packed-128)/4*4) : shape_type(packed);
     a.rotation=shape_rotation(packed);
 }
-const char *shape_name(int shape) {
-    if (shape >= 128 && shape < 188)
-        return "ramp";
-    if (shape == 8 || (shape >= 32 && shape <= 112))
-        return "terrain";
-    return names[shape & 7];
-}
-int shape_id(const std::string &s) {
-    for (int i = 0; i < SHAPE_COUNT; i++)
-        if (s == names[i])
-            return i;
-    return -1;
-}
+const char *shape_name(int shape) {return shape>=128 && shape<188 ? "ramp" : shape>=0 && shape<8 ? names[shape] : "cube";}
+int shape_id(const std::string &s) {for(int i=0;i<SHAPE_COUNT;i++)if(s==names[i])return i;return -1;}
 static P rotate(P p, int turn, bool normal = false) {
     for (int i = 0; i < turn; i++) {
         float x = p[0];
@@ -125,34 +46,9 @@ static void box(std::vector<ShapeFace> &f, float x0, float y0, float z0, float x
     f.push_back({{{{x0, y0, z0}, {x0, y1, z0}, {x1, y1, z0}, {x1, y0, z0}}}, {0, 0, -1}});
     f.push_back({{{{x0, y0, z1}, {x1, y0, z1}, {x1, y1, z1}, {x0, y1, z1}}}, {0, 0, 1}});
 }
-static bool terrain_split_bd(const std::array<float, 4> &h) {
-    return std::abs(h[0] - h[2]) > std::abs(h[1] - h[3]);
-}
 static std::vector<ShapeFace> make_shape_faces(uint8_t packed) {
     std::vector<ShapeFace> f;
     if(packed>=128 && packed<188) return ramp_faces(packed);
-    if ((packed >= 32 && packed <= 112) || packed == 8) {
-        auto h = terrain_heights(packed);
-        box(f,0,0,0,1,1,1);
-        for(auto &face:f) for(auto &p:face.points) if(p[1]>.5f) {
-            int corner=p[0]<.5f ? (p[2]<.5f?0:1) : (p[2]<.5f?3:2);
-            p[1]=h[corner];
-        }
-        P a{0,h[0],0}, b{0,h[1],1}, c{1,h[2],1}, d{1,h[3],0};
-        auto triangle=[&](P p,P q,P r) {
-            P n=cross(sub(q,p),sub(r,p)); float length=std::sqrt(dot(n,n));
-            for(auto &v:n) v/=std::max(.00001f,length);
-            return ShapeFace{{p,q,r,r},n};
-        };
-        if (terrain_split_bd(h)) {
-            f[3] = triangle(a, b, d);
-            f.push_back(triangle(b, c, d));
-        } else {
-            f[3] = triangle(a, b, c);
-            f.push_back(triangle(a, c, d));
-        }
-        return f;
-    }
     int shape = packed & 7;
     if (shape == 1)
         box(f, 0, 0, 0, 1, .5f, 1);
@@ -204,20 +100,6 @@ const std::vector<ShapeFace> &shape_faces(uint8_t packed) {
 }
 std::vector<std::vector<P>> shape_hulls(uint8_t packed) {
     if(packed>=128 && packed<188) return ramp_hulls(packed);
-    if((packed>=32 && packed<=112) || packed == 8) {
-        auto h=terrain_heights(packed);
-        P points[4]={{0,h[0],0},{0,h[1],1},{1,h[2],1},{1,h[3],0}};
-        std::vector<std::vector<P>> hulls;
-        auto tris = terrain_split_bd(h)
-                        ? std::array<std::array<int, 3>, 2>{{{0, 1, 3}, {1, 2, 3}}}
-                        : std::array<std::array<int, 3>, 2>{{{0, 1, 2}, {0, 2, 3}}};
-        for(auto indices: tris) {
-            std::vector<P> hull; float volume=0;
-            for(int i:indices) { hull.push_back(points[i]); hull.push_back({points[i][0],0,points[i][2]}); volume+=h[i]; }
-            if(volume>.0001f) hulls.push_back(std::move(hull));
-        }
-        return hulls;
-    }
     const auto &faces = shape_faces(packed);
     std::vector<std::vector<P>> out;
     for (size_t i = 0; i < faces.size(); i += 6) {
@@ -237,16 +119,6 @@ std::vector<std::vector<P>> shape_hulls(uint8_t packed) {
 }
 float shape_top(uint8_t packed, float x, float z) {
     if(packed>=128 && packed<188) return ramp_top(packed,x,z);
-    if((packed>=32 && packed<=112) || packed == 8) {
-        auto h=terrain_heights(packed);
-        if (terrain_split_bd(h)) {
-            return x + z <= 1.f
-                       ? h[0] * (1.f - x - z) + h[1] * z + h[3] * x
-                       : h[1] * (1.f - x) + h[2] * (x + z - 1.f) + h[3] * (1.f - z);
-        }
-        return z>=x ? h[0]*(1-z)+h[1]*(z-x)+h[2]*x
-                    : h[0]*(1-x)+h[2]*z+h[3]*(x-z);
-    }
     P p = rotate({x, 0, z}, (4 - ((packed >> 3) & 3)) & 3);
     x = p[0];
     z = p[2];
@@ -271,23 +143,6 @@ float shape_top(uint8_t packed, float x, float z) {
 }
 bool shape_intersects(uint8_t packed, P lo, P hi) {
     if(packed>=128 && packed<188) return ramp_intersects(packed,lo,hi);
-    if((packed>=32 && packed<=112) || packed == 8) {
-        for(int i=0;i<3;i++) { lo[i]=std::max(lo[i],0.f); hi[i]=std::min(hi[i],1.f); if(lo[i]>=hi[i])return false; }
-        float top=0;
-        for(float x:{lo[0],hi[0]}) for(float z:{lo[2],hi[2]}) top=std::max(top,shape_top(packed,x,z));
-        auto h = terrain_heights(packed);
-        if (terrain_split_bd(h)) {
-            float low = std::max(lo[0], 1.f - hi[2]), high = std::min(hi[0], 1.f - lo[2]);
-            if (low <= high) {
-                top = std::max(top, shape_top(packed, low, 1.f - low));
-                top = std::max(top, shape_top(packed, high, 1.f - high));
-            }
-        } else {
-            float low=std::max(lo[0],lo[2]), high=std::min(hi[0],hi[2]);
-            if(low<=high) { top=std::max(top,shape_top(packed,low,low)); top=std::max(top,shape_top(packed,high,high)); }
-        }
-        return lo[1]<top-.0001f;
-    }
     // Transform the AABB back into canonical block space (quarter turns preserve AABBs).
     P a = rotate(lo, (4 - ((packed >> 3) & 3)) & 3), b = rotate(hi, (4 - ((packed >> 3) & 3)) & 3);
     for (int i = 0; i < 3; i++) {

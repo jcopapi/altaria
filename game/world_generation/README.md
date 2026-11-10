@@ -327,17 +327,10 @@ ramps are also reconnected after voxel/surface edits during meshing. Unaffected
 chunks do not rebuild, and adjacent construction regions are dirtied when needed.
 
 World generation uses `surface_shapes: true` for original half-height slab caps.
-`procedural_terrain: true` caps only the original exposed top layer, with a normal
-base underneath, within `terrain_distance` (default 32 m). `terrain_max_height`
-(default 1 block) bounds this surface. Mining does not turn the uncovered base
-into more Terrain. Building replaces a cap from the base plane. Procedural and
-player caps share the same Transvoxel path.
-Explicit off edits override generation and survive reload. It never generates
-manual ramp forms. See [Terrain](terrain/README.md) for controls, architecture,
-validation and current limits. Old `surface_ramps` and
-`terrain_smoothing` settings are retired on load; saved edits and manually placed
-forms remain intact. The former larger sampling halo and ramp-generation pass
-have been removed. Manual ramp connections still use local derived snapshots.
+Terrain smoothing is removed. Only ordinary blocks and slabs are generated.
+Manual ramps remain available for construction. Older saved modifier flags are
+ignored, and obsolete profile forms are read as ordinary cubes while retaining
+material, paint and position. Old generation options are stripped on load.
 
 ### Streaming frame budgets
 

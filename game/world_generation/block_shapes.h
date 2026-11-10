@@ -1,19 +1,10 @@
 #pragma once
 #include "voxel_core.h"
 namespace altaria {
-// Codes 0..31 preserve original forms/quarter turns. Legacy surface-profile
-// codes 32..112 stay readable. Ramp scales/corners use 128..187.
-enum class BlockShape : uint8_t { Cube, Slab, VerticalSlab, Ramp, Stairs, Roof, Pillar, MiniPillar, Terrain };
-constexpr int SHAPE_COUNT = 9;
-struct TerrainSpec {
-    bool valid = false;
-    std::array<int, 4> h{2, 2, 2, 2};
-};
+// Packed ordinary forms/quarter turns use 0..31. Ramp variants use 128..187.
+enum class BlockShape : uint8_t { Cube, Slab, VerticalSlab, Ramp, Stairs, Roof, Pillar, MiniPillar };
+constexpr int SHAPE_COUNT = 8;
 bool valid_shape_id(int shape);
-uint8_t terrain_shape(std::array<int, 4> heights);
-std::array<float, 4> terrain_heights(uint8_t packed);
-TerrainSpec terrain_spec(uint8_t packed);
-uint8_t connect_terrain(const std::function<bool(int, int, int)> &solid);
 uint8_t pack_shape(int shape, int rotation = 0);
 int shape_type(uint8_t packed);
 int shape_rotation(uint8_t packed);

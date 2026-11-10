@@ -34,8 +34,7 @@ biome/terrain/surface/meshing pass timings.
 
 Environment/build commands (English):
 
-- `shape cube|slab|vertical_slab|ramp|stairs|roof|pillar|mini_pillar|terrain` selects the held form/tool.
-- `terrain [at x y z] [on|off|toggle]` applies/removes the independent smooth modifier.
+- `shape cube|slab|vertical_slab|ramp|stairs|roof|pillar|mini_pillar` selects the held form/tool.
 - `shape at x y z <name> [rotation 0..3]` changes an existing material's form.
 - `time <0..24|pause|resume>` sets/pauses/resumes the continuous day cycle.
 - `weather clear|rain|storm` changes weather lighting and temperature.
@@ -73,13 +72,3 @@ default (`outline_distance_start: 0`, `outline_distance_end: 0`), suppressing
 internal block seams and isolated cubes while outlining nearby hills as well as
 distant landforms. Procedural surfaces use full blocks and slabs; ramps are a
 building form.
-
-**T** toggles Terrain on the target. With `shape terrain`, right-click applies or
-removes it and the preview shows the affected neighbors. Smooth triangles use the
-original owner for selection, paint and mining. `stats` exposes `terrain_patches`,
-`terrain_pending`, `terrain_triangles`, `terrain_max_build_ms`,
-`terrain_max_upload_ms` and `terrain_max_refresh_ms`. See [Terrain](../world_generation/terrain/README.md).
-
-Terrain applies only to an exposed cube/floor slab with a normal base underneath.
-It is a surface cap, up to one block high. Ordinary construction replaces the cap
-from the base plane; mining it frees the cell and leaves the base ordinary.
