@@ -1,0 +1,4 @@
+SUPPORT_JUDGE_PASS placements=264 components=369 kept=69373 removed=326 host/corridor/water_clipping deterministic
+SUPPORT_CONCURRENCY_PASS shared_mask=true entries=1 kept=34
+COLLISION_RECT_JUDGE_PASS cases=54 winding_matches_render=true area_exact=true
+PARTIAL_COLLIDER_JUDGE_PASS shapes=88 nondegenerate_triangles=952 degenerate_visual_triangles=208 clockwise_and_bounds_match=true

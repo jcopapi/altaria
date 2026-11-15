@@ -1,9 +1,20 @@
 #pragma once
 #include "voxel_core.h"
 namespace altaria {
-// Packed ordinary forms/quarter turns use 0..31. Ramp variants use 128..187.
+// Packed ordinary forms use 0..31, ramps 128..187 and branches 188..191.
+// 192..254 held the retired Terrain caps and now read as cubes.
 enum class BlockShape : uint8_t { Cube, Slab, VerticalSlab, Ramp, Stairs, Roof, Pillar, MiniPillar };
 constexpr int SHAPE_COUNT = 8;
+uint8_t horizontal_mini_pillar(int axis);
+uint8_t horizontal_pillar(int axis);
+uint8_t upside_down_stairs(uint8_t packed);
+uint8_t connect_building_corner(uint8_t packed, const std::function<uint8_t(int,int)> &neighbors);
+uint8_t branch_fork(int axis);
+// Branch joints (mini-pillar arms through a small core). Directions: 0 -x, 1 +x, 2 -z, 3 +z.
+uint8_t branch_elbow_up(int direction);   // arm from `direction`, continuing upward
+uint8_t branch_elbow_down(int direction); // arm from `direction`, continuing downward
+uint8_t branch_tee_up(int axis);          // through arm on axis (0 x, 1 z) with an upward shoot
+uint8_t branch_stub(int direction);       // trunk pillar with a single arm toward `direction`
 bool valid_shape_id(int shape);
 uint8_t pack_shape(int shape, int rotation = 0);
 int shape_type(uint8_t packed);
@@ -16,10 +27,12 @@ struct RampSpec {
     RampScale scale=RampScale::Full;
     RampCorner corner=RampCorner::Straight;
     int turn=0;
+    bool inverted=false;
     float low() const { return scale==RampScale::Raised ? .5f : 0.f; }
     float rise() const { return scale==RampScale::Full ? 1.f : .5f; }
 };
 RampSpec ramp_spec(uint8_t packed);
+uint8_t upside_down_ramp(uint8_t packed);
 uint8_t ramp_shape(RampScale scale, RampCorner corner, int turn=0);
 const char *ramp_corner_name(RampCorner corner);
 uint8_t connect_ramp(uint8_t packed, const std::function<uint8_t(int,int)> &neighbors);

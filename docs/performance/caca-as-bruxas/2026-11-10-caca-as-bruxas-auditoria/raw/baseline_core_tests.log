@@ -1,0 +1,3 @@
+PASS liquid system tests: Cellular Automata, Viscosity, Reaction, Sleep, and River Currents.
+Mountain strong-mask coverage 165/961
+PASS 225109 checks. Altitude range 17.4052..299.582; fine mesh 21.7363 ms; far mesh 5.44719 ms; tiles 453.

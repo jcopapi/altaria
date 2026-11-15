@@ -1,4 +1,5 @@
 #include "physics_blocks.h"
+#include "../debug/frame_profile.h"
 #include "block_shapes.h"
 #include <algorithm>
 #include <cmath>
@@ -105,9 +106,11 @@ bool PhysicsBlocks::add(std::vector<std::pair<IVec3, BlockId>> parts, std::vecto
     return true;
 }
 void PhysicsBlocks::_physics_process(double) {
+    ALTARIA_PROFILE("physicsblocks.physics");
     for (auto &d : debris) {
         bool far = d.body->get_global_position().distance_to(viewer) > settings.physics_distance;
-        bool ready = world->collision_ready(d.body->get_global_position());
+        bool ready = !far && world->debris_collision_ready(
+            d.mesh->get_global_transform().xform(d.mesh->get_aabb()).grow(4.f));
         bool frozen = far || !ready;
         if (d.body->is_freeze_enabled() != frozen) {
             if (frozen) {
@@ -168,6 +171,20 @@ bool PhysicsBlocks::release(IVec3 p, bool tree, String &error) {
     std::deque<IVec3> queue;
     std::unordered_set<IVec3, CoordHash> visited;
     bool is_tree = tree && world->registry().get(id).wood;
+    std::unordered_set<IVec3, CoordHash> generated_tree;
+    if (is_tree) {
+        const auto &generator = *world->generator();
+        for (const auto &site : generator.tree_sites(p.x - 6, p.z - 6, p.x + 7, p.z + 7, true)) {
+            const auto site_parts = generator.tree_parts(site);
+            if (std::none_of(site_parts.begin(), site_parts.end(), [&](const TreePart &part) {
+                    return part.first == p && part.second == id;
+                }))
+                continue;
+            for (const auto &part : site_parts)
+                generated_tree.insert(part.first);
+            break;
+        }
+    }
     queue.push_back(p);
     while (!queue.empty()) {
         auto c = queue.front();
@@ -175,6 +192,8 @@ bool PhysicsBlocks::release(IVec3 p, bool tree, String &error) {
         if (!visited.insert(c).second)
             continue;
         if (std::abs(c.x - p.x) > 5 || std::abs(c.z - p.z) > 5 || c.y < p.y || c.y > p.y + 18)
+            continue;
+        if (!generated_tree.empty() && !generated_tree.count(c))
             continue;
         auto block = world->block_at(c.x, c.y, c.z);
         auto &def = world->registry().get(block);

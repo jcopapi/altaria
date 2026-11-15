@@ -1,0 +1,45 @@
+{
+  "chunk_modification": {
+    "edits": 1,
+    "modification_time_ms": 102.971,
+    "revision": 2,
+    "scenario": "chunk_modification"
+  },
+  "flight_streaming": {
+    "fps_estimate": 42.1666044709251,
+    "frame_time_avg_ms": 23.71545,
+    "frame_time_p95_ms": 67.135,
+    "frame_time_p99_ms": 107.7,
+    "max_frame_time_ms": 107.7,
+    "sample_count": 60,
+    "scenario": "flight_streaming"
+  },
+  "memory_telemetry": {
+    "final_static_mb": 73,
+    "initial_static_mb": 65,
+    "peak_static_mb": 76,
+    "scenario": "memory_telemetry",
+    "voxel_bytes_kb": 52290
+  },
+  "teleport_stress": {
+    "peak_pending_queue": 24,
+    "scenario": "teleport_stress",
+    "settle_time_ms": 2794,
+    "target": [
+      5000,
+      200,
+      5000
+    ],
+    "tiles_at_destination": 458
+  },
+  "world_generation": {
+    "first_tile_ms": 110.684329,
+    "scenario": "world_generation",
+    "seed": 424242,
+    "tiles_loaded": 460,
+    "total_elapsed_ms": 2232,
+    "triangles": 2291470,
+    "voxel_memory_kb": 55777,
+    "world_ready_ms": 2225.761966
+  }
+}

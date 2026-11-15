@@ -17,6 +17,8 @@ std::vector<BiomeDef> default_biomes() {
         {"desert", "Desert", {.69f, .67f, .27f}, .96f, .08f, .30f, .10f, .08f, .6f, 1.3f, true, false},
         {"jungle", "Jungle", {.075f, .49f, .20f}, .82f, .95f, .85f, .9f, .16f, .7f, 1.6f, false, false},
         {"enchanted", "Enchanted", {.65f, .24f, .88f}, .59f, .7f, 1, 1.05f, .15f, .65f, 1.1f, false, false}};
+    biomes[1].day_c = -3;
+    biomes[1].night_c = -18;
     biomes[1].fog_day = {.88f, .94f, 1};
     biomes[1].fog_night = {.48f, .57f, .76f};
     biomes[1].fog_start = 80;
@@ -56,6 +58,21 @@ std::vector<BiomeSample> BiomeStage::regions(const std::vector<float> &x, const 
     std::vector<BiomeSample> out(x.size());
     if (x.empty() || cfg.biomes.empty())
         return out;
+    if (!cfg.single_biome.empty()) {
+        int forced = -1;
+        for (size_t i = 0; i < cfg.biomes.size(); ++i) {
+            if (cfg.biomes[i].key == cfg.single_biome) {
+                forced = int(i);
+                break;
+            }
+        }
+        if (forced >= 0) {
+            const BiomeSample sample{forced, forced, 1.f, 1000.f, cfg.biomes[forced].temperature,
+                                     cfg.biomes[forced].humidity};
+            std::fill(out.begin(), out.end(), sample);
+            return out;
+        }
+    }
     int n = int(x.size());
 
     // Pre-sort biomes along thermal-moisture axis when testing_biomes is active so warm and cold

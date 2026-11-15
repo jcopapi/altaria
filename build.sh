@@ -13,6 +13,11 @@ if [[ ! -f "$project_dir/native/godot-cpp/SConstruct" ]]; then
     exit 1
 fi
 
+if [[ ! -f "$project_dir/native/third_party/entt/entt/entt.hpp" ]]; then
+    echo "EnTT não encontrado. Rode ./tools/setup_cpp.sh (consulte o README.md)." >&2
+    exit 1
+fi
+
 if [[ ! -f "$project_dir/native/build/fastnoise-install/lib/libFastNoise.a" ]]; then
     "$project_dir/tools/build_fastnoise.sh"
 fi

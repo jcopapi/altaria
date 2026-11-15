@@ -3,7 +3,13 @@
 #include <cmath>
 namespace altaria {
 using P=std::array<float,3>;
+uint8_t upside_down_ramp(uint8_t packed) {
+    const auto spec = ramp_spec(packed);
+    return uint8_t(78 + int(spec.corner) * 4 + spec.turn);
+}
 RampSpec ramp_spec(uint8_t packed) {
+    if (packed >= 78 && packed < 98)
+        return {true, RampScale::Full, RampCorner((packed - 78) / 4), (packed - 78) % 4, true};
     if(packed<32 && (packed&7)==3) return {true,RampScale::Full,RampCorner::Straight,(packed>>3)&3};
     if(packed>=128 && packed<188) {
         int group=(packed-128)/4;
@@ -23,15 +29,19 @@ const char *ramp_corner_name(RampCorner corner) {
 uint8_t connect_ramp(uint8_t packed,const std::function<uint8_t(int,int)> &neighbors) {
     auto s=ramp_spec(packed); if(!s.valid)return packed;
     const int dx[]={1,0,-1,0},dz[]={0,1,0,-1};
-    auto compatible=[&](uint8_t code) { auto n=ramp_spec(code); return n.valid && std::abs(n.rise()-s.rise())<.001f; };
-    auto same=[&](int x,int z) { auto n=ramp_spec(neighbors(x,z)); return n.valid && n.turn==s.turn && std::abs(n.rise()-s.rise())<.001f; };
+    const auto variant = [&](RampCorner corner) {
+        auto result = ramp_shape(s.scale, corner, s.turn);
+        return s.inverted ? upside_down_ramp(result) : result;
+    };
+    auto compatible=[&](uint8_t code) { auto n=ramp_spec(code); return n.valid && n.inverted == s.inverted && std::abs(n.rise()-s.rise())<.001f; };
+    auto same=[&](int x,int z) { auto n=ramp_spec(neighbors(x,z)); return n.valid && n.inverted == s.inverted && n.turn==s.turn && std::abs(n.rise()-s.rise())<.001f; };
     auto front=neighbors(dx[s.turn],dz[s.turn]); auto f=ramp_spec(front);
     if(compatible(front) && (f.turn&1)!=(s.turn&1) && !same(-dx[f.turn],-dz[f.turn]))
-        return ramp_shape(s.scale,(f.turn-s.turn+4)%4==3 ? RampCorner::OuterLeft : RampCorner::OuterRight,s.turn);
+        return variant((f.turn-s.turn+4)%4==3 ? RampCorner::OuterLeft : RampCorner::OuterRight);
     auto back=neighbors(-dx[s.turn],-dz[s.turn]); auto b=ramp_spec(back);
     if(compatible(back) && (b.turn&1)!=(s.turn&1) && !same(dx[b.turn],dz[b.turn]))
-        return ramp_shape(s.scale,(b.turn-s.turn+4)%4==3 ? RampCorner::InnerLeft : RampCorner::InnerRight,s.turn);
-    return ramp_shape(s.scale,RampCorner::Straight,s.turn);
+        return variant((b.turn-s.turn+4)%4==3 ? RampCorner::InnerLeft : RampCorner::InnerRight);
+    return variant(RampCorner::Straight);
 }
 static P rotate(P p,int turns,bool normal=false) {
     for(int i=0;i<turns;i++) { float x=p[0]; p[0]=normal ? -p[2] : 1-p[2]; p[2]=x; }
@@ -47,7 +57,7 @@ static float height(const RampSpec &s,float x,float z) {
 }
 float ramp_top(uint8_t packed,float x,float z) {
     auto s=ramp_spec(packed); auto p=rotate({x,0,z},(4-s.turn)&3);
-    return height(s,p[0],p[2]);
+    return s.inverted ? 1.f : height(s,p[0],p[2]);
 }
 static std::array<P,4> top_points(const RampSpec &s) {
     return {{{0,height(s,0,0),0},{0,height(s,0,1),1},{1,height(s,1,1),1},{1,height(s,1,0),0}}};
@@ -67,6 +77,13 @@ std::vector<ShapeFace> ramp_faces(uint8_t packed) {
     };
     if(left(s)) {triangle(0,1,3); triangle(1,2,3);} else {triangle(0,1,2);triangle(0,2,3);}
     for(auto &f:faces) {for(auto &p:f.points)p=rotate(p,s.turn); f.normal=rotate(f.normal,s.turn,true);}
+    if (s.inverted)
+        for (auto &face : faces) {
+            for (auto &point : face.points)
+                point[1] = 1.f - point[1];
+            std::swap(face.points[1], face.points[3]);
+            face.normal[1] = -face.normal[1];
+        }
     return faces;
 }
 std::vector<std::vector<P>> ramp_hulls(uint8_t packed) {
@@ -78,11 +95,20 @@ std::vector<std::vector<P>> ramp_hulls(uint8_t packed) {
         for(int i:triangle) {hull.push_back(rotate(p[i],s.turn)); hull.push_back(rotate({p[i][0],0,p[i][2]},s.turn)); volume+=p[i][1];}
         if(volume>.00001f)hulls.push_back(std::move(hull));
     }
+    if (s.inverted)
+        for (auto &hull : hulls)
+            for (auto &point : hull)
+                point[1] = 1.f - point[1];
     return hulls;
 }
 bool ramp_intersects(uint8_t packed,P lo,P hi) {
     auto s=ramp_spec(packed); auto a=rotate(lo,(4-s.turn)&3),b=rotate(hi,(4-s.turn)&3);
     for(int i=0;i<3;i++) {lo[i]=std::max(0.f,std::min(a[i],b[i]));hi[i]=std::min(1.f,std::max(a[i],b[i])); if(lo[i]>=hi[i])return false;}
+    if (s.inverted) {
+        const float low = 1.f - hi[1];
+        hi[1] = 1.f - lo[1];
+        lo[1] = low;
+    }
     float top=0; for(float x:{lo[0],hi[0]})for(float z:{lo[2],hi[2]})top=std::max(top,height(s,x,z));
     return lo[1]<top-.0001f;
 }

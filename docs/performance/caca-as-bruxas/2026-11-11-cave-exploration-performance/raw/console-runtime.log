@@ -1,0 +1,25 @@
+Test data: /tmp/altaria-console-test.oYxO0K
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+
+WARNING: res://addons/simplegrasstextured/singleton.tscn:4 - ext_resource, invalid UID: uid://h3cmhcmf6wwy - using text path instead: res://addons/simplegrasstextured/shaders/distance.gdshader
+     at: load (./scene/resources/resource_format_text.cpp:572)
+WARNING: res://addons/simplegrasstextured/singleton.tscn:5 - ext_resource, invalid UID: uid://bpnki8vkbrrer - using text path instead: res://addons/simplegrasstextured/shaders/motion1.gdshader
+     at: load (./scene/resources/resource_format_text.cpp:572)
+WARNING: res://addons/simplegrasstextured/singleton.tscn:6 - ext_resource, invalid UID: uid://brbm3okyt3jwq - using text path instead: res://addons/simplegrasstextured/shaders/motion2.gdshader
+     at: load (./scene/resources/resource_format_text.cpp:572)
+WARNING: res://addons/simplegrasstextured/singleton.tscn:7 - ext_resource, invalid UID: uid://c4hxrek5kx6bn - using text path instead: res://addons/simplegrasstextured/shaders/normal.gdshader
+     at: load (./scene/resources/resource_format_text.cpp:572)
+WARNING: res://addons/simplegrasstextured/singleton.tscn:10 - ext_resource, invalid UID: uid://dii7jpdyaypc6 - using text path instead: res://addons/simplegrasstextured/shaders/blur1.gdshader
+     at: load (./scene/resources/resource_format_text.cpp:572)
+WARNING: res://addons/simplegrasstextured/singleton.tscn:11 - ext_resource, invalid UID: uid://ct0c3akkhiaf - using text path instead: res://addons/simplegrasstextured/shaders/blur2.gdshader
+     at: load (./scene/resources/resource_format_text.cpp:572)
+[38;2;100;149;237m[1mCrabbyConsole v0.5.1 initialized[22m[39m â Type [93m:help[39m or game commands (tp, time, godrays, seed).[0m
+[TEST] Starting Console & Debug Runtime Tests...
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World -784443236 seed=-784443236
+WORLD_OPEN Console Test World seed=12345
+Generation complete: first tile 132.2 ms | all LODs 4622.8 ms
+WORLD_STREAM_READY Generation complete: first tile 132.2 ms | all LODs 4622.8 ms
+CONSOLE_RUNTIME_PASS
+CONSOLE_RUNTIME_PASS: All console & debug tests passed successfully!

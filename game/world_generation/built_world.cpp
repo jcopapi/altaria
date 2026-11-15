@@ -1,4 +1,5 @@
 #include "built_world.h"
+#include "../debug/frame_profile.h"
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
@@ -28,8 +29,10 @@ void BuiltWorld::apply(char op, const BuiltBlock &b) {
         auto region = region_of(b);
         regions[region].push_back(b.id);
         dirty.insert(region);
-    } else
+    } else {
+        animated_pieces.erase(b.id);
         store.erase(b.id);
+    }
     store.next_id = std::max(store.next_id, b.id + 1);
     refresh_world_ramps(b.position());
     store.refresh_connections(b.position());
@@ -72,7 +75,7 @@ const BuiltBlock *BuiltWorld::get(uint64_t id) const {
     auto it = store.blocks.find(id);
     return it == store.blocks.end() ? nullptr : &it->second;
 }
-uint64_t BuiltWorld::place(Vector3 p, int block, int shape, int rotation, String &error) {
+uint64_t BuiltWorld::place(Vector3 p, int block, int shape, int rotation, String &error, uint64_t replace, BuiltBlock *preview) {
     if (!p.is_finite() || std::abs(p.x) > 1000000 || std::abs(p.z) > 1000000 ||
         p.y <= world->settings().min_y || p.y >= world->settings().max_y || block < 0 || block > 4095 ||
         !valid_shape_id(shape) || rotation < 0 || rotation > 3) {
@@ -80,12 +83,32 @@ uint64_t BuiltWorld::place(Vector3 p, int block, int shape, int rotation, String
         return 0;
     }
     BuiltBlock b;
-    b.id = store.next_id;
+    b.id = replace ? replace : store.next_id;
     b.origin8 = {int(std::round(p.x * 8)), int(std::round(p.y * 8)), int(std::round(p.z * 8))};
     b.block = block;
     b.appearance.shape = shape;
     b.appearance.rotation = rotation;
     b.connected_shape=store.connection_shape(b,&b);
+    if (b.block == world->registry().grass) {
+        const auto &registry = world->registry();
+        const auto origin = b.position();
+        const auto x = int(std::floor(origin[0] + .5f));
+        const auto y = int(std::floor(origin[1] - .001f));
+        const auto z = int(std::floor(origin[2] + .5f));
+        auto support = world->block_at(x, y, z);
+        if (const auto *previous = get(replace); previous && previous->block != registry.grass)
+            support = previous->block;
+        if (support == registry.air) {
+            const auto below = pick(Vector3(origin[0] + .5f, origin[1] + .001f, origin[2] + .5f),
+                                    Vector3(0, -1, 0), .01f);
+            if (const auto *piece = get(below.id); piece && piece->id != replace)
+                support = piece->block;
+        }
+        if (support != registry.air && support != registry.grass) {
+            b.appearance.painted = true;
+            b.appearance.tint = pack_rgb(grass_on_support(registry.get(b.block).color, registry.get(support).color));
+        }
+    }
     if (guard && !guard(b)) {
         error = "Building intersects player";
         return 0;
@@ -100,48 +123,76 @@ uint64_t BuiltWorld::place(Vector3 p, int block, int shape, int rotation, String
         error = String(message.c_str());
         return 0;
     }
-    apply('P', b);
+    if (preview)
+        *preview = b;
+    else
+        apply('P', b);
     return b.id;
 }
 uint64_t BuiltWorld::attach(Vector3 hit, Vector3 normal, Vector3 preferred, Vector3 source,
-                            uint8_t source_shape, int block, int shape, int rotation, String &error) {
-    int placement_shape=shape;
-    if(shape_type(pack_shape(shape,rotation))==3 && shape_type(source_shape)==1) {
-        bool top=normal.y>.99f;
-        shape=ramp_shape(top ? RampScale::Half : RampScale::Raised,RampCorner::Straight,0);
-        preferred.y=source.y+(top ? .5f : 0.f);
-        if(std::abs(normal.x)>.5f || std::abs(normal.z)>.5f)
-            rotation=normal.x>.5f ? 0 : normal.z>.5f ? 1 : normal.x<-.5f ? 2 : 3;
+                            uint8_t source_shape, int block, int shape, int rotation, String &error, BuiltBlock *preview) {
+    const bool pillar = shape == int(BlockShape::Pillar) || shape == int(BlockShape::MiniPillar);
+    const int axis = std::abs(normal.y) >= std::max(std::abs(normal.x), std::abs(normal.z)) ? 1 :
+                     std::abs(normal.x) >= std::abs(normal.z) ? 0 : 2;
+    if (pillar && axis != 1) {
+        const int horizontal_axis = axis == 0 ? 0 : 1;
+        shape = shape == int(BlockShape::Pillar) ? horizontal_pillar(horizontal_axis)
+                                                : horizontal_mini_pillar(horizontal_axis);
+        rotation = 0;
     }
-    placement_shape=shape;
-    // Try centered support first, then nearby half-block offsets for narrow stair
-    // treads and pillars. Contact is solved from the clicked face's actual plane.
-    int axis = 0;
-    for (int j = 1; j < 3; j++)
-        if (std::abs(normal[j]) > std::abs(normal[axis]))
-            axis = j;
-    int a = (axis + 1) % 3, b = (axis + 2) % 3;
-    for (float radius : {0.f, .125f, .25f, .5f})
-        for (int direction = 0; direction < (radius == 0 ? 1 : 8); direction++) {
-            Vector3 candidate = preferred;
-            const int dx[] = {1, -1, 0, 0, 1, -1, 1, -1}, dz[] = {0, 0, 1, -1, 1, -1, -1, 1};
-            if (radius > 0) {
-                candidate[a] += dx[direction] * radius;
-                candidate[b] += dz[direction] * radius;
-            }
-            auto origin =
-                snap_placement({hit.x, hit.y, hit.z}, {normal.x, normal.y, normal.z},
-                               pack_shape(placement_shape, rotation), {candidate.x, candidate.y, candidate.z});
-            Vector3 contact = Vector3(origin.x / 8.f, origin.y / 8.f, origin.z / 8.f) - normal * .002f;
-            if (!shapes_overlap(pack_shape(placement_shape, rotation), {contact.x, contact.y, contact.z},
-                                source_shape, {source.x, source.y, source.z}))
+    const bool inverted = normal.y < -.5f || (axis != 1 && hit.y - source.y > .5f);
+    if (shape == int(BlockShape::Ramp) && inverted) {
+        shape = upside_down_ramp(pack_shape(shape, rotation));
+        rotation = 0;
+    } else if (shape_type(pack_shape(shape, rotation)) == int(BlockShape::Ramp) &&
+        shape_type(source_shape) == int(BlockShape::Slab)) {
+        shape = ramp_shape(axis == 1 && normal.y > 0 ? RampScale::Half : RampScale::Raised,
+                           RampCorner::Straight);
+        if (axis != 1)
+            preferred.y = source.y;
+    }
+
+    if (shape == int(BlockShape::Stairs) && inverted) {
+        shape = upside_down_stairs(pack_shape(shape, rotation));
+        rotation = 0;
+    }
+    const bool wall = shape == int(BlockShape::VerticalSlab);
+    if (wall && axis != 1) {
+        rotation = axis == 0 ? (normal.x > 0 ? 0 : 2) : (normal.z > 0 ? 1 : 3);
+    }
+    const auto packed = pack_shape(shape, rotation);
+    // Side attachments align to the face center. Across the height of a
+    // vertical face, use the source's cell origin so slabs share its grid.
+    if (axis != 1)
+        preferred.y = pillar ? source.y + (shape_bounds(source_shape).second[1] +
+                                            shape_bounds(source_shape).first[1] - 1.f) * .5f : source.y;
+    for (int i : {0, 2})
+        if (i != axis && (!pillar || axis != 1))
+            preferred[i] = std::round(preferred[i] * 2.f) * .5f;
+    if (wall) {
+        const auto [lo, hi] = shape_bounds(packed);
+        for (int i : {0, 2}) {
+            if (i == axis)
                 continue;
-            auto id =
-                place(Vector3(origin.x / 8.f, origin.y / 8.f, origin.z / 8.f), block, shape, rotation, error);
-            if (id)
-                return id;
+            preferred[i] = source[i];
+            if (hi[i] - lo[i] < .75f)
+                preferred[i] += (hit[i] - source[i] >= .5f ? .5f : 0.f) - lo[i];
         }
-    return 0;
+    }
+    if (pillar && axis == 1) {
+        preferred.x = source.x;
+        preferred.z = source.z;
+    }
+    const auto origin = snap_placement({hit.x, hit.y, hit.z}, {normal.x, normal.y, normal.z}, packed,
+                                       {preferred.x, preferred.y, preferred.z});
+    const Vector3 position(origin.x / 8.f, origin.y / 8.f, origin.z / 8.f);
+    const Vector3 contact = position - normal * .002f;
+    if (!shapes_overlap(packed, {contact.x, contact.y, contact.z}, source_shape,
+                        {source.x, source.y, source.z})) {
+        error = "No centered grid attachment on this face";
+        return 0;
+    }
+    return place(position, block, shape, rotation, error, 0, preview);
 }
 bool BuiltWorld::remove(uint64_t id, String &error) {
     auto b = get(id);
@@ -207,11 +258,32 @@ BuiltWorld::Hit BuiltWorld::pick(Vector3 origin, Vector3 direction, float reach)
 bool BuiltWorld::collides_box(Vector3 lo, Vector3 hi) const {
     for(auto id:store.nearby({lo.x,lo.y,lo.z},{hi.x,hi.y,hi.z})) {
         const auto &b=store.blocks.at(id);
-        if(!world->registry().get(b.block).solid)continue;
+        const auto &def=world->registry().get(b.block);
+        if(!def.solid || def.foliage)continue;
         auto p=b.position();
         if(shape_intersects(b.shape(),{lo.x-p[0],lo.y-p[1],lo.z-p[2]},{hi.x-p[0],hi.y-p[1],hi.z-p[2]}))return true;
     }
     return false;
+}
+bool BuiltWorld::in_foliage_box(Vector3 lo, Vector3 hi) const {
+    for (auto id : store.nearby({lo.x, lo.y, lo.z}, {hi.x, hi.y, hi.z})) {
+        const auto &b = store.blocks.at(id);
+        if (!world->registry().get(b.block).foliage)
+            continue;
+        auto p = b.position();
+        if (shape_intersects(b.shape(), {lo.x - p[0], lo.y - p[1], lo.z - p[2]},
+                             {hi.x - p[0], hi.y - p[1], hi.z - p[2]}))
+            return true;
+    }
+    return false;
+}
+void BuiltWorld::set_placement_animated(uint64_t id, bool animated) {
+    if (animated)
+        animated_pieces.insert(id);
+    else if (!animated_pieces.erase(id))
+        return;
+    if (const auto *piece = get(id))
+        dirty.insert(region_of(*piece));
 }
 void BuiltWorld::rebuild(IVec3 key) {
     auto &region = meshes[key];
@@ -227,6 +299,9 @@ void BuiltWorld::rebuild(IVec3 key) {
         return;
     }
     Surface surface, collision;
+    std::vector<GrassInstance> grass;
+    const auto &blocks = world->registry();
+    const bool near = tile_distance({key.x, key.z, 0}, viewer.x, viewer.z) < world->settings().near_distance;
     for (auto id : ids->second) {
         const auto &b = store.blocks.at(id);
         auto p = b.position();
@@ -258,12 +333,37 @@ void BuiltWorld::rebuild(IVec3 key) {
                              world->registry(), transition_overlay);
         for (size_t i = start; i < surface.vertices.size(); i++)
             surface.vertices[i].wind += p[1];
-        if (world->registry().get(b.block).solid) {
+        const auto &def = blocks.get(b.block);
+        const bool animated = animated_pieces.count(id);
+        if (!animated && near && (b.block == blocks.grass || def.grass_on_rock)) {
+            const auto &settings = world->settings();
+            for (int i = 0; i < settings.grass_tufts; ++i) {
+                auto tuft = grass_for_block(p, b.shape(), b.appearance, c, def, settings, world->last_seed(), i);
+                if (!tuft)
+                    continue;
+                const Vector3 root(tuft->x, tuft->y, tuft->z);
+                const Vector3 lo = root + Vector3(-.025f, .05f, -.025f);
+                const Vector3 hi = root + Vector3(.025f, .30f, .025f);
+                if (!collides_box(lo, hi) && !world->collides_box(lo, hi)) {
+                    tuft->x -= key.x;
+                    tuft->z -= key.z;
+                    grass.push_back(*tuft);
+                }
+            }
+        }
+        if (def.solid && !def.foliage) {
             int offset = collision.vertices.size();
             collision.vertices.insert(collision.vertices.end(), surface.vertices.begin() + start,
                                       surface.vertices.end());
-            for (size_t i = index_start; i < surface.indices.size(); i++)
-                collision.indices.push_back(offset + surface.indices[i] - int(start));
+            for (size_t i = index_start; i < surface.indices.size(); i++) {
+                const int vertex = surface.indices[i];
+                if ((int(surface.vertices[vertex].decal) & 32) == 0)
+                    collision.indices.push_back(offset + vertex - int(start));
+            }
+        }
+        if (animated) {
+            surface.vertices.resize(start);
+            surface.indices.resize(index_start);
         }
     }
     region.mesh = memnew(MeshInstance3D);
@@ -272,9 +372,8 @@ void BuiltWorld::rebuild(IVec3 key) {
     region.mesh->set_mesh(world->surface_mesh(surface));
     region.mesh->set_visibility_range_end(world->settings().view_distance);
     add_child(region.mesh);
-    region.grass = nullptr;
-    region.grass_near = false;
-    bool near = tile_distance({key.x, key.z, 0}, viewer.x, viewer.z) < world->settings().near_distance;
+    AABB grass_bounds;
+    region.grass = world->grass_batch(grass, region.mesh, grass_bounds);
     region.collision_near = near;
     region.mesh->set_cast_shadows_setting(near ? GeometryInstance3D::SHADOW_CASTING_SETTING_ON
                                                : GeometryInstance3D::SHADOW_CASTING_SETTING_OFF);
@@ -299,6 +398,7 @@ void BuiltWorld::rebuild(IVec3 key) {
     }
 }
 void BuiltWorld::_process(double delta) {
+    ALTARIA_PROFILE("built.process");
     timer += delta;
     if (timer > .3) {
         timer = 0;

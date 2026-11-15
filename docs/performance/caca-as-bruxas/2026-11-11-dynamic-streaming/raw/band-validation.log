@@ -1,0 +1,17 @@
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World -2002499753 seed=-2002499753
+WORLD_OPEN Streaming benchmark seed=1337
+STREAM {"cancelled_jobs":0,"case":"normal_start","collision":true,"drawn_primitives":0.0,"fog_end":2600.0,"lod0":24,"lod1":26,"lod2":36,"lod5":1,"pending":0,"ready_ms":1274.423845,"stream_radius":2816.0,"stream_underground":false,"tiles":260,"triangles":1009314,"upload_max":1.5096869468689,"voxel_bytes":5185816,"wanted":260}
+Generation complete: first tile 98.9 ms | all LODs 1274.4 ms
+WORLD_STREAM_READY Generation complete: first tile 98.9 ms | all LODs 1274.4 ms
+STREAM {"cancelled_jobs":0,"case":"slow_end","collision":true,"drawn_primitives":0.0,"fog_end":2600.0,"lod0":24,"lod1":26,"lod2":32,"lod5":1,"pending":0,"ready_ms":1274.423845,"stream_radius":2816.0,"stream_underground":false,"tiles":259,"triangles":996510,"upload_max":1.82638704776764,"voxel_bytes":5599664,"wanted":259}
+STREAM {"cancelled_jobs":0,"case":"flight_end","collision":true,"drawn_primitives":0.0,"fog_end":2600.0,"lod0":32,"lod1":28,"lod2":51,"lod5":4,"pending":0,"ready_ms":1274.423845,"stream_radius":2816.0,"stream_underground":false,"tiles":293,"triangles":1127992,"upload_max":2.99620294570923,"voxel_bytes":6936000,"wanted":293}
+STREAM {"cancelled_jobs":0,"case":"desert","collision":true,"drawn_primitives":0.0,"fog_end":1695.61267089844,"lod0":24,"lod1":30,"lod2":47,"lod5":0,"pending":0,"ready_ms":1274.423845,"stream_radius":1920.0,"stream_underground":false,"tiles":219,"triangles":787280,"upload_max":2.99620294570923,"voxel_bytes":4788152,"wanted":219}
+STREAM_DEPTH_READY_MS 733.026
+STREAM {"cancelled_jobs":0,"case":"deep","collision":true,"drawn_primitives":0.0,"fog_end":2314.82421875,"lod0":60,"lod1":33,"lod2":11,"lod5":0,"pending":0,"ready_ms":1274.423845,"stream_radius":256.0,"stream_underground":true,"tiles":104,"triangles":156598,"upload_max":2.99620294570923,"voxel_bytes":27466560,"wanted":104}
+STREAM_DEPTH_ENV { "depth": "abyssal", "depth_weights": [0.0, 0.0, 1.0, 0.0], "below_surface": 326.465972900391, "surface_height": 64.1659774780273, "surface_influence": 0.0, "geothermal": 0.26086086034775, "biome": "altaria:limestone", "secondary_biome": "altaria:limestone", "primary_weight": 1.0, "temperature_c": 27.5213203430176, "humidity": 0.5, "geology": 0.5, "frozen": 0.0, "sedimentary": 0.0, "rooted": 0.0, "pressure_kpa": 101.324996948242, "oxygen_factor": 1.0, "visibility_factor": 1.0, "environmental_damage_per_second": 0.0, "loaded": true, "fluid": "dry", "immersion_depth": 0.0, "basin_source": "lake", "river_courses": 0, "fluid_surface_y": -411, "rock": 1 } eye=(117.8645, -262.3, 187.4685) voxel=0
+STREAM {"cancelled_jobs":0,"case":"returned","collision":true,"drawn_primitives":0.0,"fog_end":2598.18212890625,"lod0":24,"lod1":26,"lod2":36,"lod5":1,"pending":0,"ready_ms":1274.423845,"stream_radius":2816.0,"stream_underground":false,"tiles":260,"triangles":1009322,"upload_max":2.99620294570923,"voxel_bytes":5491000,"wanted":260}
+DYNAMIC_STREAMING_PASS

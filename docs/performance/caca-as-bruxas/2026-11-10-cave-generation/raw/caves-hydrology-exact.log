@@ -1,0 +1,3 @@
+CAVE_POOL_PASS type=water top=-166 source=(-112,83) rivers=1; LOD0/1/2 caps, all halos, non-solid fluid mesh, local edits
+CAVE_POOL_PASS type=lava top=-325 source=(-88,166) rivers=0; LOD0/1/2 caps, all halos, non-solid fluid mesh, local edits
+CAVE_COAST_PASS openings=8 ocean_path_contacts=4

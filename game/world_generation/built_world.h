@@ -8,7 +8,7 @@ class BuiltWorld : public Node3D {
     struct Region {
         MeshInstance3D *mesh = nullptr;
         StaticBody3D *collider = nullptr;
-        bool collision_near = false, grass_near = false;
+        bool collision_near = false;
         MultiMeshInstance3D *grass = nullptr;
     };
     VoxelWorld *world = nullptr;
@@ -16,6 +16,7 @@ class BuiltWorld : public Node3D {
     std::unordered_map<altaria::IVec3, std::vector<uint64_t>, altaria::CoordHash> regions;
     std::unordered_map<altaria::IVec3, Region, altaria::CoordHash> meshes;
     std::unordered_set<altaria::IVec3, altaria::CoordHash> dirty;
+    std::unordered_set<uint64_t> animated_pieces;
     Vector3 viewer;
     float timer = 0;
     std::function<bool(const altaria::BuiltBlock &)> guard;
@@ -44,12 +45,15 @@ class BuiltWorld : public Node3D {
     }
     Hit pick(Vector3 origin, Vector3 direction, float reach) const;
     const altaria::BuiltBlock *get(uint64_t id) const;
-    uint64_t place(Vector3 position, int block, int shape, int rotation, String &error);
+    uint64_t place(Vector3 position, int block, int shape, int rotation, String &error, uint64_t replace = 0,
+                   altaria::BuiltBlock *preview = nullptr);
     uint64_t attach(Vector3 hit, Vector3 normal, Vector3 preferred, Vector3 source, uint8_t source_shape,
-                    int block, int shape, int rotation, String &error);
+                    int block, int shape, int rotation, String &error, altaria::BuiltBlock *preview = nullptr);
     bool remove(uint64_t id, String &error);
+    void set_placement_animated(uint64_t id, bool animated);
     bool appearance(uint64_t id, const altaria::Appearance &value, String &error);
     bool collides_box(Vector3 minimum, Vector3 maximum) const;
+    bool in_foliage_box(Vector3 minimum, Vector3 maximum) const;
     std::pair<float, float> thermal(Vector3 position) const;
     Dictionary stats() const;
     Array describe() const;

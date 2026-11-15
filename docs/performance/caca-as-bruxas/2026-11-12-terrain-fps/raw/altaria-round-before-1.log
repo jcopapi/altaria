@@ -1,0 +1,14 @@
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6360)
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4050 Laptop GPU
+
+[38;2;100;149;237m[1mCrabbyConsole v0.5.1 initialized[22m[39m â Type [93m:help[39m or game commands (tp, time, godrays, seed).[0m
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World -446672060 seed=-446672060
+WORLD_OPEN Terrain FPS benchmark seed=1337
+Generation complete: first tile 150.9 ms | all LODs 4168.2 ms
+WORLD_STREAM_READY Generation complete: first tile 150.9 ms | all LODs 4168.2 ms
+ROUND_FPS river median=9.027 p95=9.685 p99=10.912 max=11.016 fps=110.778774786751 triangles=5435308 tiles=334
+ROUND_FPS clouds median=6.413 p95=7.015 p99=7.222 max=7.364 fps=155.933260564478 triangles=4921824 tiles=375

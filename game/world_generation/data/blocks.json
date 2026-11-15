@@ -1,5 +1,7 @@
 {
-  "outline_distance_blacklist": ["altaria:leaves"],
+  "outline_distance_blacklist": [
+    "altaria:leaves"
+  ],
   "blocks": [
     {
       "id": 0,
@@ -25,7 +27,7 @@
         0.46,
         0.48
       ],
-      "texture_layer": 7
+      "texture_layer": 6
     },
     {
       "id": 2,
@@ -63,13 +65,13 @@
         0.7,
         0.48
       ],
-      "texture_layer": 8
+      "texture_layer": 7
     },
     {
       "id": 5,
       "key": "altaria:water",
       "name": "Water",
-      "name_pt": "\u00c1gua",
+      "name_pt": "Água",
       "color": [
         0.13,
         0.38,
@@ -77,6 +79,7 @@
       ],
       "solid": false,
       "water": true,
+      "liquid": true,
       "texture_layer": 0
     },
     {
@@ -89,7 +92,7 @@
         0.92,
         0.94
       ],
-      "texture_layer": 9,
+      "texture_layer": 11,
       "thermal_delta_c": -6,
       "thermal_radius": 4
     },
@@ -116,7 +119,7 @@
         0.32,
         0.2
       ],
-      "texture_layer": 0
+      "texture_layer": 12
     },
     {
       "id": 9,
@@ -128,9 +131,10 @@
         0.24,
         0.12
       ],
-      "texture_layer": 10,
+      "texture_layer": 9,
       "wood": true,
-      "mass": 18
+      "mass": 18,
+      "texture_end_layer": 5
     },
     {
       "id": 10,
@@ -144,7 +148,8 @@
       ],
       "foliage": true,
       "mass": 0.3,
-      "texture_layer": 11
+      "texture_layer": 10,
+      "alpha_cutout": true
     },
     {
       "id": 11,
@@ -158,7 +163,8 @@
       ],
       "thermal_delta_c": -10,
       "thermal_radius": 4,
-      "mass": 25
+      "mass": 25,
+      "texture_layer": 13
     },
     {
       "id": 12,
@@ -173,6 +179,305 @@
       "thermal_delta_c": 16,
       "thermal_radius": 5,
       "mass": 12
+    },
+    {
+      "id": 13,
+      "key": "altaria:lava",
+      "name": "Lava",
+      "name_pt": "Lava",
+      "color": [
+        0.98,
+        0.35,
+        0.05
+      ],
+      "solid": false,
+      "liquid": true,
+      "lava": true,
+      "placeable": true,
+      "thermal_delta_c": 32,
+      "thermal_radius": 6,
+      "texture_layer": 14
+    },
+    {
+      "id": 14,
+      "key": "altaria:limestone",
+      "rock_variation": true,
+      "name": "Limestone",
+      "name_pt": "Calcário",
+      "color": [
+        0.63,
+        0.6,
+        0.5
+      ],
+      "texture_layer": 15
+    },
+    {
+      "id": 15,
+      "key": "altaria:sandstone",
+      "rock_variation": true,
+      "name": "Sandstone",
+      "name_pt": "Arenito",
+      "color": [
+        0.7,
+        0.52,
+        0.29
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 16,
+      "key": "altaria:moss_stone",
+      "rock_variation": true,
+      "name": "Mossy stone",
+      "name_pt": "Pedra musgosa",
+      "color": [
+        0.26,
+        0.41,
+        0.28
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 17,
+      "key": "altaria:crystal_stone",
+      "rock_variation": true,
+      "name": "Crystal-bearing rock",
+      "name_pt": "Rocha cristalina",
+      "color": [
+        0.34,
+        0.49,
+        0.64
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 18,
+      "key": "altaria:fossil_limestone",
+      "rock_variation": true,
+      "name": "Fossil limestone",
+      "name_pt": "Calcário fossilizado",
+      "color": [
+        0.58,
+        0.51,
+        0.39
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 19,
+      "key": "altaria:wet_stone",
+      "rock_variation": true,
+      "name": "Wet stone",
+      "name_pt": "Pedra úmida",
+      "color": [
+        0.25,
+        0.34,
+        0.38
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 20,
+      "key": "altaria:abyss_stone",
+      "rock_variation": true,
+      "name": "Abyssal stone",
+      "name_pt": "Pedra abissal",
+      "color": [
+        0.19,
+        0.23,
+        0.3
+      ],
+      "texture_layer": 16
+    },
+    {
+      "id": 21,
+      "key": "altaria:corrupted_stone",
+      "rock_variation": true,
+      "name": "Corrupted stone",
+      "name_pt": "Pedra corrompida",
+      "color": [
+        0.33,
+        0.18,
+        0.4
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 22,
+      "key": "altaria:basalt",
+      "rock_variation": true,
+      "name": "Basalt",
+      "name_pt": "Basalto",
+      "color": [
+        0.22,
+        0.19,
+        0.23
+      ],
+      "texture_layer": 17
+    },
+    {
+      "id": 23,
+      "key": "altaria:crystal_tip",
+      "name": "Cave crystal",
+      "name_pt": "Cristal de caverna",
+      "color": [
+        0.46,
+        0.83,
+        0.92
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 24,
+      "key": "altaria:fungal_cap",
+      "name": "Cave mushroom cap",
+      "name_pt": "Chapéu de fungo",
+      "color": [
+        0.72,
+        0.36,
+        0.56
+      ],
+      "texture_layer": 18
+    },
+    {
+      "id": 25,
+      "key": "altaria:fossil_bone",
+      "name": "Fossil bone",
+      "name_pt": "Osso fossilizado",
+      "color": [
+        0.87,
+        0.78,
+        0.61
+      ],
+      "texture_layer": 0
+    },
+    {
+      "id": 26,
+      "key": "altaria:gravel",
+      "rock_variation": true,
+      "name": "Gravel",
+      "name_pt": "Cascalho",
+      "color": [
+        0.55,
+        0.51,
+        0.45
+      ],
+      "texture_layer": 4
+    },
+    {
+      "id": 27,
+      "key": "altaria:cave_moss",
+      "name": "Cave Moss",
+      "name_pt": "Musgo de caverna",
+      "color": [
+        0.24,
+        0.33,
+        0.18
+      ],
+      "texture_layer": 19
+    },
+    {
+      "id": 28,
+      "key": "altaria:cave_root",
+      "name": "Cave Root",
+      "name_pt": "Raiz de caverna",
+      "solid": false,
+      "placeable": false,
+      "root_plant": true,
+      "alpha_cutout": true,
+      "color": [
+        0.36,
+        0.23,
+        0.15
+      ],
+      "texture_layer": 20
+    },
+    {
+      "id": 29,
+      "key": "altaria:rock_grass",
+      "placeable": false,
+      "name": "Rock grass",
+      "name_pt": "Grama de rocha",
+      "color": [
+        0.48,
+        0.39,
+        0.56
+      ],
+      "texture_layer": 3,
+      "grass_on_rock": true
+    },
+  {
+    "id": 30,
+    "key": "altaria:planks",
+    "name": "Planks",
+    "name_pt": "Tábuas",
+    "color": [
+      0.57,
+      0.38,
+      0.21
+    ],
+    "texture_layer": 21
+  },
+  {
+    "id": 31,
+    "key": "altaria:stone_bricks",
+    "name": "Stone bricks",
+    "name_pt": "Tijolos de pedra",
+    "color": [
+      0.48,
+      0.47,
+      0.46
+    ],
+    "texture_layer": 22
+  },
+  {
+    "id": 32,
+    "key": "altaria:ore",
+    "deposit_model": "res://game/assets/blocks/ore.gltf",
+    "name": "Iron Ore",
+    "name_pt": "Minério de Ferro",
+    "placeable": false,
+    "collectible": true,
+    "color": [
+      0.55,
+      0.43,
+      0.37
+    ],
+    "texture_layer": 23
+  },
+  {
+    "id": 33,
+    "key": "altaria:hellstone",
+    "name": "Hellstone",
+    "name_pt": "Pedra infernal",
+    "color": [
+      0.46,
+      0.2,
+      0.14
+    ],
+    "texture_layer": 24
+  },
+  {
+    "id": 34,
+    "key": "altaria:pebble",
+    "deposit_model": "res://game/assets/blocks/pebble.gltf",
+    "name": "Pebble",
+    "name_pt": "Pedrinha",
+    "color": [0.75, 0.73, 0.72],
+    "placeable": false,
+    "collectible": true,
+    "instant_break": true,
+    "texture_layer": 25
+  },
+    {
+      "id": 35,
+      "key": "altaria:cave_grass",
+      "placeable": false,
+      "name": "Cave grass",
+      "name_pt": "Grama de caverna",
+      "color": [0.51, 0.34, 0.20],
+      "texture_layer": 3,
+      "grass_on_rock": true
     }
   ],
   "roles": {
@@ -182,6 +487,7 @@
     "grass": "altaria:grass",
     "sand": "altaria:sand",
     "water": "altaria:water",
+    "lava": "altaria:lava",
     "snow": "altaria:snow",
     "bedrock": "altaria:bedrock"
   },
@@ -204,13 +510,10 @@
       "path": "res://game/assets/blocks/grass_top_overlay.png"
     },
     {
-      "path": "res://game/assets/blocks/pebbles1.png"
+      "path": "res://game/assets/blocks/gravel.png"
     },
     {
-      "path": "res://game/assets/blocks/pebbles2.png"
-    },
-    {
-      "path": "res://game/assets/blocks/pebbles3.png"
+      "path": "res://game/assets/blocks/log1_top.png"
     },
     {
       "path": "res://game/assets/blocks/stone.png"
@@ -227,20 +530,55 @@
       ]
     },
     {
-      "generator": "bark",
-      "color": [
-        0.38,
-        0.24,
-        0.13
-      ]
+      "path": "res://game/assets/blocks/log1.png"
     },
     {
-      "generator": "noise",
-      "color": [
-        0.43,
-        0.62,
-        0.27
-      ]
-    }
+      "path": "res://game/assets/blocks/leaves.png"
+    },
+  {
+    "path": "res://game/assets/blocks/snow.png"
+  },
+  {
+    "path": "res://game/assets/blocks/clay.png"
+  },
+  {
+    "path": "res://game/assets/blocks/ice.png"
+  },
+  {
+    "path": "res://game/assets/blocks/lava.png"
+  },
+  {
+    "path": "res://game/assets/blocks/limestone.png"
+  },
+  {
+    "path": "res://game/assets/blocks/abyssal_stone.png"
+  },
+  {
+    "path": "res://game/assets/blocks/basalt.png"
+  },
+  {
+    "path": "res://game/assets/blocks/fungal_cap.png"
+  },
+  {
+    "path": "res://game/assets/blocks/cave_moss.png"
+  },
+  {
+    "path": "res://game/assets/blocks/cave_root.png"
+  },
+  {
+    "path": "res://game/assets/blocks/planks.png"
+  },
+  {
+    "path": "res://game/assets/blocks/stone_bricks.png"
+  },
+  {
+    "path": "res://game/assets/blocks/iron_ore.png"
+  },
+  {
+    "path": "res://game/assets/blocks/hellstone.png"
+  },
+  {
+    "path": "res://game/assets/blocks/pebble.png"
+  }
   ]
 }

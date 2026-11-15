@@ -1,0 +1,2 @@
+CAVE_FORMATION_SUPPORT_PASS placements=600 supported=137624 removed=1423
+CAVE_FORMATIONS_PASS profiles=10 formed_voxels=2392 accent_voxels=84 protected_path_points=2925; scalar/LOD0-2, 4 halos and edit-last

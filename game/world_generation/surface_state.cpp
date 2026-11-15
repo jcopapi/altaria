@@ -43,7 +43,7 @@ static bool valid_surface(const Appearance &a, const Registry &r) {
     return !a.derived_ramp && a.tint <= 0xffffff && a.preserve <= 1000 && a.brightness <= 2000 && overlay(a.overlay) &&
            overlay(a.decoration) && (a.shape == 255 || valid_shape_id(a.shape)) && a.rotation < 4;
 }
-bool WorldModel::validate_surface(const SurfaceCommand &c, std::string &error) const {
+bool WorldModel::validate_surface(const SurfaceCommand &c, std::string &error,std::optional<BlockId> support) const {
     const auto &s = generator->settings();
     auto it = sequences.find(c.actor);
     if (!c.actor || !c.sequence || (it != sequences.end() && c.sequence <= it->second)) {
@@ -59,14 +59,15 @@ bool WorldModel::validate_surface(const SurfaceCommand &c, std::string &error) c
         error = "Invalid paint or overlay definition";
         return false;
     }
-    if (block_at(c.position.x, c.position.y, c.position.z) == generator->blocks().air) {
+    BlockId block=support ? *support : block_at(c.position.x, c.position.y, c.position.z);
+    if (!generator->blocks().valid(block) || block == generator->blocks().air) {
         error = "Paint and overlays need a supporting block";
         return false;
     }
     return true;
 }
-bool WorldModel::apply_surface(const SurfaceCommand &c, std::string &error) {
-    if (!validate_surface(c, error))
+bool WorldModel::apply_surface(const SurfaceCommand &c, std::string &error,std::optional<BlockId> support) {
+    if (!validate_surface(c, error,support))
         return false;
     if (!appearances.count(c.position))
         surface_regions[region(c.position)].push_back(c.position);

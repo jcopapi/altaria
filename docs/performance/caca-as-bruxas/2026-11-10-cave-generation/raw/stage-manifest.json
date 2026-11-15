@@ -1,0 +1,33 @@
+{
+  "baseline_git": "eff109cccd7226189ff68832196cb9d2a555bc16",
+  "worktree": "dirty, concurrent non-cave edits preserved",
+  "scope": "staged cave foundation and session-only edits; full goal incomplete",
+  "microbenchmark": {
+    "cpu": "Intel Core i7-13620H",
+    "compiler_flags": "-std=c++17 -fno-exceptions -O2 -Wall -Wextra -Werror -pthread",
+    "seed": 1337,
+    "roof": "constant110",
+    "samples_per_run": 32768,
+    "runs": 3,
+    "renderer": "none; pure C++",
+    "fps_gain_claim": false
+  },
+  "sha256": {
+    "game/world_generation/caves/cave_runtime.cpp": "59d6e4ab0f213086f00996fb1bb12b87b7f03fb875f3ed0df899f3cfa2f9be97",
+    "game/world_generation/caves/cave_plan.cpp": "0f60db5c2838e16472fc35c5d266ee4892531339b44f8a191ecec1c3dd8e2e41",
+    "game/world_generation/caves/cave_field.cpp": "99f65ebca98c4d7d219e8735a6073f1387935fce3e5a592e11f1cb68e513e598",
+    "game/world_generation/caves/cave_runtime.h": "96e92568be9007022f77376f857ac34e26e19b9433d8bc83eb9b56d2ba9099eb",
+    "game/world_generation/caves/cave_plan.h": "ea5f340bec18e684379df580cb2a3a2335c4f7ae3bb553fff58f239e5cf8da75",
+    "game/world_generation/caves/cave_field.h": "bb0db54eac87c26d70e5325a9ef6f6a9b338b6b645706a95205f7f44521ee8df",
+    "game/world_generation/cave_data.cpp": "471558f398f89b506dcff4e0367d83fea043d5cfea8e97b1d6f7df4d18df7c0f",
+    "game/world_generation/data/caves.json": "4326bff378bbeea599ef851d6fc2126735d0a1becaa85c45c5ed6a7667749001",
+    "game/world_generation/terrain_mesh.cpp": "8b93f47efe01c1cc9b2c296c14664faa58567f98302b7ae04fda0a6d1536a69d",
+    "game/world_generation/voxel_core.cpp": "6c62b4fe857c8560d36037281eb62297bdc5f7335e4c8793e93c992380bb8d7f",
+    "game/world_generation/voxel_core.h": "6e789e7702ee5503490a1bb58879e68a401711b4bf1915ed8bf3e9484b6e5ebf",
+    "game/world_generation/surface_state.cpp": "9e962cc1e0bbb9ca676c587b9d17e6798a4989d009a3c2129d5628d574e725d0",
+    "game/world_generation/voxel_world.cpp": "a597471dc375a5d575aa40a8294ff20c9a049d84c66d7f7473e3d1e5a19c0030",
+    "native/src/altaria_game.cpp": "819f04c736e17df4db63adf4157b0c1ddada956f4bc54d0986c1b3bcbfe40258",
+    "tests/cave_runtime.gd": "7250ff81734f5f263c94883d6fc4618dd97221282dc4c77fcf20fc5d0114c96d",
+    "tests/cave_connectivity_tests.cpp": "2dca0de7d0944f6b1f8a5eb931f26a44e1add900beb22b5d7578e2c4a981ae57"
+  }
+}

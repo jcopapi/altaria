@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://b21duay1fn4sl"
+
+[deps]
+
+files=["res://docs/performance/caca-as-bruxas/2026-11-10-caca-as-bruxas-auditoria/raw/benchmark_results.metric.translation", "res://docs/performance/caca-as-bruxas/2026-11-10-caca-as-bruxas-auditoria/raw/benchmark_results.value.translation"]
+
+source_file="res://docs/performance/caca-as-bruxas/2026-11-10-caca-as-bruxas-auditoria/raw/benchmark_results.csv"
+dest_files=["res://docs/performance/caca-as-bruxas/2026-11-10-caca-as-bruxas-auditoria/raw/benchmark_results.metric.translation", "res://docs/performance/caca-as-bruxas/2026-11-10-caca-as-bruxas-auditoria/raw/benchmark_results.value.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

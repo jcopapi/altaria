@@ -1,0 +1,42 @@
+{
+  "liquids": [
+    {
+      "id": 1,
+      "key": "water",
+      "block_key": "altaria:water",
+      "name": "Water",
+      "name_pt": "Água",
+      "viscosity": 1.0,
+      "tick_delay": 1,
+      "max_spread_rate": 64,
+      "current_push_strength": 9.5,
+      "density": 1000.0,
+      "damage_per_second": 0.0,
+      "reactions": [
+        {
+          "with_liquid": "lava",
+          "result_block": "altaria:stone"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "key": "lava",
+      "block_key": "altaria:lava",
+      "name": "Lava",
+      "name_pt": "Lava",
+      "viscosity": 4.5,
+      "tick_delay": 4,
+      "max_spread_rate": 16,
+      "current_push_strength": 2.0,
+      "density": 3100.0,
+      "damage_per_second": 25.0,
+      "reactions": [
+        {
+          "with_liquid": "water",
+          "result_block": "altaria:stone"
+        }
+      ]
+    }
+  ]
+}

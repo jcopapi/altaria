@@ -1,5 +1,6 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_toon;
+#include "res://game/world_generation/shaders/lod_opacity.gdshaderinc"
 #include "res://game/world_generation/shaders/block_tint.gdshaderinc"
 uniform bool fullbright = false;
 uniform sampler2DArray block_textures : filter_nearest_mipmap, repeat_disable;
@@ -12,10 +13,12 @@ void vertex() {
     target_hsv = rgb_to_hsv(COLOR.rgb);
     preserve = COLOR.a;
     brightness = CUSTOM0.a;
-    layer = UV2.x;
-    painted = CUSTOM1.x;
+    layer = floor(CUSTOM2.z * 255.0 + 0.5);
+    painted = CUSTOM2.x;
 }
 void fragment() {
+    if (lod_opacity < 0.0)
+        discard;
     vec4 original = texture(block_textures, vec3(UV, layer));
     if (painted > 0.5) { original = tint_block(original, target_hsv, preserve, brightness); }
     vec3 color = color_to_linear(original.rgb);

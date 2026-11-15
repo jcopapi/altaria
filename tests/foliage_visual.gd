@@ -85,9 +85,9 @@ func run() -> void:
     await create_timer(.4).timeout
     var s: Dictionary=game.get_debug_state()
     print("FOLIAGE_STATS ",s)
-    check(s.vegetation_tiles==0 and s.grass_instances==0 and s.bushes==0,"3D grass and bushes are removed")
+    check(s.vegetation_tiles>0 and s.grass_instances>0,"Exposed grass has animated vegetation")
     var batches=game.find_children("GrassInstances","MultiMeshInstance3D",true,false)
-    check(batches.is_empty(),"No 3D grass MultiMesh instances are created")
+    check(not batches.is_empty(),"Grass uses MultiMesh instances")
     await capture("terrain_grass_blocks")
     # Isolate a textured cube. A camera tracking its transform must see the same
     # texels after arbitrary translation and rotation, including after save/load.

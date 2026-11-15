@@ -1,0 +1,2 @@
+CAVE_INTEGRATION_PASS: chamber/entrance scalar-bulk equality, shared halo, rock floors, dry voids, session edit-last, fresh-world reset, bounds and cache configuration
+plan_ms=0.253256 field_ms=62.7079 total_tile_ms=96.4568 mesh_ms=27.8987 cache_regions=9 estimated_cache_bytes=2472768

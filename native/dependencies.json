@@ -18,5 +18,13 @@
     "commit": "f7e9ce6fca475731c0a3c115ec29dcfd36886b2a",
     "license": "MIT",
     "managed_by": "FastNoise2 CMake"
+  },
+  "entt": {
+    "repository": "https://github.com/skypjack/entt",
+    "tag": "v3.16.0",
+    "file": "single_include/entt/entt.hpp",
+    "vendored_at": "native/third_party/entt",
+    "sha256": "3272191cf3d46cec92368f918695502dc8d174c92e0b8b4a5d53fed28e240c9f",
+    "license": "MIT"
   }
 }

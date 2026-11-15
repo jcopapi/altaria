@@ -1,4 +1,5 @@
 #include "world_data.h"
+#include "block_shapes.h"
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -27,6 +28,15 @@ Dictionary load_generation_data(String &error) {
         data["biomes"] = read_json("res://game/world_generation/data/biomes.json", error);
     if (error.is_empty())
         data["environment"] = read_json("res://game/world_generation/data/environment.json", error);
+    if (error.is_empty())
+        data["caves"] = read_json("res://game/world_generation/data/caves.json", error);
+    if (error.is_empty()) {
+        Dictionary caves=data["caves"];
+        caves["biomes"]=read_json("res://game/world_generation/data/cave_biomes.json",error);
+        data["caves"]=caves;
+    }
+    if (error.is_empty())
+        data["resources"] = read_json("res://game/world_generation/data/resources.json", error);
     return data;
 }
 Dictionary load_block_data(String &error) {
@@ -68,6 +78,8 @@ bool parse_environment(const Dictionary &d, EnvironmentSettings &settings, Strin
         settings.field = decltype(settings.field)(v);                                                        \
     }
     settings.outline_enabled = d.get("outline_enabled", true);
+    settings.outline_silhouettes = d.get("outline_silhouettes", true);
+    settings.ssao_enabled = d.get("ssao_enabled", false);
     settings.pixelation_enabled = d.get("pixelation_enabled", true);
     settings.godrays_enabled = d.get("godrays_enabled", true);
     settings.godrays_volumetric = d.get("godrays_volumetric", true);
@@ -113,6 +125,45 @@ bool parse_environment(const Dictionary &d, EnvironmentSettings &settings, Strin
     LOAD_ENV(grass_noise_strength, 0, 1);
     LOAD_ENV(cloud_coverage, 0, 1);
     LOAD_ENV(cloud_pixel_size, .001, .1);
+    LOAD_ENV(cloud_base_y, 64, 1024);
+    LOAD_ENV(cloud_thickness, 8, 256);
+    LOAD_ENV(cloud_above_opacity, 0, 1);
+    LOAD_ENV(grade_strength, 0, 1);
+    LOAD_ENV(saturation, 0, 3);
+    LOAD_ENV(contrast, .5, 2);
+    LOAD_ENV(glow_intensity, 0, 4);
+    LOAD_ENV(sun_halo, 0, 4);
+    LOAD_ENV(cloud_bands, 2, 16);
+#define LOAD_ENV_COLOR(field)                                                                                \
+    if (d.has(#field)) {                                                                                     \
+        Array c = d[#field];                                                                                 \
+        bool ok = c.size() == 3;                                                                             \
+        for (int i = 0; ok && i < 3; i++)                                                                    \
+            ok = std::isfinite(double(c[i])) && double(c[i]) >= 0 && double(c[i]) <= 4;                      \
+        if (!ok) {                                                                                           \
+            error = "Invalid environment color: " #field;                                                    \
+            return false;                                                                                    \
+        }                                                                                                    \
+        settings.field = {float(c[0]), float(c[1]), float(c[2])};                                            \
+    }
+    LOAD_ENV_COLOR(sun_color_day);
+    LOAD_ENV_COLOR(sun_color_dusk);
+    LOAD_ENV_COLOR(moon_color);
+    LOAD_ENV_COLOR(sky_day_zenith);
+    LOAD_ENV_COLOR(sky_day_horizon);
+    LOAD_ENV_COLOR(sky_night_zenith);
+    LOAD_ENV_COLOR(sky_night_horizon);
+    LOAD_ENV_COLOR(sky_dusk_glow);
+    LOAD_ENV_COLOR(ambient_day);
+    LOAD_ENV_COLOR(ambient_night);
+    LOAD_ENV_COLOR(sky_fill_day);
+    LOAD_ENV_COLOR(sky_fill_night);
+    LOAD_ENV_COLOR(grade_shadow_tint);
+    LOAD_ENV_COLOR(grade_highlight_tint);
+    LOAD_ENV_COLOR(cloud_lit_color);
+    LOAD_ENV_COLOR(cloud_shadow_color);
+    LOAD_ENV_COLOR(cloud_dusk_color);
+#undef LOAD_ENV_COLOR
     LOAD_ENV(max_bodies, 1, 128);
     LOAD_ENV(max_parts, 1, 256);
     LOAD_ENV(physics_distance, 32, 128);
@@ -120,7 +171,88 @@ bool parse_environment(const Dictionary &d, EnvironmentSettings &settings, Strin
 #undef LOAD_ENV
     return true;
 }
-bool parse_settings(const Dictionary &d, Settings &s, String &error) {
+bool parse_settings(const Dictionary &saved, Settings &s, String &error) {
+    // Machine tuning is not part of a world: saved worlds snapshot their
+    // generation settings, but these keys always follow the current files.
+    Dictionary d = saved.duplicate();
+    {
+        String ignored;
+        const Dictionary current = read_json("res://game/world_generation/data/generation.json", ignored);
+        for (const char *key : {"workers", "upload_budget", "upload_time_budget_ms", "upload_vertex_budget", "max_pending"})
+            if (current.has(key))
+                d[key] = current[key];
+    }
+    if (d.has("resources")) {
+        if (d["resources"].get_type() != Variant::DICTIONARY ||
+            Dictionary(d["resources"]).get("deposits", Variant()).get_type() != Variant::ARRAY) {
+            error = "Expected resources.deposits array";
+            return false;
+        }
+        const Dictionary resource_data = d["resources"];
+        if (resource_data.has("enabled") && resource_data["enabled"].get_type() != Variant::BOOL) {
+            error = "Expected resources.enabled boolean";
+            return false;
+        }
+        s.generate_resource_deposits = resource_data.get("enabled", true);
+        const Array deposits = resource_data["deposits"];
+        for (int i = 0; i < deposits.size(); ++i) {
+            if (deposits[i].get_type() != Variant::DICTIONARY) {
+                error = "Expected resource deposit object";
+                return false;
+            }
+            const Dictionary entry = deposits[i];
+            const String block = entry.get("block", "");
+            const String tint = entry.get("tint", "#ffffff");
+            ResourceRule rule;
+            rule.block = block.utf8().get_data();
+            rule.min_depth = entry.get("min_depth", 0);
+            rule.max_depth = entry.get("max_depth", 0);
+            rule.chance = entry.get("chance", 0);
+            rule.size = entry.get("size", .2);
+            rule.pieces = entry.get("pieces", 1);
+            rule.all_faces = entry.get("all_faces", false);
+            rule.embed = entry.get("embed", 0.f);
+            rule.irregular = entry.get("irregular", false);
+            rule.outline = entry.get("outline", true);
+            if (block.is_empty() || !Color::html_is_valid(tint) ||
+                entry.get("hosts", Variant()).get_type() != Variant::ARRAY ||
+                !std::isfinite(rule.min_depth) || !std::isfinite(rule.max_depth) ||
+                rule.min_depth > rule.max_depth || !(rule.chance >= 0.f && rule.chance <= 1.f) ||
+                !(rule.size >= .05f && rule.size <= .45f) ||
+                !(rule.embed >= 0.f && rule.embed <= .75f) ||
+                rule.pieces < 1 || rule.pieces > (block == "altaria:pebble" ? 3 : 4)) {
+                error = "Invalid resource deposit settings";
+                return false;
+            }
+            const Array hosts = entry["hosts"];
+            for (int j = 0; j < hosts.size(); ++j) {
+                if (hosts[j].get_type() != Variant::STRING || String(hosts[j]).is_empty()) {
+                    error = "Invalid resource host key";
+                    return false;
+                }
+                rule.hosts.emplace_back(String(hosts[j]).utf8().get_data());
+            }
+            if (rule.hosts.empty()) {
+                error = "Resource deposits need at least one host block";
+                return false;
+            }
+            const Color color = Color::html(tint);
+            rule.tint = {color.r, color.g, color.b};
+            if (s.generate_resource_deposits)
+                s.resources.push_back(std::move(rule));
+        }
+    }
+    const String preset = d.get("preset", "default");
+    if (preset == "plain")
+        s.preset = WorldPreset::Plain;
+    else if (preset == "structure")
+        s.preset = WorldPreset::Structure;
+    else if (preset == "default")
+        s.preset = WorldPreset::Default;
+    else {
+        error = "Unknown world preset. Choose default, plain or structure.";
+        return false;
+    }
 #define LOAD(field)                                                                                          \
     do {                                                                                                     \
         if (d.has(#field)) {                                                                                 \
@@ -152,6 +284,17 @@ bool parse_settings(const Dictionary &d, Settings &s, String &error) {
     LOAD(warp_amplitude);
     LOAD(valley_depth);
     LOAD(valley_width);
+    LOAD(ocean_depth);
+    LOAD(river_scale);
+    LOAD(river_width);
+    LOAD(beach_height);
+    LOAD(meadow_hill_amplitude);
+    LOAD(hill_spacing);
+    LOAD(hill_chance);
+    LOAD(hill_height_min);
+    LOAD(hill_height_max);
+    LOAD(hill_width_min);
+    LOAD(hill_width_max);
     LOAD(cliff_strength);
     LOAD(terrace_strength);
     LOAD(plains_threshold);
@@ -181,6 +324,7 @@ bool parse_settings(const Dictionary &d, Settings &s, String &error) {
     LOAD(mountain_blend);
     LOAD(tree_spacing);
     LOAD(tree_lod_max);
+    LOAD(far_heightfield_lod);
     LOAD(grass_tufts);
     LOAD(grass_height);
     LOAD(grass_height_variation);
@@ -190,13 +334,38 @@ bool parse_settings(const Dictionary &d, Settings &s, String &error) {
     LOAD(grass_fade_distance);
     LOAD(bush_render_distance);
     LOAD(upload_time_budget_ms);
+    LOAD(upload_vertex_budget);
     s.bush_block = String(d.get("bush_block", String("altaria:leaves"))).utf8().get_data();
     s.vegetation = d.get("vegetation", false);
     s.surface_shapes = d.get("surface_shapes", false);
-    // Retire both experimental generators, including snapshots in existing saves.
-    if (bool(d.get("surface_ramps", false)) || bool(d.get("terrain_smoothing", false)))
-        s.surface_shapes = true;
-    if(s.upload_time_budget_ms<.25f || s.upload_time_budget_ms>8) {
+    if (d.has("smooth_lowland_relief") && d["smooth_lowland_relief"].get_type() != Variant::BOOL) {
+        error = "Expected boolean smooth_lowland_relief setting";
+        return false;
+    }
+    s.smooth_lowland_relief = d.get("smooth_lowland_relief", false);
+    for (const char *field : {"deeper_waterbeds", "mixed_sediments", "mountain_ledges"}) {
+        if (d.has(field) && d[field].get_type() != Variant::BOOL) {
+            error = String("Expected boolean setting: ") + field;
+            return false;
+        }
+    }
+    s.deeper_waterbeds = d.get("deeper_waterbeds", false);
+    s.mixed_sediments = d.get("mixed_sediments", false);
+    s.mountain_ledges = d.get("mountain_ledges", false);
+    if(d.has("far_vertical_trim") && d["far_vertical_trim"].get_type()!=Variant::BOOL){error="Expected boolean far vertical trim setting";return false;}
+    s.far_vertical_trim=d.get("far_vertical_trim",false);
+    if (d.has("adaptive_streaming") && d["adaptive_streaming"].get_type()!=Variant::BOOL) {
+        error="Expected boolean adaptive streaming setting";
+        return false;
+    }
+    s.adaptive_streaming=d.get("adaptive_streaming",false);
+    if (d.has("caves")) {
+        if (d["caves"].get_type()!=Variant::DICTIONARY) {error="Expected caves settings object";return false;}
+        s.caves.plan.floor=s.min_y;s.caves.plan.ceiling=s.max_y;
+        if (!parse_caves(d["caves"],s.caves,error))return false;
+    }
+    if(s.upload_time_budget_ms<.25f || s.upload_time_budget_ms>8 ||
+       s.upload_vertex_budget<8000 || s.upload_vertex_budget>2000000) {
         error="Invalid upload budget"; return false;
     }
     if (s.tree_lod_max < 0 || s.tree_lod_max > 2 || s.grass_tufts < 1 || s.grass_tufts > 16 ||
@@ -210,10 +379,11 @@ bool parse_settings(const Dictionary &d, Settings &s, String &error) {
         return false;
     }
 #undef LOAD
-    if ((s.generator_version != 1 && s.generator_version != 2) || s.min_y % 16 || s.max_y % 16 ||
-        s.min_y < -512 || s.max_y > 1024 || s.max_y - s.min_y < 64 || s.max_y - s.min_y > 768 ||
-        s.sea_level <= s.min_y || s.sea_level >= s.max_y || s.octaves < 2 || s.octaves > 8 || s.workers < 1 ||
-        s.workers > 8 || s.upload_budget < 1 || s.upload_budget > 8 || s.max_pending < 4 ||
+    if ((s.generator_version < 1 || s.generator_version > 3) || s.min_y % 16 || s.max_y % 16 ||
+        s.min_y < -caves::max_vertical_span || s.max_y > 1024 || s.max_y - s.min_y < 64 ||
+        s.max_y - s.min_y > caves::max_vertical_span ||
+        s.sea_level <= s.min_y || s.sea_level >= s.max_y || s.octaves < 2 || s.octaves > 8 || s.workers < 0 ||
+        s.workers > 16 || s.upload_budget < 1 || s.upload_budget > 8 || s.max_pending < 4 ||
         s.max_pending > 64 || s.near_distance < 32 || s.middle_distance <= s.near_distance ||
         s.coarse_distance <= s.middle_distance || s.view_distance < s.coarse_distance + 256 ||
         s.view_distance > 8192 || s.autosave_seconds < 2 || s.continental_scale <= 0 ||
@@ -223,6 +393,15 @@ bool parse_settings(const Dictionary &d, Settings &s, String &error) {
         s.cliff_strength > 64 || s.terrace_strength < 0 || s.terrace_strength > 1 || s.warp_amplitude < 0 ||
         s.warp_amplitude > 512) {
         error = "Generation settings out of range. See game/world_generation/README.md.";
+        return false;
+    }
+    if(s.generator_version>=3 && (s.ocean_depth<4 || s.ocean_depth>160 || s.river_scale<128 ||
+        s.river_width<=0 || s.river_width>=s.valley_width || s.beach_height<0 || s.beach_height>8 ||
+        s.meadow_hill_amplitude<0 || s.meadow_hill_amplitude>32 || s.hill_chance<0 || s.hill_chance>1 ||
+        s.hill_height_min<1 || s.hill_height_max<s.hill_height_min || s.hill_height_max>64 ||
+        s.hill_width_min<.6f || s.hill_width_max<s.hill_width_min || s.hill_width_max>6 ||
+        s.hill_spacing<s.hill_height_max*s.hill_width_max+3.f || s.hill_spacing>512)) {
+        error="Invalid coastline or river settings";
         return false;
     }
     if (s.generator_version >= 2 &&
@@ -280,11 +459,12 @@ bool parse_settings(const Dictionary &d, Settings &s, String &error) {
             out.humidity = bd.get("humidity", .5);
             out.terrain_multiplier = bd.get("terrain_multiplier", 1);
             out.mountain_multiplier = bd.get("mountain_multiplier", 1);
-            out.pebbles = bd.get("pebble_density", .1);
+            out.pebbles = bd.get("pebble_density", 0.0);
             out.preserve_saturation = bd.get("preserve_saturation", .65);
             out.brightness = bd.get("brightness", 1.35);
             out.desert = bd.get("desert", false);
             out.snow = bd.get("snow", false);
+            out.volcanic = bd.get("volcanic", false);
             out.day_c = bd.get("day_temperature_c", out.snow ? -4 : out.desert ? 38 : 22);
             out.night_c = bd.get("night_temperature_c", out.snow ? -16 : out.desert ? 8 : 10);
             out.tree_density = bd.get("tree_density", out.desert ? 0 : .45);
@@ -356,6 +536,30 @@ bool parse_settings(const Dictionary &d, Settings &s, String &error) {
             return false;
         }
     }
+    if (d.has("single_biome")) {
+        if (d["single_biome"].get_type() != Variant::STRING) {
+            error = "Expected string setting: single_biome";
+            return false;
+        }
+        const String requested = String(d["single_biome"]).strip_edges().to_lower();
+        if (!requested.is_empty()) {
+            std::string req = requested.utf8().get_data();
+            bool matched = false;
+            for (const auto &b : s.biomes) {
+                std::string k = String(b.key.c_str()).to_lower().utf8().get_data();
+                std::string n = String(b.name.c_str()).to_lower().utf8().get_data();
+                if (req == k || req == n) {
+                    s.single_biome = b.key;
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) {
+                error = "Unknown single_biome: " + requested;
+                return false;
+            }
+        }
+    }
     if (d.has("environment")) {
         if (d["environment"].get_type() != Variant::DICTIONARY) {
             error = "Expected environment object";
@@ -391,16 +595,26 @@ bool parse_registry(const Dictionary &d, Registry &r, String &error) {
         def.key = key.utf8().get_data();
         def.name = String(b.get("name", key)).utf8().get_data();
         def.name_pt = String(b.get("name_pt", String(def.name.c_str()))).utf8().get_data();
+        def.deposit_model = String(b.get("deposit_model", "")).utf8().get_data();
         def.color = {float(color[0]), float(color[1]), float(color[2])};
         def.texture_layer = b.get("texture_layer", 0);
+        def.texture_end_layer = b.get("texture_end_layer", -1);
         def.overlay = b.get("overlay", 0);
         def.transition_overlay = b.get("transition_overlay", 0);
         def.solid = b.get("solid", true);
         def.water = b.get("water", false);
+        def.lava = b.get("lava", false);
+        def.liquid = b.get("liquid", def.water || def.lava);
         def.placeable = b.get("placeable", true);
+        def.collectible = b.get("collectible", def.placeable);
+        def.instant_break = b.get("instant_break", false);
         def.wood = b.get("wood", false);
         def.foliage = b.get("foliage", false);
+        def.root_plant = b.get("root_plant", false);
+        def.rock_variation = b.get("rock_variation", false);
+        def.grass_on_rock = b.get("grass_on_rock", false);
         def.tintable = b.get("tintable", false);
+        def.alpha_cutout = b.get("alpha_cutout", false);
         def.mass = b.get("mass", 20);
         def.thermal_delta = b.get("thermal_delta_c", 0);
         def.thermal_radius = b.get("thermal_radius", 0);
@@ -488,7 +702,8 @@ bool parse_registry(const Dictionary &d, Registry &r, String &error) {
     }
     for (auto &b : r.blocks)
         if (!b.key.empty() &&
-            (b.texture_layer < 0 || b.texture_layer >= int(r.textures.size()) || b.overlay < 0 ||
+            (b.texture_layer < 0 || b.texture_layer >= int(r.textures.size()) ||
+             b.texture_end_layer < -1 || b.texture_end_layer >= int(r.textures.size()) || b.overlay < 0 ||
              b.overlay >= int(r.overlays.size()) || (b.overlay > 0 && r.overlays[b.overlay].key.empty()) ||
              b.transition_overlay < 0 || b.transition_overlay >= int(r.overlays.size()) ||
              (b.transition_overlay > 0 && r.overlays[b.transition_overlay].key.empty()))) {
@@ -513,6 +728,11 @@ bool parse_registry(const Dictionary &d, Registry &r, String &error) {
     ROLE(water);
     ROLE(snow);
     ROLE(bedrock);
+    if (roles.has("lava")) {
+        String lava_key = roles.get("lava", "altaria:lava");
+        if (r.keys.count(lava_key.utf8().get_data()))
+            r.lava = r.find(lava_key.utf8().get_data());
+    }
 #undef ROLE
     if (r.air != 0 || r.get(r.air).solid || r.get(r.air).water || !r.get(r.water).water ||
         r.get(r.water).solid || !r.get(r.stone).solid || !r.get(r.bedrock).solid) {

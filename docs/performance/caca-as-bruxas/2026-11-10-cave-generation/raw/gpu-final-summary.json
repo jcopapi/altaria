@@ -1,0 +1,179 @@
+[
+  {
+    "trial": 1,
+    "output_directory": "/tmp/altaria-cave-frame.c9N9QM",
+    "mode": "Vulkan Forward+ RTX4050",
+    "scenarios": {
+      "stationary_lake": {
+        "count": 241.0,
+        "p50_ms": 8.299,
+        "p95_ms": 9.254,
+        "p99_ms": 9.482,
+        "max_ms": 9.668,
+        "pending": 0.0,
+        "tiles": 460.0,
+        "voxel_bytes": 99693440.0,
+        "collider_triangles": 303972.0,
+        "collider_ms_max": 19.7541122436523,
+        "upload_ms_max": 23.1716423034668
+      },
+      "streaming_stress": {
+        "count": 595.0,
+        "p50_ms": 8.15,
+        "p95_ms": 12.705,
+        "p99_ms": 16.758,
+        "max_ms": 27.599,
+        "pending": 24.0,
+        "tiles": 500.0,
+        "voxel_bytes": 179804240.0,
+        "collider_triangles": 722916.0,
+        "collider_ms_max": 20.8451366424561,
+        "upload_ms_max": 24.824634552002
+      },
+      "lake_remesh": {
+        "count": 241.0,
+        "p50_ms": 8.139,
+        "p95_ms": 9.277,
+        "p99_ms": 9.374,
+        "max_ms": 17.401,
+        "pending": 0.0,
+        "tiles": 463.0,
+        "voxel_bytes": 106814400.0,
+        "collider_triangles": 326740.0,
+        "collider_ms_max": 20.8451366424561,
+        "upload_ms_max": 26.2921581268311
+      }
+    },
+    "startup": {
+      "mode": "X11",
+      "seed": "1337",
+      "first_tile_ms": "548.461444",
+      "ready_ms": "6331.961339"
+    },
+    "peak_rss_kib": 1611028,
+    "input_hashes": [
+      "6e5c993629129d11af99df69819ffbd8a7431f01c8c7b20f24687097a1571402  bin/libaltaria.linux.template_debug.x86_64.so",
+      "77e2c9e2268d1a0664fa05b9b2c0e78b0a4a9429bbfaa2bc92b55ce7f1e080a1  /tmp/altaria-cave-frame.c9N9QM/project/game/world_generation/data/caves.json",
+      "8ac15d2b1b7e5071eaa3b549e5557c7e2ae76212efc870f24b8b7d0324fa0231  /tmp/altaria-cave-frame.c9N9QM/project/game/world_generation/data/cave_biomes.json",
+      "c3ad04fb7c204a1e69f296eea7c524c692f871992f30e5ccca7274f96beaba7c  /tmp/altaria-cave-frame.c9N9QM/project/game/world_generation/data/generation.json"
+    ]
+  },
+  {
+    "trial": 2,
+    "output_directory": "/tmp/altaria-cave-frame.oHDoxk",
+    "mode": "Vulkan Forward+ RTX4050",
+    "scenarios": {
+      "stationary_lake": {
+        "count": 241.0,
+        "p50_ms": 8.033,
+        "p95_ms": 9.319,
+        "p99_ms": 9.407,
+        "max_ms": 9.507,
+        "pending": 0.0,
+        "tiles": 460.0,
+        "voxel_bytes": 99693440.0,
+        "collider_triangles": 303972.0,
+        "collider_ms_max": 21.9790058135986,
+        "upload_ms_max": 26.0899028778076
+      },
+      "streaming_stress": {
+        "count": 594.0,
+        "p50_ms": 8.146,
+        "p95_ms": 11.896,
+        "p99_ms": 18.605,
+        "max_ms": 25.89,
+        "pending": 24.0,
+        "tiles": 498.0,
+        "voxel_bytes": 174463520.0,
+        "collider_triangles": 708340.0,
+        "collider_ms_max": 21.9790058135986,
+        "upload_ms_max": 26.0899028778076
+      },
+      "lake_remesh": {
+        "count": 241.0,
+        "p50_ms": 8.118,
+        "p95_ms": 9.312,
+        "p99_ms": 9.492,
+        "max_ms": 17.307,
+        "pending": 0.0,
+        "tiles": 463.0,
+        "voxel_bytes": 106814400.0,
+        "collider_triangles": 326740.0,
+        "collider_ms_max": 22.1622352600098,
+        "upload_ms_max": 28.2861919403076
+      }
+    },
+    "startup": {
+      "mode": "X11",
+      "seed": "1337",
+      "first_tile_ms": "510.455289",
+      "ready_ms": "6242.217355"
+    },
+    "peak_rss_kib": 1609200,
+    "input_hashes": [
+      "6e5c993629129d11af99df69819ffbd8a7431f01c8c7b20f24687097a1571402  bin/libaltaria.linux.template_debug.x86_64.so",
+      "77e2c9e2268d1a0664fa05b9b2c0e78b0a4a9429bbfaa2bc92b55ce7f1e080a1  /tmp/altaria-cave-frame.oHDoxk/project/game/world_generation/data/caves.json",
+      "8ac15d2b1b7e5071eaa3b549e5557c7e2ae76212efc870f24b8b7d0324fa0231  /tmp/altaria-cave-frame.oHDoxk/project/game/world_generation/data/cave_biomes.json",
+      "c3ad04fb7c204a1e69f296eea7c524c692f871992f30e5ccca7274f96beaba7c  /tmp/altaria-cave-frame.oHDoxk/project/game/world_generation/data/generation.json"
+    ]
+  },
+  {
+    "trial": 3,
+    "output_directory": "/tmp/altaria-cave-frame.dh5uxZ",
+    "mode": "Vulkan Forward+ RTX4050",
+    "scenarios": {
+      "stationary_lake": {
+        "count": 241.0,
+        "p50_ms": 8.161,
+        "p95_ms": 9.281,
+        "p99_ms": 9.369,
+        "max_ms": 9.432,
+        "pending": 0.0,
+        "tiles": 460.0,
+        "voxel_bytes": 99693440.0,
+        "collider_triangles": 303972.0,
+        "collider_ms_max": 19.8719120025635,
+        "upload_ms_max": 23.1145935058594
+      },
+      "streaming_stress": {
+        "count": 596.0,
+        "p50_ms": 8.185,
+        "p95_ms": 11.447,
+        "p99_ms": 17.147,
+        "max_ms": 23.128,
+        "pending": 24.0,
+        "tiles": 490.0,
+        "voxel_bytes": 169122800.0,
+        "collider_triangles": 688682.0,
+        "collider_ms_max": 19.8719120025635,
+        "upload_ms_max": 23.1145935058594
+      },
+      "lake_remesh": {
+        "count": 241.0,
+        "p50_ms": 8.107,
+        "p95_ms": 9.448,
+        "p99_ms": 9.658,
+        "max_ms": 16.842,
+        "pending": 0.0,
+        "tiles": 460.0,
+        "voxel_bytes": 99693440.0,
+        "collider_triangles": 303984.0,
+        "collider_ms_max": 19.8719120025635,
+        "upload_ms_max": 24.1148319244385
+      }
+    },
+    "startup": {
+      "mode": "X11",
+      "seed": "1337",
+      "first_tile_ms": "543.038797",
+      "ready_ms": "6241.489979"
+    },
+    "peak_rss_kib": 1619992,
+    "input_hashes": [
+      "6e5c993629129d11af99df69819ffbd8a7431f01c8c7b20f24687097a1571402  bin/libaltaria.linux.template_debug.x86_64.so",
+      "77e2c9e2268d1a0664fa05b9b2c0e78b0a4a9429bbfaa2bc92b55ce7f1e080a1  /tmp/altaria-cave-frame.dh5uxZ/project/game/world_generation/data/caves.json",
+      "8ac15d2b1b7e5071eaa3b549e5557c7e2ae76212efc870f24b8b7d0324fa0231  /tmp/altaria-cave-frame.dh5uxZ/project/game/world_generation/data/cave_biomes.json",
+      "c3ad04fb7c204a1e69f296eea7c524c692f871992f30e5ccca7274f96beaba7c  /tmp/altaria-cave-frame.dh5uxZ/project/game/world_generation/data/generation.json"
+    ]
+  }
+]

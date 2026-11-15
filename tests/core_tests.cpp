@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <unordered_set>
 using namespace altaria;
 static int checks = 0;
 static void require(bool condition, const char *message) {
@@ -46,10 +47,16 @@ static Registry registry() {
 #include "environment_core_tests.h"
 #include "cartoon_core_tests.h"
 #include "ramp_core_tests.h"
+#include "liquid_core_tests.h"
+#include "command_parser_tests.h"
+#include "surface_reform_tests.h"
 int main() {
+    altaria::run_command_parser_tests();
     test_environment_features();
     test_cartoon_building();
     test_ramp_connections();
+    test_liquid_system();
+    test_surface_reform();
     Registry r = registry();
     Settings s;
     auto gen = std::make_shared<Generator>(s, r, 1337);
@@ -163,7 +170,14 @@ int main() {
     flat_blocks.grass = flat_blocks.stone;
     Generator fg(flat, flat_blocks, 1);
     auto fm = build_tile({0, 0, 0}, 0, fg, std::make_shared<EditMap>());
-    require(fm.solid.indices.size() == 12, "greedy mesher collapses flat terrain to top and bottom quads");
+    require(fm.solid.indices.size() == 6, "Greedy mesher emits one flat top and culls the inaccessible underside");
+    require(std::any_of(fm.collision_rects.begin(),fm.collision_rects.end(),[&](const CollisionRect &face){
+        return face.axis==1 && !face.positive && face.corner[1]==flat.min_y;
+    }),"World floor keeps its physical boundary");
+    const auto cave_tiles = select_tiles({-15, 97, 70, 140, 192, true}, s);
+    require(!cave_tiles.empty() && std::all_of(cave_tiles.begin(), cave_tiles.end(),
+                [](const TileKey &tile) { return tile.level == 0; }),
+            "cave streaming uses full-resolution voxels across the lit range");
     auto tiles = select_tiles(-15, 97, s);
     bool levels[6] = {};
     for (size_t i = 0; i < tiles.size(); i++) {

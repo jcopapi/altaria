@@ -1,0 +1,17 @@
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6360)
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4050 Laptop GPU
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World -1692141056 seed=-1692141056
+WORLD_OPEN Cave reform validation seed=1337
+REFORM_INITIAL first_tile_ms=407.823796 ready_ms=3980.071698 voxel_bytes=36887960 tiles=444
+Generation complete: first tile 407.8 ms | all LODs 3980.1 ms
+WORLD_STREAM_READY Generation complete: first tile 407.8 ms | all LODs 3980.1 ms
+REFORM_FRAME stationary n=242 p50=8.259 p95=8.626 p99=8.689 max=8.762 voxel_bytes=36887960 pending=0 build=0
+REFORM_FRAME streaming n=472 p50=8.333 p95=11.398 p99=16.663 max=25.844 voxel_bytes=44610040 pending=24 build=0
+REFORM_LANDMARKS entrances={ "shaft": { "kind": "shaft", "position": (-94.26233, 50.56194, 78.27117) }, "mouth": { "kind": "mouth", "position": (115.4538, 50.92302, -128.952) }, "ravine": { "kind": "ravine", "position": (-218.2066, 29.03364, -157.6185) } } hall={ "id": "4011060619640554776", "depth": 2, "center": (179.5348, -373.81, 90.99252), "radius": (70.39934, 29.68885, 65.99162), "archetype": "giant", "isolated": false } deep={ "id": "827820847019164541", "depth": 3, "center": (-214.7384, -678.6464, -93.46739), "radius": (11.16739, 6.889043, 14.05682), "archetype": "normal", "isolated": false }
+REFORM_DEEPEST (-215, -679, -93) block=5 below_surface=697.941589355469 fluid=water
+CAVE_REFORM_RUNTIME_PASS

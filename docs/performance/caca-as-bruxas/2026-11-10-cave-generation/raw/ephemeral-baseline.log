@@ -1,0 +1,9 @@
+Test data: /tmp/altaria-ephemeral-test.dRWFCn
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World -1094798361 seed=-1094798361
+WORLD_OPEN World 1337 seed=1337
+WORLD_STREAM_READY Generation complete: first tile 78.8 ms | all LODs 2044.0 ms
+EPHEMERAL_RUNTIME_PASS

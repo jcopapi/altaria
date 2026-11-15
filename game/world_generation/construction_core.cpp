@@ -162,6 +162,25 @@ uint8_t ConstructionStore::neighbor_ramp(int x8,int z8,float plane,uint64_t excl
 }
 uint8_t ConstructionStore::connection_shape(const BuiltBlock &b,const BuiltBlock *preview) const {
     auto authored=pack_shape(b.appearance.shape,b.appearance.rotation);
+    if (shape_type(authored) == int(BlockShape::Stairs) || shape_type(authored) == int(BlockShape::Roof)) {
+        return connect_building_corner(authored, [&](int dx, int dz) -> uint8_t {
+            const IVec3 target{b.origin8.x + dx * 8, b.origin8.y, b.origin8.z + dz * 8};
+            const auto matches = [&](const BuiltBlock &other) {
+                return other.origin8 == target &&
+                    shape_type(pack_shape(other.appearance.shape, other.appearance.rotation)) == shape_type(authored);
+            };
+            if (preview && matches(*preview))
+                return pack_shape(preview->appearance.shape, preview->appearance.rotation);
+            const auto p = b.position();
+            for (auto id : nearby({p[0] + dx, p[1], p[2] + dz},
+                                  {p[0] + dx + 1, p[1] + 1, p[2] + dz + 1})) {
+                const auto &other = blocks.at(id);
+                if ((!preview || id != preview->id) && matches(other))
+                    return pack_shape(other.appearance.shape, other.appearance.rotation);
+            }
+            return 255;
+        });
+    }
     auto source=ramp_spec(authored);
     if(!source.valid)return authored;
     float plane=b.position()[1]+source.low();

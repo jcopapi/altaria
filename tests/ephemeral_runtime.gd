@@ -3,6 +3,8 @@ func run() -> void:
     game=load("res://scenes/main.tscn").instantiate()
     root.add_child(game)
     await process_frame
+    check(not game.get_debug_state().world_open, "No world before a command")
+    check(game.execute_command("world new 1337").begins_with("Generating"), "Generate the first world")
     find_player()
     actor.position=Vector3(0,235,5)
     await settle()
@@ -12,6 +14,9 @@ func run() -> void:
     check(game.set_voxel(0,220,0,3),"Edit current temporary world")
     check(game.place_block(Vector3(3,220,0),1,"slab",0)>0,"Ordinary construction works")
     check(game.paint_voxel(0,220,0,"#aa44cc",.4,1.1),"In-memory paint works")
+    var chicken_reply: String = game.execute_command("spawn chicken 3")
+    check(chicken_reply.begins_with("Spawned"),"EnTT chickens spawn from the console")
+    check(game.get_creature_count("altaria:chicken")>=1 and game.get_debug_state().creatures.has("altaria:chicken"),"Chickens are tracked by the entity registry")
     check(game.execute_command("world new 1337").begins_with("Generating"),"Generate fresh test world")
     find_player()
     actor.position=Vector3(0,235,5)

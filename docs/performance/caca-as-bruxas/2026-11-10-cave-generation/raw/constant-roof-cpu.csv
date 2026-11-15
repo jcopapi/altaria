@@ -1,0 +1,4 @@
+iteration,plan_ms,cold_query_ms,warm_query_ms,sample_32768_ms,carved,query_primitives,cache_regions,estimated_cache_bytes
+0,0.102709,2.52848,0.033403,4.17248,12624,67,9,1487886
+1,0.081561,2.17558,0.029558,4.97405,12624,67,9,1487886
+2,0.082916,2.06821,0.030532,4.27168,12624,67,9,1487886

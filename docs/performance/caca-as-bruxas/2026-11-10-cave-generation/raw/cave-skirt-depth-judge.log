@@ -1,0 +1,5 @@
+SKIRT_SEGMENT lo=-16 hi=2 color_r=0.2
+SKIRT_SEGMENT lo=2 hi=12 color_r=0.9
+SKIRT_SEGMENT lo=-16 hi=2 color_r=0.2
+SKIRT_SEGMENT lo=2 hi=12 color_r=0.9
+SKIRT_DEEP_MATERIAL_PASS

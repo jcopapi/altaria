@@ -3,6 +3,9 @@
 F1/backtick opens the plain console. Enter executes; Up/Down navigate history;
 Esc closes it. Player movement stops while typing. Commands are always in English.
 
+Use `resolution 1920x1080` to set and save the window size. `resolution` shows
+the current size and `resolution list` shows presets. The default is 1920×1080.
+
 | Command | Behavior |
 | --- | --- |
 | `world new [seed]` | Save current world; generate a new random or explicit-seed world during play; reload data files |
@@ -20,6 +23,7 @@ Esc closes it. Player movement stops while typing. Commands are always in Englis
 | `speed 30` | Flight speed (1–150) |
 | `tp 0 200 0` | Teleport |
 | `block altaria:sand` | Select a placeable block |
+| `item pickaxe\|axe\|clear [left\|right]` | Equip or clear a first-person tool. Defaults to the right hand. |
 | `spawn altaria:marker` | Spawn a data-defined placeholder entity |
 | `save` | Commit world/player metadata |
 | `help` | List commands |
@@ -46,7 +50,9 @@ Environment/build commands (English):
 - `fog #RRGGBB [start end]` overrides fog color and optionally its distances in metres.
 - `fog biome` restores blended biome/day-night fog.
 - `temperature` reports ambient, block contribution and apparent temperature in °C.
-- `light #RRGGBB [energy .1..20] [radius 1..64]` places a persistent colored light (max 16).
+- `light [color [energy .1..20] [radius 1..192]]` places a fixed light at the current viewpoint (max 16). Colors accept names and hex values.
+- `light follow [on|off|color [energy] [radius]]` toggles or configures the personal light.
+- `log export 30s` saves recent messages, engine errors and warnings, slow frames and chunk queue samples to `user://logs`. The console prints the full path. Requests can cover up to 300 seconds of available session history.
 - `cut [at x y z]` cuts a connected upper tree into one Jolt compound body.
 - `physics [at x y z]` releases one material/shape into Jolt.
 - `physics clear` removes all physical debris from the current world.
@@ -72,3 +78,37 @@ default (`outline_distance_start: 0`, `outline_distance_end: 0`), suppressing
 internal block seams and isolated cubes while outlining nearby hills as well as
 distant landforms. Procedural surfaces use full blocks and slabs; ramps are a
 building form.
+
+## Structure
+
+Start with `world new structure`. The stone anchor is removable. Right-click
+in open space to place a piece four blocks along the crosshair.
+
+| Control | Behavior |
+| --- | --- |
+| `cheat inventory on` / `cheat inventory off` | Enable or disable **T** for the Cheat Inventory. Click a block to add 64 to a matching stack or an empty slot. |
+| **V** / **B** | Mark corner 1 or 2 on the aimed block, or four blocks away in open space |
+| `structure pos1 [x y z]` / `structure pos2 [x y z]` | Mark by aim or by integer coordinates |
+| `structure clear` | Clear both corners |
+| `structure fill [block]` | Fill up to 4,096 cells with cubes of the held or named block, such as `altaria:stone` |
+| `structure fill air` | Clear the selected blocks |
+| `structure export <name>` | Write a non-empty selection of up to 262,144 cells to `user://structures/<name>.json` |
+
+Both corners are inclusive. A fill replaces construction pieces inside the
+area. If a piece crosses the outline, enlarge the selection to include it.
+
+Export version 1 uses `format: "altaria.structure"` and a `size` array in
+`[x, y, z]` order. Each entry in `blocks` has:
+
+- `block`, the namespaced registry key.
+- `position`, an `[x, y, z]` offset from the minimum corner. Construction
+  pieces keep their fractional block offsets and are included whole when
+  their bounds intersect the selection.
+- `kind`, either `voxel` or `construction`.
+- `shape`, `shape_code` and `rotation` (quarter turns). For authored shapes,
+  `authored_shape`, `authored_shape_id` and `authored_rotation` preserve the input to the connection rules.
+  `shape_code` stores the resolved geometry, including ramp variants.
+- Optional `paint` data and `overlay` or `decoration` keys. An empty key
+  clears that layer. An absent key uses the block default.
+
+Empty cells have no entries. Exporting the same name replaces its JSON file.

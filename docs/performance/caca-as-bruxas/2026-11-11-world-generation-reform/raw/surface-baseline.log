@@ -1,0 +1,12 @@
+1337 columns=341056 rivers=35253 ocean=87883 beaches=26627 wet=123081 longest_ocean_x=2352
+near -68,193 jump=43.2294 steep_edges=901 low=36.0281 high=157.725
+near -61,157 jump=43.2294 steep_edges=691 low=36.0281 high=109.754
+near -59,163 jump=43.2294 steep_edges=670 low=36.0281 high=112.824
+42 columns=341056 rivers=36238 ocean=89532 beaches=25785 wet=125627 longest_ocean_x=2928
+near -68,193 jump=23.3393 steep_edges=737 low=36.0281 high=144.588
+near -61,157 jump=23.3393 steep_edges=141 low=36.0284 high=150.516
+near -59,163 jump=23.3393 steep_edges=252 low=36.0283 high=150.516
+-89 columns=341056 rivers=35065 ocean=89740 beaches=26172 wet=124741 longest_ocean_x=3024
+near -68,193 jump=2.49238 steep_edges=0 low=43.8 high=52.8613
+near -61,157 jump=1.34251 steep_edges=0 low=43.8 high=51.2306
+near -59,163 jump=1.46105 steep_edges=0 low=43.8 high=51.2306

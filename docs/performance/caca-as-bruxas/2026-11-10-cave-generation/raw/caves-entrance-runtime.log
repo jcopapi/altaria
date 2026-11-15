@@ -1,0 +1,15 @@
+/tmp/altaria-cave-session.1398to/project
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World 627733605 seed=627733605
+WORLD_OPEN Cave session test seed=1337
+CAVE_RESIDENT_STATE player=(100.0, 150.0, 100.0) cache_regions=64 pinned=1 misses=111 pending=0 rooms=12
+CAVE_BIOME_DISTRIBUTION { "altaria:fossil": 223, "altaria:abyssal": 491, "altaria:infernal": 569, "altaria:fungal": 322, "altaria:limestone": 459, "altaria:flooded": 22, "altaria:crystal": 347, "altaria:hydrothermal": 66, "altaria:corrupted": 1 } depths={ "normal": true, "deep": true, "abyssal": true, "infernal": true } frozen_crystal=true hydrothermal_abyssal=true
+Generation complete: first tile 266.2 ms | all LODs 4948.5 ms
+WORLD_STREAM_READY Generation complete: first tile 266.2 ms | all LODs 4948.5 ms
+CAVE_JOLT_FIXTURE floor=(154.0, -328.0, 172.0) positions=[(154.3004, -327.0202, 172.1285)] pending=0
+Paint and overlays need a supporting block
+WORLD_OPEN World 1337 seed=1337
+CAVE_RUNTIME_PASS

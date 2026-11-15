@@ -1,4 +1,8 @@
 #include "altaria_game.h"
+#include "arc_hotbar.h"
+#include "crab_console_bridge.h"
+#include "diorama_minimap.h"
+#include "stamina_ring.h"
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/godot.hpp>
@@ -7,7 +11,14 @@ namespace {
 
 void initialize_altaria(godot::ModuleInitializationLevel level) {
     if (level == godot::MODULE_INITIALIZATION_LEVEL_SCENE) {
+        GDREGISTER_CLASS(godot::GameLog);
+        GDREGISTER_CLASS(godot::CrabConsole);
+        GDREGISTER_CLASS(godot::CrabConsoleDebugDrawer);
         GDREGISTER_CLASS(godot::AltariaGame);
+        GDREGISTER_CLASS(godot::ArcHotbar);
+        GDREGISTER_CLASS(godot::CrosshairDot);
+        GDREGISTER_CLASS(godot::StaminaRing);
+        GDREGISTER_CLASS(godot::DioramaMinimap);
         GDREGISTER_CLASS(godot::VoxelWorld);
         GDREGISTER_CLASS(godot::FlyingPlayer);
         GDREGISTER_CLASS(godot::WorldAtmosphere);

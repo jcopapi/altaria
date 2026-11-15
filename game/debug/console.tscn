@@ -1,0 +1,123 @@
+[gd_scene format=3]
+
+[ext_resource type="FontFile" path="res://addons/crabbyconsole/fonts/roboto/static/RobotoMono-Regular.ttf" id="1_mono"]
+
+[sub_resource type="Theme" id="Theme_console"]
+default_font = ExtResource("1_mono")
+default_font_size = 14
+
+[sub_resource type="StyleBoxFlat" id="Style_shell"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.26, 0.28, 0.25, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.49, 0.51, 0.47, 1)
+
+[sub_resource type="StyleBoxFlat" id="Style_inset"]
+content_margin_left = 7.0
+content_margin_top = 5.0
+content_margin_right = 7.0
+content_margin_bottom = 5.0
+bg_color = Color(0.15, 0.17, 0.15, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.09, 0.10, 0.09, 1)
+
+[sub_resource type="StyleBoxFlat" id="Style_focus"]
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.63, 0.64, 0.59, 1)
+
+[sub_resource type="StyleBoxFlat" id="Style_button"]
+bg_color = Color(0.34, 0.36, 0.33, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.51, 0.53, 0.49, 1)
+
+[node name="GameConsole" type="CrabConsole"]
+process_mode = 3
+
+[node name="ConsoleCanvasLayer" type="CanvasLayer" parent="."]
+layer = 100
+visible = false
+
+[node name="ConsolePanel" type="PanelContainer" parent="ConsoleCanvasLayer"]
+anchor_right = 0.74
+anchor_bottom = 0.77
+offset_left = 24.0
+offset_top = 24.0
+theme = SubResource("Theme_console")
+theme_override_styles/panel = SubResource("Style_shell")
+
+[node name="Content" type="VBoxContainer" parent="ConsoleCanvasLayer/ConsolePanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Header" type="HBoxContainer" parent="ConsoleCanvasLayer/ConsolePanel/Content"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="ConsoleCanvasLayer/ConsolePanel/Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Console"
+
+[node name="CloseConsole" type="Button" parent="ConsoleCanvasLayer/ConsolePanel/Content/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 22)
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "Close (Esc)"
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_focus")
+theme_override_styles/pressed = SubResource("Style_button")
+text = "X"
+
+[node name="Output" type="PanelContainer" parent="ConsoleCanvasLayer/ConsolePanel/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("Style_inset")
+
+[node name="ConsoleHistory" type="RichTextLabel" parent="ConsoleCanvasLayer/ConsolePanel/Content/Output"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/default_color = Color(0.87, 0.88, 0.84, 1)
+theme_override_constants/line_separation = 2
+bbcode_enabled = true
+scroll_following = true
+selection_enabled = true
+context_menu_enabled = true
+
+[node name="AutocompleteLabel" type="RichTextLabel" parent="ConsoleCanvasLayer/ConsolePanel/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.91, 0.91, 0.83, 1)
+theme_override_styles/normal = SubResource("Style_inset")
+fit_content = true
+scroll_active = false
+
+[node name="ConsoleLineEdit" type="LineEdit" parent="ConsoleCanvasLayer/ConsolePanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_styles/normal = SubResource("Style_inset")
+theme_override_styles/focus = SubResource("Style_focus")
+theme_override_colors/font_color = Color(0.95, 0.95, 0.91, 1)
+theme_override_colors/font_placeholder_color = Color(0.62, 0.64, 0.59, 1)
+placeholder_text = "Enter command"
+max_length = 512
+keep_editing_on_text_submit = true
+caret_blink = false

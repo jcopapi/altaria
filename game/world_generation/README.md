@@ -1,24 +1,32 @@
 # Voxel generation, biomes and surface layers
 
-F5 creates a fresh world with a random seed immediately. Open the console with F1:
-`world new` generates another random world; `world new 1337` reproduces a seed.
-The previous world is saved. Esc opens the saved-world menu.
+F5 opens the console. Enter `world new` to generate a world with a random seed
+or `world new 1337` to reproduce a seed.
+Block and appearance edits persist for the current session as chunks unload and reload.
 
 ## Data files
 
 | File | Change here |
 | --- | --- |
-| `data/generation.json` | Terrain shapes, mountain-region frequency, LOD distances, fallback fog and worker/upload budgets |
-| `data/biomes.json` | Biome distribution, region size, climate/altitude cooling, terrain multipliers, grass tint, fog palettes/ranges and pebble density |
+| `data/generation.json` | Continental scale, ocean depth, river and valley widths, beach height, mountains, LOD and upload budgets |
+| `data/biomes.json` | Biome distribution, climate/altitude cooling, terrain multipliers, grass tint and fog palettes |
 | `data/environment.json` | Cartoon contour, distance pixelation, fog transition, sky, lighting, wind, temperature and physics budgets |
 | `data/blocks.json` | Stable block IDs, collision flags, fallback colors and texture-array slots |
+| `data/resources.json` | Ore and pebble deposits by host, depth, chance per exposed block, piece count, size, tint, exposed faces and embedding. `enabled: false` pauses these deposits and automatic pebble decals. |
 | `data/overlays.json` | Independent surface/decorative layers and their top/side texture slots |
 | `../player/data/entities.json` | Player and entity definitions |
 
-`world new` reloads these files. Worlds snapshot their terrain and biome settings,
-so changing defaults does not reshape existing saved worlds. Generator versions 1
-and 2 are supported; version 1 keeps the original terrain algorithm. New worlds
-use version 2.
+`world new` reloads these files and uses the current version 3 surface profile.
+`continental_scale` controls the distance between continents, and `ocean_depth`
+controls the depth of ordinary open-ocean basins. With `deeper_waterbeds`,
+the coastal shelf remains shallow, river pools vary in depth, and offshore
+trenches can reach the first layer above bedrock. `river_scale` controls the
+spacing of drainage corridors.
+`valley_width` shapes their wide floodplains and `river_width` controls their
+water channels. `beach_height` caps the altitude of sand on low coastal slopes.
+`meadow_hill_amplitude` controls the relief of small hills in lowland meadows.
+`mountain_ledges` introduces rock steps of 3, 4 and 5 blocks at 75, 111 and
+151 blocks above sea level in mountain ranges.
 
 ## Generation passes
 
@@ -26,15 +34,29 @@ The bounded worker pool processes each requested tile through explicit passes:
 
 1. **Biome regions** (`biome_stage.cpp`): deterministic, jittered Voronoi regions;
    optional temperature/humidity-based classification for the production layout.
-2. **Terrain** (`Generator::columns`): continental shape, sparse mountain-region
-   mask, ridged ranges, erosion masks, valleys, shelves and horizontal domain warp.
+2. **Terrain** (`Generator::columns`): ocean basins, coastal slopes, rolling
+   foothills, cordilleras, erosion and horizontal domain warp. Gradual valley
+   floors feed shallow river channels at the existing water level.
 3. **Surface materials**: altitude cooling, snow/desert/grass assignment, soil/stone
    layers and biome tint. Height-driven cooling can turn warm highlands into snow.
-4. **Voxels and overlays**: density deformation, saved block/appearance edits and
-   deterministic pebble scatter on supporting surfaces.
-5. **Meshing and upload**: exposed-face greedy meshing on worker threads; a bounded
-   number of mesh uploads per frame on the main thread.
+   Snow cover rises smoothly across cold biome borders, the climate snow line and
+   `snow_height`; in the half-covered band a drift noise leaves snow patches on
+   the grass and grass patches on the snow. Grass colour follows the biome
+   weight, so it changes gradually across a border.
+4. **Voxels and overlays**: density deformation, cave carving, grass transition
+   overlays and edits from the current session.
+5. **Meshing and upload**: exposed-face greedy meshing on worker threads, which
+   also convert each surface to engine arrays. The main thread hands over a
+   bounded number of tiles per frame (`upload_budget`, `upload_time_budget_ms`,
+   `upload_vertex_budget`); a tile that would exceed the vertex budget after
+   another upload waits for the next frame. Canopy meshes (leaf cards and
+   canopy shadows) follow their tile one frame later, so the two costs never
+   stack in one frame.
 
+Frame pacing is judged by the worst frames, not the average: the debug state
+and the HUD report `frame_worst_ms` and `frame_p99_ms` over the last 600 frames,
+plus `frame_spikes` (frames slower than 33.4 ms since start), `upload_vertices`,
+`max_upload_vertices` and `deferred_uploads`.
 `stats` reports the latest uploaded tile's pass timings, total initial-view generation time,
 first-tile latency, queued jobs, six LOD counts, texture layers and decorations.
 Erosion is a procedural mask, not a hydraulic simulation.
@@ -53,7 +75,15 @@ Increase `scale` (for example, to 1500–3000) for larger regions. Set
 `blend_width` controls transitions. `altitude_cooling`, `cold_start_altitude` and
 `snow_temperature` control elevation-driven cold surfaces. Each definition has
 independent terrain/mountain multipliers, grass RGB, saturation preservation,
-brightness and pebble density. New biome variants can be added to the data array.
+and brightness. New biome variants can be added to the data array.
+
+Lowlands and foothills get distinct bell-shaped hills from `hill_chance`,
+`hill_spacing`, `hill_height_min`/`hill_height_max` (blocks) and
+`hill_width_min`/`hill_width_max` (base radius per block of height). Each hill has
+its own elongation and lobed outline, smaller hills are more common, overlapping
+hills keep the higher surface, and the effect fades near coasts and mountain
+ranges. `hill_spacing` must be at least `hill_height_max × hill_width_max + 3`.
+Worlds saved without these keys keep their original relief.
 
 Mountain ranges use `mountain_region_scale`, `mountain_threshold` and
 `mountain_blend`, independently of their height/detail. Raising the threshold
@@ -61,10 +91,10 @@ makes mountains less frequent; `mountain_amplitude` controls their height.
 
 ## Voxel appearance through the horizon
 
-All six LODs retain voxel volumes and block materials. Generation uses full cubes
-and the original half-height slab caps at LOD0. Cliffs and distant LODs retain
-voxel faces. Procedural Terrain caps and ramps have been removed; saved generation
-snapshots migrate back to slabs. Authored shapes remain readable for compatibility.
+All six LODs retain voxel volumes and block materials. World generation uses
+only cubes and slabs: nearby one-block steps get slabs, and everything else,
+including distant tiles, stays greedy cube meshes. Authored shapes remain
+available for construction.
 
 | LOD | Tile width | Horizontal sample | Vertical sample |
 | --- | --- | --- | --- |
@@ -80,16 +110,28 @@ stepped, square faces and block textures. `near_distance`, `middle_distance`,
 `coarse_distance`, `distant_distance` and `horizon_distance` control quadtree
 subdivision. They must be ascending. `view_distance` supports up to 8192 m.
 
-Radial shader fog follows the viewer's biome, with day/night colors and smooth
-transitions across borders. Each biome sets `fog_day`, `fog_night`, `fog_start`
-and `fog_end`. Meadow defaults to blue/purple at 1800–5600 m; Desert uses yellow at
-55–550 m; Snowfields uses white at 80–780 m; Enchanted uses purple at 180–2200 m.
-Jungle has a green-blue haze at 450–2600 m. Rain/storm shorten these ranges.
-Fog becomes opaque before the outer render boundary (94% of view distance),
-including the screen corners. Camera far clipping extends beyond that boundary.
-Fullbright changes lighting, not the fog.
-Boundary skirts conceal LOD height differences. Water keeps the same sea surface
-height across LODs. The system currently switches meshes without geomorphing.
+Surface fog follows the viewer's biome. Each biome supplies day and night colors
+and its own distance range. Rain and storms shorten that range. Adjacent terrain
+resolutions meet on the same plane using the solid and liquid spans of both
+tiles. The ground and its seams swap together once replacement tiles are ready.
+Trees and grass crossfade through complementary pixel opacity. Water retains the
+same surface height across LODs and varies from blue to turquoise in world space.
+Its opacity increases with the depth of the rendered riverbed or seabed.
+
+Adaptive streaming keeps full surface detail near the player and extends it in
+the direction of travel. Enclosed caves stream full-resolution blocks within a
+local depth window. Diffuse daylight travels through connected openings and
+weakens with distance, including where a near-surface opening crosses a chunk
+boundary. A tree blocks direct sunlight while the ground below still receives
+daylight from the sky. Solid terrain blocks this fill in closed caves, and the
+fill goes dark at night. Biome fog and atmospheric rays
+apply above ground. Local colored lights cast shadows and can extend the
+full-resolution streaming range. Use `light follow` for a camera-mounted lamp,
+`light follow #62a6ff` to recolor it, and `light follow off` to turn it off. The night sky remains visible outdoors while unlit ground
+becomes nearly black. Collision, selection and dynamic liquids check whether
+their height is available. Active rigid bodies can request detailed collision
+tiles independently of the visual radius.
+Session edits live independently of the streamed geometry.
 
 ### Cartoon contour and distance pixelation
 
@@ -114,7 +156,7 @@ All visible geometry and the sky share the low-resolution raster. A subtle extra
 coarsening grows smoothly with distance from 48 to 2400 metres, independently of
 terrain LOD. Samples must remain on the same depth/normal surface, preserving
 silhouettes and aerial perspective. Block texture scale and mipmaps remain intact
-across LOD boundaries. Terrain retains its voxel silhouettes and slab caps. The
+across LOD boundaries. Terrain retains its voxel silhouettes. The
 postprocess uses Forward+'s normal/roughness buffer.
 
 Tune these defaults in `data/environment.json`:
@@ -177,13 +219,12 @@ overwriting newer edits. Queue size and mesh uploads per frame are bounded.
 
 ## Blocks and textures
 
-Sand (`altaria:sand`, hotbar 4), stone (`altaria:stone`), dirt (`altaria:dirt`),
-grass (`altaria:grass`) and pebble layers all use the supplied 16×16 PNG assets
-in `game/assets/blocks/` (`sand.png`, `stone.png`, `dirt.png`,
-`grass_top_overlay.png`, `grass_side_overlay.png`, and `pebbles*.png`). Snow,
-wood and leaves use generated textures. Texture-array layers are mipmapped and
-sampled with nearest pixel filtering. Imported image layers are normalized to
-16×16.
+Sand, stone, dirt, grass, gravel, trunks and leaves use PNG assets in
+`game/assets/blocks/`. Gravel appears in riverbeds and along shallow coasts.
+Trunks use `log1.png` on the sides and `log1_top.png` on the ends. Leaves use
+`leaves.png` with alpha cutouts. The grass block uses the opaque grass tile,
+and `grass.png` supplies the blade sprites. The renderer normalizes texture
+array layers to 16×16 and uses nearest filtering with mipmaps.
 
 Add a block with a unique numeric ID and namespaced key:
 
@@ -193,10 +234,9 @@ Add a block with a unique numeric ID and namespaced key:
 
 Layer 0 is white, so it uses the block's fallback `color`. Textured blocks use the
 original texture colors. To add a custom texture, append a slot to `textures` and
-reference that array index with `texture_layer`. The new block appears in block
-selection automatically. Mouse wheel selects beyond the first eight hotbar slots.
-Never renumber/delete IDs already referenced by saved worlds. The loader validates
-both block and overlay ID manifests.
+reference that array index with `texture_layer`. Set `texture_end_layer` to use a
+different layer for upward and downward faces. Set `alpha_cutout` for textures
+with transparent pixels. The new block appears in block selection automatically.
 
 ## Grass blocks and transition overlays
 
@@ -210,16 +250,10 @@ Blocks can define `"transition_overlay": <overlay_id>` in `data/blocks.json`:
   stone beneath grass), composited in the opaque terrain pass with matching
   biome/paint HSV tint and world-space grass variation. Other blocks can reuse
   `transition_overlay` to project their own edge transitions onto connected blocks.
-- Pebbles: `altaria:pebbles1`, `altaria:pebbles2`, `altaria:pebbles3` are separate
-  alpha-cutout surface decorations. Placement/rotation is deterministic by seed
-  and coordinate; density is set per biome. They have no collision or fluid physics.
 
-The supporting block's ID/collision stays unchanged. A transition/surface overlay and a pebble
-decoration can coexist. `overlay grass`, `overlay pebbles2`, `overlay clear` and
-`overlay reset` operate on the targeted block. `clear` removes both layers at that
-coordinate; `reset` restores procedural/default layers. A manually selected overlay
-is saved independently of the block type. Small decorative sprites are rendered
-only at detailed LOD; the terrain and its block surfaces remain visible farther out.
+`overlay grass`, `overlay clear` and `overlay reset` operate on the targeted
+block. `clear` removes its applied layers. `reset` restores procedural layers.
+Applied overlays are tracked separately from the block type during the session.
 
 ## Shared HSV coloring
 
@@ -284,21 +318,35 @@ the test harnesses.
 `data/environment.json` controls the day length/start hour, sunlight/moonlight,
 ambient energy, pixel cloud scale/coverage, wind, grass color noise, Celsius lapse
 rate, weather temperature deltas, and physical body/part/distance budgets. These
-values are snapshotted in each new world's generation metadata.
+values are snapshotted in each new world's generation metadata. Clouds occupy
+a moving volume at a fixed height above sea level. Scene depth hides clouds
+behind solid terrain and the highest mountains reach above the cloud layer.
 
-`data/generation.json` controls voxel tree vegetation as well as terrain:
-`vegetation`, `tree_spacing`, `tree_lod_max` (0–2), and `surface_shapes`. Tree
-placement uses a seeded, jittered grid and per-biome `tree_density`. Canopies are
-voxel geometry through LOD2 by default. Tree definitions currently use simple
-wood/leaf cubes with generated bark/leaf textures. 3D grass tufts and surface
-bushes have been removed; grass blocks use `grass_top_overlay.png` directly with
-world-space color noise (`grass_noise.gdshaderinc`) and project a transition
-side overlay onto connected lower blocks.
+`data/generation.json` controls voxel trees through `vegetation`, `tree_spacing`
+and `tree_lod_max` (0–2). Candidates sit on a grid of half `tree_spacing`; a
+low-frequency forest patch field (170 m and 53 m octaves) gathers them into woods,
+widened by biome humidity, while open ground keeps only rare solitary trees.
+Trees keep the round, tall (spire), open and broad forms, but each one builds its
+own branch layout: branches leave the trunk through one-sided stubs or forks and
+grow flat, upturned (elbow + vertical shoots), stepped (out, up, out) or drooping.
+The joints are dedicated mini-pillar shapes: `branch_elbow_up`, `branch_elbow_down`,
+`branch_tee_up` and `branch_stub` (codes 113–126). Every branch tip carries a leaf
+blob (dense core, ragged shell) and spires add a tiered cone, keeping the whole
+tree within 248 parts (`max_parts` 256) so it still detaches as one body.
+Branches and leaves stay within 5 blocks of the trunk. Shrubs generate
+as separate groups of leaf blocks. The visible canopy uses overlapping textured cards.
+A separate opaque mesh casts the canopy's shadow.
+The middle LODs use a thin trunk under a leaf cube with subtle world-space noise.
+More distant LODs keep the canopy through the terrain view range. Each exposed grass block in
+the near mesh grows nine tufts by default. The blades sample the supporting
+block's texture, paint and world-space color variation. Purple grass generates as separate blocks on top
+of mountain rock and dry cave floors. Grass and rock share a world-space color noise function.
 
 The eight shapes are `cube`, `slab`, `vertical_slab`, `ramp`, `stairs`, `roof`,
 `pillar` and `mini_pillar`. Hold **R + wheel** to choose a form for the held material;
-**Q** rotates it by 90 degrees. The terrain pass generates half-height surface
-caps. Other forms are available for building through the same material system.
+**Q** rotates it by 90 degrees. A mini-pillar attached to a side face lies along
+the face's horizontal axis. These forms are available for building through the
+same material system.
 Shape and rotation are stored independently of block IDs in the surface journal.
 The reader supports the original paint journal and the new checksummed S2 records.
 Exact shape geometry is shared by meshing, selection rays, player AABB collision
@@ -320,15 +368,140 @@ only a local neighborhood. Geometry, grass roots, selection, player collision an
 Jolt convex hulls share the same straight/corner definitions. Connections are
 re-derived from authored placements on reload and persist when released into Jolt.
 
-Constructed ramps connect in both directions with procedural and edited world
-ramps. Sparse derived world connections enter immutable worker snapshots, retaining
+Constructed ramps connect in both directions with edited world ramps. Sparse derived world connections enter immutable worker snapshots, retaining
 paint and overlays; they are not extra authoritative journal edits. Edited world
 ramps are also reconnected after voxel/surface edits during meshing. Unaffected
 chunks do not rebuild, and adjacent construction regions are dirtied when needed.
 
-World generation uses `surface_shapes: true` for original half-height slab caps.
-Terrain smoothing is removed. Only ordinary blocks and slabs are generated.
-Manual ramps remain available for construction. Older saved modifier flags are
+The Terrain shape (rounded auto-connecting caps) has been removed. Its codes
+(shape 8, packed 192..254) are still accepted when loading old saves and read
+as plain cubes. A lone one-block rock column between open cave air renders as
+a pillar.
+
+Underground, sight ends where light does (`VoxelWorld::underground_sight`,
+56 m without a lamp, further with stronger lights): fog closes to darkness at
+that distance, the background is fogged too, and full-resolution streaming
+reaches only 40 m beyond it. Inside the underworld a hot orange haze (like the
+desert's fog, 34–190 m) replaces the darkness, the stream ring widens to
+208 m, embers and ash drift around the viewer, the post pass adds a faint
+heat shimmer, and the roof glows with ember cracks. Rock warms toward red
+with depth.
+
+SSAO is off by default (`ssao_enabled` in `environment.json`): it darkened
+every concave corner, from LOD steps to narrow cave gaps, for a full-screen pass.
+
+Silhouette outlines are off by default (`outline_silhouettes` in
+`environment.json`); water shorelines keep theirs. Pebbles and ores use the
+materials and outlines baked into their glTF models. The `deposit_model` field
+in `blocks.json` selects the model, and `resources.json` controls where deposits
+spawn. Instances share meshes within each full-detail chunk.
+
+Thin shapes (Pillar, MiniPillar) don't block diffuse daylight, so dripstone
+casts no square dark patches. `tests/run_cap_hole_tests.sh` ray-casts from
+cave air beside generated shapes to catch holes in the surface.
+
+Full-resolution tiles upload their ground and liquids as stacked 32 m sections
+(`sections.*`), one mesh instance each, so the renderer culls every section
+against the view instead of a tile's whole column. Triangles that cross a
+section boundary are clipped; the geometry is otherwise identical. In caves
+this drew 20–45% fewer triangles. A Minecraft-style flood fill through open
+space was tried on top and dropped: caves here are connected enough that it
+hid nothing the frustum didn't already, and its turn-back rule left holes.
+
+Workers pack each surface straight into the renderer's own compressed vertex
+buffers (`pack_surface` in `voxel_world.cpp`): 16-bit positions within the
+surface bounds, an octahedral tangent frame, 16-bit UVs, RGBA8 tint as
+`COLOR`, base color and brightness as half floats in `CUSTOM0`, the flag bit
+field and side top as 32-bit floats in `CUSTOM1.xy`, and painted, overlay
+tint and both texture layers as RGBA8 in `CUSTOM2` (layers stored as
+`layer / 255` and `(overlay + 1) / 255`). The main thread hands the bytes to
+an `ArrayMesh` without converting anything.
+
+Main-thread streaming work is kept small:
+
+- `workers: 0` sizes the generation pool to the machine (hardware threads
+  minus two, 2 to 8). Upload and pool tuning is not part of a saved world.
+- LOD seams build on a background thread from a snapshot of the visible
+  tiles; the main thread only swaps the mesh.
+- The skylight halo samples caves in bulk (one cave query and one noise fill
+  per tile) instead of per cell.
+- Coarse tiles (LOD 1–2) skip the noise caves, which never reach the surface.
+- Past LOD 3 only a share of far tree crowns is drawn (half at LOD 4, a
+  quarter at LOD 5), widened to keep the forest's cover.
+- Lava and root glow lights show only within 72 m of the viewer, and the
+  underworld's lava ocean adds none (its glow is in the terrain shader).
+- `profile` in the console lists main-thread scopes (average, worst, calls);
+  `profile reset` clears them. The same data is in the debug state.
+
+With `surface_shapes: true`, full-detail tiles soften one-block steps above sea
+level so the player can walk instead of jumping. An air cell beside a
+neighbour exactly one block higher gets a bottom slab of the ground block, a
+half step. Gentle interior ground away from edges keeps the half-height cap
+from `Generator::surface_shape`. Neighbours just outside the halo are read from
+the bare terrain, so tiles agree at their edges. Coarse LODs stay cubic.
+
+Daylit ground has no side shading. The terrain shader lights every daylit
+solid face as if it pointed up, at every LOD: the sun's toon diffuse, the
+0.72 side factor and the daylight sampled in front of a side all match the
+tops. The surface reads as one rounded form instead of individual blocks.
+Faces without daylight (caves) fade back to their real normals, so lamps and
+the underworld still shape cave walls. Side faces store any exposure of 4/15
+or more as full daylight, matching the shader; this barely changes the face
+count (about 0.2% fewer vertices), since most sides were already fully lit.
+
+Deep water hides its floor. The water shader darkens toward an abyss colour
+and turns opaque past about 15 m of water. Coarse tiles (step > 1) drop
+seabed faces more than 16 m below the surface (`deep_water_cutoff`), and the
+far heightfield raises submerged ground to that depth. Ripples, caustics and
+crests fade out beyond about 46 m, so distant water stays calm.
+
+New default worlds spawn through `Generator::find_spawn`, which:
+- looks for dry plains in a temperate biome (Meadow/Enchanted), within 2 km of
+  the origin and away from rivers and lakes;
+- requires heights within 1.5 blocks across a 25 m square;
+- requires both a cold and a hot region within 2.6 km.
+The biome temperature wave places temperate bands between cold and hot ones, so
+the nearby land always varies. The search takes about 35 ms. If it finds
+nothing, the game falls back to the old scenic spot.
+
+### Organic caves and the underworld
+
+`caves.json` `noise` adds caves alongside the planned chamber graph
+(`caves/cave_noise.*`). A 4 m lattice of noise channels is interpolated
+per cell, identically in tile fills and scalar `Generator::terrain_sample`:
+
+- **Halls**: irregular 3D blobs with broad rock pillars and one-block mini
+  columns. They grow more frequent toward the underworld (`cheese_threshold`
+  near the surface, `deep_threshold` at the underworld roof over
+  `transition_height`).
+- **Tunnels**: winding, branching passages whose width varies from crawl
+  size to wide galleries.
+- **Crawlspaces** (flat slots) and **fissures** (tall narrow cracks) dominate
+  different regions (`region_scale`), so each area has its own character.
+- **Lava seas**: enclosed bowls below fixed `lava_seas` levels, 100–200 m
+  across, with rock pillars rising out of the lava. Other caves are kept out of
+  each bowl so lava never meets open air sideways. Any other cave crossing a
+  sea's area fills with its lava below the sea level, so the sea fills the
+  whole cavern; a rock ring and floor (40 m down) keep that lava enclosed, and
+  the bowl always keeps at least 3.5 m of air over its lava.
+- **Underworld**: between `hell_floor` and `hell_ceiling` (with noise
+  amplitudes) the whole layer is open: a hellstone floor, a roof, giant flared
+  pillars, and a lava ocean below `hell_lava`.
+
+- **Descent pillars**: `descent_chance` of the underworld's giant pillars are
+  hollow, with a spiral ledge (one turn per 9 m) around a central drop. Each
+  starts in a landing chamber `descent_height` above the underworld roof and
+  ends at a doorway on the underworld floor, with windows over the lava sea
+  on the way. The roof is otherwise sealed (`roof_seal`), so the descent is a
+  deliberate passage and gives the stream time to load the layer below.
+- **Lava falls** pour from the underworld roof (`lava_fall_chance`).
+
+No noise cave reaches within `surface_margin` of the terrain. In full-resolution
+tiles every vertical run of dry cave air may grow stalactites (Pillar blocks
+ending in a MiniPillar tip), stalagmites or, in low gaps, a thin floor-to-roof
+column. Dripstone is longer and denser in the underworld. Noise lava is static
+until disturbed.
+Manual slabs and ramps remain available. Older saved modifier flags are
 ignored, and obsolete profile forms are read as ordinary cubes while retaining
 material, paint and position. Old generation options are stripped on load.
 
@@ -465,8 +638,7 @@ The instanced renderer follows the [Godot MultiMesh optimization guide](https://
 
 `run_ramp_tests.sh` exercises actual floor clicks, both ramp heights, all corner
 updates, player contact, construction/world connections, mesh rebuilds, save/reload
-and physical corners. It also verifies that legacy Terrain/ramp generation
-snapshots return to slabs while authored edits survive. `run_ramp_visual.sh`
+and physical corners. It also verifies that authored edits survive reloads. `run_ramp_visual.sh`
 captures the slab world and manually built ramp joins.
 `run_silhouette_visual.sh` compares broad silhouettes, individual internal faces,
 an isolated cube and blacklisted leaves in day/night lighting, plus nearby fade

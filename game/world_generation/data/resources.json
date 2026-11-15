@@ -1,0 +1,57 @@
+{
+  "enabled": true,
+  "deposits": [
+    {
+      "block": "altaria:ore",
+      "outline": false,
+      "hosts": ["altaria:stone", "altaria:limestone", "altaria:basalt"],
+      "min_depth": 10,
+      "max_depth": 220,
+      "chance": 0.0040,
+      "pieces": 4,
+      "size": 0.39,
+      "all_faces": true,
+      "embed": 0.28,
+      "tint": "#c39075"
+    },
+    {
+      "block": "altaria:ore",
+      "outline": false,
+      "hosts": ["altaria:stone", "altaria:limestone", "altaria:basalt"],
+      "min_depth": 24,
+      "max_depth": 380,
+      "chance": 0.0028,
+      "pieces": 4,
+      "size": 0.36,
+      "all_faces": true,
+      "embed": 0.28,
+      "tint": "#6ecb92"
+    },
+    {
+      "block": "altaria:ore",
+      "outline": false,
+      "hosts": ["altaria:stone", "altaria:limestone", "altaria:basalt"],
+      "min_depth": 95,
+      "max_depth": 1024,
+      "chance": 0.0015,
+      "pieces": 3,
+      "size": 0.40,
+      "all_faces": true,
+      "embed": 0.28,
+      "tint": "#eac362"
+    },
+    {
+      "block": "altaria:pebble",
+      "hosts": ["altaria:grass", "altaria:rock_grass", "altaria:dirt", "altaria:sand", "altaria:gravel", "altaria:stone", "altaria:snow"],
+      "min_depth": -5,
+      "max_depth": 3,
+      "chance": 0.007,
+      "pieces": 3,
+      "size": 0.23,
+      "irregular": true,
+      "embed": 0.18,
+      "outline": false,
+      "tint": "#ffffff"
+    }
+  ]
+}

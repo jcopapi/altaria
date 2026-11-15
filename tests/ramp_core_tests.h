@@ -1,5 +1,9 @@
 static void test_ramp_connections() {
-    require(SHAPE_COUNT == 8 && shape_id("terrain") == -1, "Only ordinary block forms are selectable");
+    require(SHAPE_COUNT == 8 && shape_id("terrain") < 0, "Terrain is no longer a shape");
+    for (int code : {8, 192, 208, 254})
+        require(valid_shape_id(code) && shape_type(uint8_t(code == 8 ? pack_shape(code) : code)) == int(BlockShape::Cube) &&
+                    shape_top(uint8_t(code == 8 ? pack_shape(code) : code), .5f, .5f) == 1.f,
+                "Retired Terrain codes in old saves read as cubes");
     for(int scale=0;scale<3;scale++)for(int corner=0;corner<5;corner++)for(int turn=0;turn<4;turn++) {
         auto shape=ramp_shape(RampScale(scale),RampCorner(corner),turn);
         Appearance a;unpack_shape(shape,a);
@@ -12,7 +16,51 @@ static void test_ramp_connections() {
         }
     }
     auto r=registry(); Settings cfg; std::string error;
+    const auto inverted = upside_down_ramp(pack_shape(int(BlockShape::Ramp)));
+    const auto inverted_turn = upside_down_ramp(pack_shape(int(BlockShape::Ramp), 1));
+    const auto inverted_corner = connect_ramp(inverted, [&](int x, int z) {
+        return x == 1 && z == 0 ? inverted_turn : uint8_t(0);
+    });
+    require(ramp_spec(inverted_corner).inverted && ramp_spec(inverted_corner).corner == RampCorner::OuterRight,
+            "Inverted ramps connect to other inverted ramps");
+    require(connect_ramp(inverted, [](int x, int z) { return x == 1 && z == 0 ? uint8_t(11) : uint8_t(0); }) ==
+                inverted, "Inverted ramps ignore upright ramps");
+    require(std::abs(shape_ray(inverted, {.25f, -1, .5f}, {0, 1, 0}, 3) - 1.75f) < .001f &&
+            !shape_intersects(inverted, {.2f, .1f, .4f}, {.3f, .6f, .6f}),
+            "Inverted ramp leaves the space below its underside open");
+    for (int turn = 0; turn < 4; ++turn) {
+        for (uint8_t tile : {pack_shape(int(BlockShape::Roof), turn), uint8_t(40 + turn), uint8_t(98 + turn)}) {
+            const float top = shape_top(tile, .39f, .61f);
+            const float underside = shape_ray(tile, {.39f, -1, .61f}, {0, 1, 0}, 3) - 1;
+            require(std::abs(top - underside - .125f) < .001f &&
+                    !shape_intersects(tile, {.389f, underside - .1f, .609f}, {.391f, underside - .02f, .611f}),
+                    "Roof tile and corners have a thin, open underside");
+        }
+    }
     auto empty=[](int,int,int){return std::make_pair(BlockId(0),uint8_t(0));};
+    for (auto form : {BlockShape::Stairs, BlockShape::Roof}) {
+        ConstructionStore store;
+        BuiltBlock first{1, {0, 1760, 0}, r.stone, Appearance()};
+        first.appearance.shape = int(form);
+        store.put(first);
+        auto second = first;
+        second.id = 2;
+        second.origin8.x = 8;
+        second.appearance.rotation = 1;
+        require(store.can_place(second, r, cfg, empty, error), "Perpendicular neighbor can be placed");
+        store.put(second);
+        const auto corner = store.blocks.at(first.id).shape();
+        require(corner != first.shape() && shape_type(corner) == int(form), "Perpendicular neighbor creates a corner");
+        Appearance resolved;
+        unpack_shape(corner, resolved);
+        require(pack_shape(resolved.shape, resolved.rotation) == corner, "Corner survives shape serialization");
+        for (float x : {.13f, .43f, .83f})
+            for (float z : {.18f, .58f, .93f})
+                require(std::abs(shape_ray(corner, {x, 2, z}, {0, -1, 0}, 3) -
+                                 (2 - shape_top(corner, x, z))) < .001f, "Corner ray follows the visible face");
+        store.erase(second.id);
+        require(store.blocks.at(first.id).shape() == first.shape(), "Corner returns to straight after removal");
+    }
     for(int turn=0;turn<4;turn++)for(int side:{1,3})for(int direction:{-1,1}) {
         ConstructionStore store;
         BuiltBlock a{1,{0,1760,0},r.grass,Appearance()};a.appearance.shape=3;a.appearance.rotation=turn;
@@ -38,14 +86,14 @@ static void test_ramp_connections() {
     auto a=build_tile({256,128,0},0,gen,edits,surfaces,false),b=build_tile({288,128,0},0,gen,edits,surfaces,false);
     int slabs=0;
     for(auto &entry:a.volume->shapes) {slabs+=entry.second==1;require(entry.second==1,"Procedural surface only emits slabs");}
-    require(slabs>20,"Slab-only surface generation preserved");
+    require(slabs>20,"Surface generation places slabs");
     Surface water_surface;
     append_block_surface(water_surface,{0,220,0},0,r.water,Appearance(),gen.column(0,0),r);
-    require(!water_surface.vertices.empty() && water_surface.vertices.front().decal==2,
+    require(!water_surface.vertices.empty() && (int(water_surface.vertices.front().decal) & 3) == 2,
             "Water carries a shoreline region marker independent of texture or lighting");
     for(int level=1;level<6;level++) {
         auto distant=build_tile({0,0,level},0,gen,edits,surfaces,false);
-        require(!distant.volume || distant.volume->shapes.empty(),"Distant LODs retain original cube generation without ramps or Terrain");
+        require(!distant.volume || distant.volume->shapes.empty(),"Distant LODs retain plain cube generation");
     }
     for(int z=0;z<32;z++)for(int y=0;y<a.volume->height;y++) {
         size_t ia=((z+1)*(a.volume->height+2)+(y+1))*34+33,ib=((z+1)*(b.volume->height+2)+(y+1))*34+1;
@@ -65,9 +113,9 @@ static void test_ramp_connections() {
         int plains = 0, foothills = 0, plateaus = 0, valleys = 0, chains = 0, oceans = 0, exposed_rock = 0,
             eroded_dirt = 0, border_rivers = 0, transition_zones = 0, buildable_zones = 0, adventure_zones = 0,
             terrace_zones = 0, arch_candidates = 0, cold_hot_adjacent = 0, beaches = 0, lakes = 0,
-            stepped_banks = 0, waterfalls = 0;
+            stepped_banks = 0;
         float max_peak = -1000.f;
-        int best_idx = -1, best_arch_idx = -1, best_waterfall_idx = -1;
+        int best_idx = -1, best_arch_idx = -1;
         float max_arch = 0.f;
         int grid_w = 51; // -1600..1600 step 64 -> 51x51
         for (size_t i = 0; i < cols.size(); i++) {
@@ -89,11 +137,6 @@ static void test_ramp_connections() {
             beaches += (c.beach_mask > .18f && c.surface == r.sand);
             lakes += (c.lake_mask > .25f && c.height <= cfg.sea_level);
             stepped_banks += (c.river_bank_step > .25f && c.height > cfg.sea_level);
-            if (c.waterfall_mask > .25f && c.water_top > cfg.sea_level + 4) {
-                waterfalls++;
-                if (best_waterfall_idx < 0)
-                    best_waterfall_idx = int(i);
-            }
             if (c.arch_mask > max_arch) {
                 max_arch = c.arch_mask;
                 best_arch_idx = int(i);
@@ -125,15 +168,26 @@ static void test_ramp_connections() {
                 "Hierarchical generator produces continental oceans, plains, foothills, plateaus, deep valleys, and connected mountain chains");
         require(exposed_rock > 15 && eroded_dirt > 5,
                 "Geological material rules expose stone on cliffs/crests and dirt on eroded slopes");
-        require(border_rivers > 5 && transition_zones > 50,
-                "Rivers actively separate distinct biomes and submerge below sea_level to flow into the ocean");
-        require(beaches > 8 && lakes > 5 && stepped_banks > 10 && waterfalls > 3 && best_waterfall_idx >= 0,
-                "World generates sandy coastal beaches, river-connected lakes, stepped climbable riverbanks, and mountain waterfalls");
-        // Verify that high-altitude mountain waterfall streams emit actual water blocks above sea_level:
-        int wx_wf = int(gx[best_waterfall_idx]), wz_wf = int(gz[best_waterfall_idx]);
-        auto wf_col = gen.column(wx_wf, wz_wf);
-        require(gen.terrain_sample(wx_wf, wf_col.water_top, wz_wf) == r.water && wf_col.water_top > cfg.sea_level + 4,
-                "Mountain stream and waterfall columns place elevated water blocks above sea_level");
+        require(beaches > 8 && lakes > 5 && stepped_banks > 10,
+                "World generates sandy coastal beaches, river-connected lakes, and stepped climbable riverbanks");
+        // Verify that naturally generated liquids stay fixed at or below sea_level (no elevated water climbing mountains)
+        // and river channels carry downstream current vectors:
+        int mountain_elevated_water = 0;
+        int river_currents = 0;
+        for (size_t i = 0; i < cols.size(); i++) {
+            const auto &c = cols[i];
+            if (c.river > .25f && (std::abs(c.river_flow_x) > .01f || std::abs(c.river_flow_z) > .01f))
+                river_currents++;
+            if (c.mountain > .4f && c.height > cfg.sea_level + 15) {
+                int wx = int(gx[i]), wz = int(gz[i]);
+                if (gen.terrain_sample(wx, int(c.height) + 1, wz) == r.water || c.water_top > cfg.sea_level)
+                    mountain_elevated_water++;
+            }
+        }
+        require(mountain_elevated_water == 0,
+                "Naturally generated liquids remain fixed at or below sea_level with no mountain climbing water");
+        require(river_currents > 10,
+                "River channels provide downstream current vectors toward the ocean");
         require(cold_hot_adjacent == 0,
                 "Proximity climate rule prevents freezing snow biomes from spawning adjacent to hot deserts");
         require(buildable_zones > 25 && adventure_zones > 25 && terrace_zones > 20,

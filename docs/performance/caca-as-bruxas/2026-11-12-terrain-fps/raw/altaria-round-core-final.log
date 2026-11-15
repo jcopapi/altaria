@@ -1,0 +1,6 @@
+[TEST] Running CommandParser tests...
+[PASS] CommandParser tests passed successfully!
+PASS liquid system tests: Cellular Automata, Viscosity, Reaction, Sleep, and River Currents.
+PASS regional surface and block textures. Seed 1337 maximum local step: 4.80009 m.
+Mountain strong-mask coverage 165/961
+PASS 224986 checks. Altitude range 17.4052..299.582; fine mesh 28.3601 ms; far mesh 6.76421 ms; tiles 453.

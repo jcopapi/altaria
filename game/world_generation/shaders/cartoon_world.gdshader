@@ -1,9 +1,16 @@
 shader_type spatial;
 render_mode unshaded, fog_disabled, cull_disabled, depth_draw_never, depth_test_disabled, shadows_disabled;
+#include "res://game/world_generation/shaders/world_clouds.gdshaderinc"
 uniform sampler2D screen_tex : hint_screen_texture, filter_nearest, repeat_disable;
 uniform sampler2D depth_tex : hint_depth_texture, filter_nearest, repeat_disable;
 uniform sampler2D normals_tex : hint_normal_roughness_texture, filter_nearest, repeat_disable;
 uniform bool outlines = true;
+uniform bool silhouette_outlines = true;
+// 0..1: shimmering hot air in the underworld, stronger with distance.
+uniform float heat_haze = 0.0;
+// Camera inside a liquid: 0 dry, 1 fully under water, and the same for lava.
+uniform float underwater = 0.0;
+uniform float in_lava = 0.0;
 uniform bool pixelation = true;
 uniform float outline_width = 1.0;
 uniform float outline_strength = .9;
@@ -28,6 +35,10 @@ uniform float godrays_reach = .85;
 uniform int godrays_samples = 16;
 uniform vec3 godrays_color : source_color = vec3(1.0,.87,.65);
 uniform bool debug_outline_mask = false;
+// Split-tone grade: cool, saturated shadows and warm highlights.
+uniform vec3 grade_shadow_tint : source_color = vec3(0.46, 0.36, 0.78);
+uniform vec3 grade_highlight_tint : source_color = vec3(1.0, 0.90, 0.72);
+uniform float grade_strength = 0.35;
 vec3 view_position(vec2 uv, mat4 projection_inverse) {
     float raw = textureLod(depth_tex, uv, 0.0).r;
     if (raw < .0000001) return vec3(0.0, 0.0, -1000000.0);
@@ -43,6 +54,9 @@ float outline_allowed(float roughness,float distance_to_camera) {
 }
 float water_mask(float roughness) {
     return step(.61, roughness) * (1.0 - step(.75, roughness));
+}
+float resource_mask(float roughness) {
+    return step(.874, roughness) * (1.0 - step(.895, roughness));
 }
 vec2 safe_uv(vec2 uv) {
     vec2 size = vec2(textureSize(depth_tex,0));
@@ -68,7 +82,23 @@ void fragment() {
     vec2 uv = SCREEN_UV;
     vec3 p = view_position(uv, INV_PROJECTION_MATRIX);
     float d = length(p);
-    vec3 color = textureLod(screen_tex, uv, 0.0).rgb;
+    vec2 color_uv = uv;
+    if (heat_haze > .001 && d < 100000.0) {
+        float far = smoothstep(6.0, 70.0, d);
+        vec2 wobble = vec2(sin(uv.y * 92.0 + TIME * 3.1) + sin(uv.y * 41.0 - TIME * 1.7),
+                           cos(uv.x * 77.0 + TIME * 2.4));
+        color_uv = safe_uv(uv + wobble * .0011 * heat_haze * far);
+    }
+    float submerged = max(underwater, in_lava);
+    if (submerged > .001) {
+        // The view wavers through the liquid: slow swells under water, a fast
+        // boil inside lava.
+        float speed = mix(1.0, 3.2, in_lava / max(submerged, .001));
+        vec2 sway = vec2(sin(uv.y * 23.0 + TIME * 1.7 * speed) + .5 * sin(uv.y * 57.0 - TIME * 2.3 * speed),
+                         cos(uv.x * 19.0 + TIME * 1.3 * speed));
+        color_uv = safe_uv(color_uv + sway * (.0028 * underwater + .0045 * in_lava));
+    }
+    vec3 color = textureLod(screen_tex, color_uv, 0.0).rgb;
     float outline_fade = outline_distance_end > outline_distance_start
         ? smoothstep(outline_distance_start, outline_distance_end, d)
         : step(outline_distance_start, d);
@@ -88,7 +118,15 @@ void fragment() {
                 color = mix(color, textureLod(screen_tex, snapped, 0.0).rgb, far_weight * .7);
             }
         }
-        if (outlines && outline_fade>.001 && normal_data.a<.985 && outline_allowed(normal_data.a,d)>.001) {
+        if (outlines && silhouette_outlines && d < fog_end && resource_mask(normal_data.a) > .5) {
+            vec2 pixel = outline_width / VIEWPORT_SIZE;
+            float interior = resource_mask(textureLod(normals_tex, safe_uv(uv + vec2(pixel.x, 0.0)), 0.0).a)
+                           * resource_mask(textureLod(normals_tex, safe_uv(uv - vec2(pixel.x, 0.0)), 0.0).a)
+                           * resource_mask(textureLod(normals_tex, safe_uv(uv + vec2(0.0, pixel.y)), 0.0).a)
+                           * resource_mask(textureLod(normals_tex, safe_uv(uv - vec2(0.0, pixel.y)), 0.0).a);
+            color *= mix(1.0, .24, (1.0 - interior) * outline_strength * (1.0 - smoothstep(fog_start, fog_end, d)));
+        }
+        if (outlines && d < fog_end && outline_fade>.001 && normal_data.a<.985 && outline_allowed(normal_data.a,d)>.001) {
             vec3 world_normal = normalize((INV_VIEW_MATRIX * vec4(n, 0.0)).xyz);
             float facing_light = max(0.0, dot(world_normal, normalize(key_light_direction)));
             float edge = 0.0;
@@ -121,7 +159,8 @@ void fragment() {
                         + feature_support(uv+tangent,p,n,INV_PROJECTION_MATRIX)
                         + feature_support(uv-tangent,p,n,INV_PROJECTION_MATRIX);
                     float broad_surface = smoothstep(1.5, 2.5, support);
-                    edge = max(edge, gap * broad_surface * permitted);
+                    if (silhouette_outlines)
+                        edge = max(edge, gap * broad_surface * permitted);
                     if (shoreline > .001) {
                         // Trace the land/water region boundary, not noisy sand
                         // texels or a one-block puddle. Samples reuse the depth
@@ -145,32 +184,46 @@ void fragment() {
             color = mix(color, min(color * 1.15, vec3(1.0)), highlight);
         }
     }
-    // Bounded screen-space light scattering, at the scene's reduced resolution.
-    // Depth blocks terrain/trees; low-chroma cloud pixels mask the source too.
-    // No extra camera, shadow map or full-resolution volumetric buffer.
-    if(godrays && godrays_visibility>.001) {
-        float on_screen=1.0-smoothstep(.02,.2,max(max(-sun_screen.x,sun_screen.x-1.0),max(-sun_screen.y,sun_screen.y-1.0)));
-        if(on_screen>.001) {
-            vec2 step_uv=(sun_screen-uv)*godrays_reach/float(godrays_samples);
-            vec2 sample_uv=uv+step_uv*.5;
-            float scattering=0.0, weight=1.0;
-            for(int i=0;i<32;i++) {
-                if(i>=godrays_samples)break;
-                if(all(greaterThanEqual(sample_uv,vec2(0))) && all(lessThanEqual(sample_uv,vec2(1)))) {
-                    float sky_mask=1.0-step(.0000001,textureLod(depth_tex,sample_uv,0.0).r);
-                    vec3 sky_color=textureLod(screen_tex,sample_uv,0.0).rgb;
-                    float brightest=max(sky_color.r,max(sky_color.g,sky_color.b));
-                    float darkest=min(sky_color.r,min(sky_color.g,sky_color.b));
-                    float cloud_open=max(smoothstep(.045,.18,brightest-darkest),smoothstep(1.1,2.5,brightest));
-                    scattering+=sky_mask*cloud_open*weight;
-                }
-                sample_uv+=step_uv; weight*=.965;
-            }
-            float air=d>100000.0 ? 1.0 : 1.0-exp(-d/65.0);
-            float focus=exp(-length((uv-sun_screen)*vec2(VIEWPORT_SIZE.x/VIEWPORT_SIZE.y,1.0))*1.3);
-            float shafts=pow(scattering/float(godrays_samples),2.0)*1.7;
-            color+=godrays_color*shafts*godrays_strength*godrays_visibility*on_screen*air*focus;
+    {
+        float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
+        float lit = smoothstep(0.04, 0.55, luma);
+        // Multiply-style tint keeps value; dark areas gain hue instead of going grey.
+        vec3 shadow_grade = color * mix(vec3(1.0), grade_shadow_tint * 1.6, 1.0 - lit);
+        vec3 graded = mix(shadow_grade, shadow_grade * grade_highlight_tint * 1.08, lit * lit);
+        color = mix(color, graded, grade_strength);
+    }
+    // Screen-space ray loop replaced by Compositor-based LensEffects (Lens Flares & God Rays)
+    if (world_clouds) {
+        vec4 near_point = INV_PROJECTION_MATRIX * vec4(uv * 2.0 - 1.0, 1.0, 1.0);
+        vec3 ray = normalize(mat3(INV_VIEW_MATRIX) * (near_point.xyz / near_point.w));
+        color = render_world_clouds(color, CAMERA_POSITION_WORLD, ray, d, FRAGCOORD.xy);
+    }
+    if (submerged > .001) {
+        float reach = d < 100000.0 ? d : 400.0;
+        // Water absorbs red first: near things keep some colour, distance fades
+        // to a blue-green murk, light ripples across the view from above.
+        if (underwater > .001) {
+            float murk = 1.0 - exp(-reach * .075);
+            vec3 tinted = color * vec3(.55, .86, .95);
+            vec3 water_fog = vec3(.03, .19, .27);
+            float ripple = .5 + .5 * sin(uv.x * 31.0 + uv.y * 17.0 + TIME * 2.2) * sin(uv.y * 23.0 - TIME * 1.6);
+            vec3 under = mix(tinted, water_fog, murk) * (.92 + .16 * ripple * (1.0 - murk));
+            color = mix(color, under, underwater);
         }
+        // Lava: almost nothing is visible past a few blocks, all of it glowing.
+        if (in_lava > .001) {
+            float murk = 1.0 - exp(-reach * .6);
+            // Swirling bright veins in a deep orange glow.
+            float swirl = sin(uv.x * 9.0 + TIME * 1.9 + sin(uv.y * 7.0 - TIME * 1.3) * 2.0)
+                        * sin(uv.y * 8.0 - TIME * 1.5 + sin(uv.x * 6.0 + TIME) * 2.0);
+            vec3 glow = mix(vec3(.62, .13, .02), vec3(1.0, .52, .10), smoothstep(.2, .9, swirl));
+            vec3 hot = mix(color * vec3(1.3, .55, .22), glow, murk);
+            float flicker = .92 + .08 * sin(TIME * 7.0 + uv.x * 13.0) * sin(TIME * 5.3 + uv.y * 11.0);
+            color = mix(color, hot * flicker, in_lava);
+        }
+        vec2 centered = uv - .5;
+        float vignette = 1.0 - smoothstep(.25, .75, length(centered * vec2(1.25, 1.0)));
+        color *= mix(1.0, .5 + .5 * vignette, submerged);
     }
     ALBEDO = color;
     if(debug_outline_mask) {

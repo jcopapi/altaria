@@ -10,5 +10,7 @@ godot::Dictionary load_block_data(godot::String &error);
 bool write_json_atomic(const godot::String &path, const godot::Dictionary &value, godot::String &error);
 bool parse_environment(const godot::Dictionary &data, EnvironmentSettings &settings, godot::String &error);
 bool parse_settings(const godot::Dictionary &data, Settings &settings, godot::String &error);
+bool parse_caves(const godot::Dictionary &data, caves::Config &settings, godot::String &error);
+bool parse_cave_biomes(const godot::Dictionary &data,caves::BiomeSettings &settings,godot::String &error);
 bool parse_registry(const godot::Dictionary &data, Registry &registry, godot::String &error);
 } // namespace altaria

@@ -1,0 +1,22 @@
+REGION -1,-1 rooms=2 passages=0 external=12
+ ROOM 17730608982447985537 type=normal depth=0 isolated=0 center=-124.633,67.3589,-191.978
+ ROOM 17839309632394816883 type=normal depth=1 isolated=1 center=-165.799,6.97192,-96.3507
+REGION 0,-1 rooms=11 passages=24 external=14
+ ROOM 11947458233273512780 type=collapse depth=0 isolated=0 center=140.492,127.501,-118.849
+ ROOM 12302759687430180439 type=normal depth=1 isolated=0 center=140.492,64.7138,-118.849
+ ROOM 7446997177942087230 type=rift depth=1 isolated=0 center=195.351,61.4816,-175.169
+ ROOM 16899644589351067680 type=rift depth=1 isolated=0 center=175.713,65.112,-126.709
+ ROOM 11159005225921927493 type=normal depth=2 isolated=0 center=140.492,-35.9742,-118.849
+ ROOM 2255008408311797896 type=giant depth=2 isolated=0 center=159.832,-48.6284,-142.625
+ ROOM 8124093399090873219 type=normal depth=2 isolated=0 center=185.453,-38.0175,-193.161
+ ROOM 4983326807971503917 type=normal depth=3 isolated=0 center=140.492,-186.25,-118.849
+ ROOM 17849454488284771123 type=normal depth=3 isolated=0 center=146.008,-182.635,-83.8794
+ ROOM 1466377775019640689 type=rift depth=3 isolated=0 center=105.426,-201.15,-192.425
+ ROOM 2176913030524698594 type=normal depth=1 isolated=1 center=120.477,65.5779,-76.5167
+REGION 0,1 rooms=2 passages=0 external=12
+ ROOM 16537004193858523495 type=normal depth=0 isolated=0 center=191.853,109.426,334.205
+ ROOM 16974045409755040545 type=giant depth=1 isolated=1 center=115.955,19.9964,334.411
+REGION 0,-2 rooms=2 passages=0 external=12
+ ROOM 3443114543446867152 type=collapse depth=0 isolated=0 center=58.7416,81.9956,-337.93
+ ROOM 9645778618251453454 type=normal depth=1 isolated=1 center=112.156,24.6199,-407.883
+ORPHAN_FULL_FIELD_COMPONENT carved_start=1 cells=13601 boundary_touches=0 explicit_isolated=0

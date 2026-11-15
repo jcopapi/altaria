@@ -1,0 +1,20 @@
+/tmp/altaria-cave-session.H3f547/project
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World 1408387541 seed=1408387541
+WORLD_OPEN Cave session test seed=1337
+CAVE_RESIDENT_STATE player=(100.0, 150.0, 100.0) cache_regions=64 pinned=1 misses=106 pending=0 rooms=12
+CAVE_BIOME_DISTRIBUTION { "altaria:fossil": 224, "altaria:abyssal": 495, "altaria:infernal": 569, "altaria:fungal": 329, "altaria:limestone": 463, "altaria:crystal": 352, "altaria:hydrothermal": 67, "altaria:corrupted": 1 } depths={ "normal": true, "deep": true, "abyssal": true, "infernal": true } frozen_crystal=true hydrothermal_abyssal=true
+Generation complete: first tile 553.8 ms | all LODs 6114.3 ms
+WORLD_STREAM_READY Generation complete: first tile 553.8 ms | all LODs 6114.3 ms
+ERROR: Native player lands on cave floor
+   at: push_error (./core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/cartoon_runtime.gd:9)
+       [1] run (res://tests/cave_runtime.gd:98)
+CAVE_JOLT_FIXTURE floor=(154.0, -328.0, 172.0) positions=[(154.3004, -327.0202, 172.1285)] pending=0
+Paint and overlays need a supporting block
+WORLD_OPEN World 1337 seed=1337
+CAVE_RUNTIME_FAIL ["Native player lands on cave floor"]

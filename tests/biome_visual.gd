@@ -64,7 +64,6 @@ func run() -> void:
                 game.paint_voxel(x + dx, y, z - dz, "#326dff", 0.35, 1.15)
             else:
                 game.paint_voxel(x + dx, y, z - dz, "#c548ff", 0.35, 1.15)
-    game.overlay_voxel(x + 2, y, z - 2, "pebbles1")
     actor.position = Vector3(x + 4.5, y + 5, z + 3)
     actor.rotation.y = 0
     camera.rotation.x = -0.70

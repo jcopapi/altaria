@@ -9,18 +9,20 @@
   "wind_strength": 0.18,
   "grass_noise_scale": 0.12,
   "grass_noise_strength": 0.28,
-  "cloud_coverage": 0.48,
-  "cloud_pixel_size": 0.008,
+  "cloud_coverage": 0.5,
+  "cloud_pixel_size": 0.024,
   "max_bodies": 40,
-  "max_parts": 192,
+  "max_parts": 256,
   "physics_distance": 100,
-  "shadow_distance": 220,
+  "shadow_distance": 140,
   "sun_energy": 1.35,
-  "moon_energy": 0.38,
-  "day_ambient": 0.35,
-  "night_ambient": 0.22,
+  "moon_energy": 0.006,
+  "day_ambient": 0.006,
+  "night_ambient": 0.002,
   "fog_transition": 1.2,
   "outline_enabled": true,
+  "outline_silhouettes": false,
+  "ssao_enabled": false,
   "outline_width": 1,
   "outline_strength": 0.9,
   "outline_highlight": 0.3,
@@ -35,13 +37,107 @@
   "godrays_reach": 0.85,
   "godrays_samples": 16,
   "godrays_volumetric": true,
-  "godrays_density": 0.0005,
+  "godrays_density": 0.00038,
   "godrays_length": 96,
-  "godrays_light_energy": 32,
+  "godrays_light_energy": 8,
   "pixelation_enabled": true,
   "render_pixel_size": 2,
   "pixelation_max": 2,
   "pixelation_start": 48,
   "pixelation_end": 2400,
-  "sky_biome_strength": 0.85
+  "sky_biome_strength": 0.85,
+  "cloud_base_y": 232,
+  "cloud_thickness": 48,
+  "cloud_bands": 4,
+  "sun_color_day": [
+    1.0,
+    0.93,
+    0.78
+  ],
+  "sun_color_dusk": [
+    1.0,
+    0.52,
+    0.38
+  ],
+  "moon_color": [
+    0.55,
+    0.62,
+    1.0
+  ],
+  "sky_day_zenith": [
+    0.16,
+    0.46,
+    0.95
+  ],
+  "sky_day_horizon": [
+    0.62,
+    0.86,
+    1.0
+  ],
+  "sky_night_zenith": [
+    0.02,
+    0.025,
+    0.09
+  ],
+  "sky_night_horizon": [
+    0.09,
+    0.07,
+    0.22
+  ],
+  "sky_dusk_glow": [
+    1.0,
+    0.42,
+    0.52
+  ],
+  "sun_halo": 0.6,
+  "ambient_day": [
+    0.62,
+    0.7,
+    1.0
+  ],
+  "ambient_night": [
+    0.3,
+    0.3,
+    0.62
+  ],
+  "sky_fill_day": [
+    0.44,
+    0.42,
+    0.66
+  ],
+  "sky_fill_night": [
+    0.05,
+    0.06,
+    0.16
+  ],
+  "grade_shadow_tint": [
+    0.46,
+    0.36,
+    0.78
+  ],
+  "grade_highlight_tint": [
+    1.0,
+    0.9,
+    0.72
+  ],
+  "grade_strength": 0.35,
+  "saturation": 1.2,
+  "contrast": 1.05,
+  "glow_intensity": 0.55,
+  "cloud_lit_color": [
+    1.04,
+    1.0,
+    0.96
+  ],
+  "cloud_shadow_color": [
+    0.74,
+    0.74,
+    0.94
+  ],
+  "cloud_dusk_color": [
+    1.0,
+    0.6,
+    0.66
+  ],
+  "cloud_above_opacity": 0.4
 }

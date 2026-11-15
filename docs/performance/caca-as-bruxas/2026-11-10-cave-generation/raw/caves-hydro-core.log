@@ -1,0 +1,5 @@
+[TEST] Running CommandParser tests...
+[PASS] CommandParser tests passed successfully!
+PASS liquid system tests: Cellular Automata, Viscosity, Reaction, Sleep, and River Currents.
+Mountain strong-mask coverage 165/961
+PASS 225109 checks. Altitude range 17.4052..299.582; fine mesh 20.9923 ms; far mesh 5.19542 ms; tiles 453.

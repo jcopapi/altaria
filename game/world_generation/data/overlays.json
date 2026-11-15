@@ -1,8 +1,5 @@
 {
   "definitions": [
-    {"id":1,"key":"altaria:grass","name":"Grass transition overlay","kind":"transition","side":2,"tintable":true},
-    {"id":2,"key":"altaria:pebbles1","name":"Pebbles 1","kind":"decal","top":4,"tintable":true},
-    {"id":3,"key":"altaria:pebbles2","name":"Pebbles 2","kind":"decal","top":5,"tintable":true},
-    {"id":4,"key":"altaria:pebbles3","name":"Pebbles 3","kind":"decal","top":6,"tintable":true}
+	{"id":1,"key":"altaria:grass","name":"Grass transition overlay","kind":"transition","side":2,"tintable":true}
   ]
 }

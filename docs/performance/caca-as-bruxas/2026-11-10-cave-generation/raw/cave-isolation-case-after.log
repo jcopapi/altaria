@@ -1,0 +1,16 @@
+CASE basin=0 chances=0.18,0.45,0.45 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=0 chances=0.18,0.45,1 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=0 chances=0.18,1,0.45 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=0 chances=0.18,1,1 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=0 chances=1,0.45,0.45 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=0 chances=1,0.45,1 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=0 chances=1,1,0.45 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=0 chances=1,1,1 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=3 chances=0.18,0.45,0.45 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=3 chances=0.18,0.45,1 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=3 chances=0.18,1,0.45 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=3 chances=0.18,1,1 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=3 chances=1,0.45,0.45 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=3 chances=1,0.45,1 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=3 chances=1,1,0.45 isolated_exists=0 local_passage=1 neighbor_passage=1
+CASE basin=3 chances=1,1,1 isolated_exists=0 local_passage=1 neighbor_passage=1

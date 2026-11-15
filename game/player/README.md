@@ -28,3 +28,15 @@ Block forms and physics: hold **R + wheel** to choose the held block's shape,
 cut a tree; click a fallen tree part to detach it. Walking collision follows the
 actual slab/ramp/stair/pillar geometry and supports small step-up transitions.
 The HUD reports apparent environment temperature in °C.
+
+## First-person hands
+
+Open `first_person/first_person_hands.tscn` in the editor. The **Left** and
+**Right** controls set the screen anchors. The root inspector exposes the
+relaxed and closed hand textures and each tool's grip offset and angles.
+Move **ToolDisplay** to align the handle with the sprite.
+
+Edit **Locomotion** for the sprint loop and **Actions** for the placement and
+break clips. The separate **Run** and **Action** nodes let both motions play
+together. Use `item pickaxe`, `item axe left` or `item clear` in-game to try
+the grips.

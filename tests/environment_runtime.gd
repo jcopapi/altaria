@@ -29,8 +29,8 @@ func run() -> void:
     check(player!=null,"Native player found")
     await settle()
     var initial: Dictionary=game.get_debug_state()
-    check(initial.grass_quads==0 and initial.bushes==0,"3D grass and bushes are removed")
-    check(initial.terrain_colliders>0 and initial.terrain_colliders==initial.lod0,"Only near terrain owns Jolt colliders")
+    check(initial.grass_quads>0,"Grass quads are generated near the player")
+    check(initial.terrain_colliders==0 and initial.player_collision_ready,"Player terrain is ready without eager Jolt colliders")
     game.execute_command("time 14")
     var day: Dictionary=game.get_temperature(Vector3(256,230,128))
     game.execute_command("time 2")
@@ -90,6 +90,7 @@ func run() -> void:
     var fallen: Dictionary=game.get_debug_state()
     print("FALLEN_STATE ", fallen)
     check(fallen.physics_frozen==0,"Bodies activate after current terrain colliders upload")
+    check(fallen.terrain_colliders>0 and fallen.terrain_colliders<fallen.lod0,"Jolt colliders are built where debris needs them")
     check(before.distance_to(fallen.physics_positions[0])>.2 and fallen.physics_rotations[0].length()>.2,"Tree moves and topples under Jolt")
     check(fallen.physics_positions[1].y>220.9 and fallen.physics_positions[1].y<221.3,"Falling block lands on voxel collision mesh")
     # Walking uses exact Jolt queries against rotated physical blocks as well as terrain.

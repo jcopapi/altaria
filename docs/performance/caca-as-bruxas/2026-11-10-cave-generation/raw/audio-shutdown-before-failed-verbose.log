@@ -1,0 +1,1207 @@
+WorkerThreadPool: 16 threads, 4 max low-priority.
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+SDL: Init OK!
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+Loading resource: res://default_bus_layout.tres remapped: res://default_bus_layout.tres
+Completed load for: 'res://default_bus_layout.tres' remapped 'res://default_bus_layout.tres' at thread -1
+CORE API HASH: 4132630894
+EDITOR API HASH: 505189451
+Loading resource: res://tests/cave_runtime.gd remapped: res://tests/cave_runtime.gd
+Completed load for: 'res://tests/cave_runtime.gd' remapped 'res://tests/cave_runtime.gd' at thread -1
+SceneTreeFTI: traversal method DEFAULT
+Loaded system CA certificates
+Loading resource: res://scenes/main.tscn remapped: res://scenes/main.tscn
+Completed load for: 'res://scenes/main.tscn' remapped 'res://scenes/main.tscn' at thread -1
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+Loading resource: res://game/assets/blocks/dirt_block.png remapped: res://game/assets/blocks/dirt_block.png
+Loading resource: res://.godot/imported/dirt_block.png-d1956a93d7d2f4830a4cd7cee0f44b39.ctex remapped: res://.godot/imported/dirt_block.png-d1956a93d7d2f4830a4cd7cee0f44b39.ctex
+Completed load for: 'res://game/assets/blocks/dirt_block.png' remapped 'res://game/assets/blocks/dirt_block.png' at thread -1
+Loading resource: res://game/assets/blocks/grass_side_overlay.png remapped: res://game/assets/blocks/grass_side_overlay.png
+Loading resource: res://.godot/imported/grass_side_overlay.png-a872ba693370a6afbbf1c81e952a0956.ctex remapped: res://.godot/imported/grass_side_overlay.png-a872ba693370a6afbbf1c81e952a0956.ctex
+Completed load for: 'res://game/assets/blocks/grass_side_overlay.png' remapped 'res://game/assets/blocks/grass_side_overlay.png' at thread -1
+Loading resource: res://game/assets/blocks/grass_top_overlay.png remapped: res://game/assets/blocks/grass_top_overlay.png
+Loading resource: res://.godot/imported/grass_top_overlay.png-316873726447439fe3ecad47f0e50e08.ctex remapped: res://.godot/imported/grass_top_overlay.png-316873726447439fe3ecad47f0e50e08.ctex
+Completed load for: 'res://game/assets/blocks/grass_top_overlay.png' remapped 'res://game/assets/blocks/grass_top_overlay.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles1.png remapped: res://game/assets/blocks/pebbles1.png
+Loading resource: res://.godot/imported/pebbles1.png-2f3a2c8b0df15ea9b39c80f36835e818.ctex remapped: res://.godot/imported/pebbles1.png-2f3a2c8b0df15ea9b39c80f36835e818.ctex
+Completed load for: 'res://game/assets/blocks/pebbles1.png' remapped 'res://game/assets/blocks/pebbles1.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles2.png remapped: res://game/assets/blocks/pebbles2.png
+Loading resource: res://.godot/imported/pebbles2.png-6e46e60d3380b9b024085c65d533d978.ctex remapped: res://.godot/imported/pebbles2.png-6e46e60d3380b9b024085c65d533d978.ctex
+Completed load for: 'res://game/assets/blocks/pebbles2.png' remapped 'res://game/assets/blocks/pebbles2.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles3.png remapped: res://game/assets/blocks/pebbles3.png
+Loading resource: res://.godot/imported/pebbles3.png-414182317ea1967774784830037b498d.ctex remapped: res://.godot/imported/pebbles3.png-414182317ea1967774784830037b498d.ctex
+Completed load for: 'res://game/assets/blocks/pebbles3.png' remapped 'res://game/assets/blocks/pebbles3.png' at thread -1
+Loading resource: res://game/assets/blocks/stone.png remapped: res://game/assets/blocks/stone.png
+Loading resource: res://.godot/imported/stone.png-dab6091dfb9ed4df4b43f0eccd55d93f.ctex remapped: res://.godot/imported/stone.png-dab6091dfb9ed4df4b43f0eccd55d93f.ctex
+Completed load for: 'res://game/assets/blocks/stone.png' remapped 'res://game/assets/blocks/stone.png' at thread -1
+Loading resource: res://game/assets/blocks/sand.png remapped: res://game/assets/blocks/sand.png
+Loading resource: res://.godot/imported/sand.png-6c849728e9e905455e4f0bbc7697c887.ctex remapped: res://.godot/imported/sand.png-6c849728e9e905455e4f0bbc7697c887.ctex
+Completed load for: 'res://game/assets/blocks/sand.png' remapped 'res://game/assets/blocks/sand.png' at thread -1
+Loading resource: res://game/world_generation/shaders/terrain.gdshader remapped: res://game/world_generation/shaders/terrain.gdshader
+Loading resource: res://game/world_generation/shaders/block_tint.gdshaderinc remapped: res://game/world_generation/shaders/block_tint.gdshaderinc
+Completed load for: 'res://game/world_generation/shaders/block_tint.gdshaderinc' remapped 'res://game/world_generation/shaders/block_tint.gdshaderinc' at thread -1
+Loading resource: res://game/world_generation/shaders/grass_noise.gdshaderinc remapped: res://game/world_generation/shaders/grass_noise.gdshaderinc
+Completed load for: 'res://game/world_generation/shaders/grass_noise.gdshaderinc' remapped 'res://game/world_generation/shaders/grass_noise.gdshaderinc' at thread -1
+Completed load for: 'res://game/world_generation/shaders/terrain.gdshader' remapped 'res://game/world_generation/shaders/terrain.gdshader' at thread -1
+Loading resource: res://game/world_generation/shaders/overlay.gdshader remapped: res://game/world_generation/shaders/overlay.gdshader
+Completed load for: 'res://game/world_generation/shaders/overlay.gdshader' remapped 'res://game/world_generation/shaders/overlay.gdshader' at thread -1
+Loading resource: res://game/world_generation/shaders/grass.gdshader remapped: res://game/world_generation/shaders/grass.gdshader
+Completed load for: 'res://game/world_generation/shaders/grass.gdshader' remapped 'res://game/world_generation/shaders/grass.gdshader' at thread -1
+Loading resource: res://addons/simplegrasstextured/textures/grassbushcc008.png remapped: res://addons/simplegrasstextured/textures/grassbushcc008.png
+Loading resource: res://.godot/imported/grassbushcc008.png-7110abc2a2a9dc117662bb95ed60be39.s3tc.ctex remapped: res://.godot/imported/grassbushcc008.png-7110abc2a2a9dc117662bb95ed60be39.s3tc.ctex
+Completed load for: 'res://addons/simplegrasstextured/textures/grassbushcc008.png' remapped 'res://addons/simplegrasstextured/textures/grassbushcc008.png' at thread -1
+Loading resource: res://game/world_generation/shaders/fantasy_sky.gdshader remapped: res://game/world_generation/shaders/fantasy_sky.gdshader
+Completed load for: 'res://game/world_generation/shaders/fantasy_sky.gdshader' remapped 'res://game/world_generation/shaders/fantasy_sky.gdshader' at thread -1
+Loading resource: res://addons/lens_effects/lens_flare_compositor_effect.gd remapped: res://addons/lens_effects/lens_flare_compositor_effect.gd
+Completed load for: 'res://addons/lens_effects/lens_flare_compositor_effect.gd' remapped 'res://addons/lens_effects/lens_flare_compositor_effect.gd' at thread -1
+Loading resource: res://addons/spatial_audio_3d/spatial_audio_3d.gd remapped: res://addons/spatial_audio_3d/spatial_audio_3d.gd
+Completed load for: 'res://addons/spatial_audio_3d/spatial_audio_3d.gd' remapped 'res://addons/spatial_audio_3d/spatial_audio_3d.gd' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc1.ogg remapped: res://sounds/vostokfootsteps/fc1.ogg
+Loading resource: res://.godot/imported/fc1.ogg-1c8facbc0236c7582e01a6f8b6589c4b.oggvorbisstr remapped: res://.godot/imported/fc1.ogg-1c8facbc0236c7582e01a6f8b6589c4b.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc1.ogg' remapped 'res://sounds/vostokfootsteps/fc1.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc2.ogg remapped: res://sounds/vostokfootsteps/fc2.ogg
+Loading resource: res://.godot/imported/fc2.ogg-95259b6ddc5a942b52660d9d61871ccc.oggvorbisstr remapped: res://.godot/imported/fc2.ogg-95259b6ddc5a942b52660d9d61871ccc.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc2.ogg' remapped 'res://sounds/vostokfootsteps/fc2.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc3.ogg remapped: res://sounds/vostokfootsteps/fc3.ogg
+Loading resource: res://.godot/imported/fc3.ogg-baaf2847cb718ab8537b969cad090d84.oggvorbisstr remapped: res://.godot/imported/fc3.ogg-baaf2847cb718ab8537b969cad090d84.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc3.ogg' remapped 'res://sounds/vostokfootsteps/fc3.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc4.ogg remapped: res://sounds/vostokfootsteps/fc4.ogg
+Loading resource: res://.godot/imported/fc4.ogg-4c982188cf99d0e65df64a0ad87013ce.oggvorbisstr remapped: res://.godot/imported/fc4.ogg-4c982188cf99d0e65df64a0ad87013ce.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc4.ogg' remapped 'res://sounds/vostokfootsteps/fc4.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc5.ogg remapped: res://sounds/vostokfootsteps/fc5.ogg
+Loading resource: res://.godot/imported/fc5.ogg-82f893abc9dbf77c84c6ac8aefefcd24.oggvorbisstr remapped: res://.godot/imported/fc5.ogg-82f893abc9dbf77c84c6ac8aefefcd24.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc5.ogg' remapped 'res://sounds/vostokfootsteps/fc5.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc6.ogg remapped: res://sounds/vostokfootsteps/fc6.ogg
+Loading resource: res://.godot/imported/fc6.ogg-b6699aae24e8cb449e2f2257b68dacce.oggvorbisstr remapped: res://.godot/imported/fc6.ogg-b6699aae24e8cb449e2f2257b68dacce.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc6.ogg' remapped 'res://sounds/vostokfootsteps/fc6.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc7.ogg remapped: res://sounds/vostokfootsteps/fc7.ogg
+Loading resource: res://.godot/imported/fc7.ogg-4ba13bf1d0991506de589aa88c7f57ba.oggvorbisstr remapped: res://.godot/imported/fc7.ogg-4ba13bf1d0991506de589aa88c7f57ba.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc7.ogg' remapped 'res://sounds/vostokfootsteps/fc7.ogg' at thread -1
+Loading resource: res://game/world_generation/shaders/cartoon_world.gdshader remapped: res://game/world_generation/shaders/cartoon_world.gdshader
+Completed load for: 'res://game/world_generation/shaders/cartoon_world.gdshader' remapped 'res://game/world_generation/shaders/cartoon_world.gdshader' at thread -1
+WORLD_OPEN World -893948000 seed=-893948000
+Loading resource: res://game/assets/blocks/dirt_block.png remapped: res://game/assets/blocks/dirt_block.png
+Loading resource: res://.godot/imported/dirt_block.png-d1956a93d7d2f4830a4cd7cee0f44b39.ctex remapped: res://.godot/imported/dirt_block.png-d1956a93d7d2f4830a4cd7cee0f44b39.ctex
+Completed load for: 'res://game/assets/blocks/dirt_block.png' remapped 'res://game/assets/blocks/dirt_block.png' at thread -1
+Loading resource: res://game/assets/blocks/grass_side_overlay.png remapped: res://game/assets/blocks/grass_side_overlay.png
+Loading resource: res://.godot/imported/grass_side_overlay.png-a872ba693370a6afbbf1c81e952a0956.ctex remapped: res://.godot/imported/grass_side_overlay.png-a872ba693370a6afbbf1c81e952a0956.ctex
+Completed load for: 'res://game/assets/blocks/grass_side_overlay.png' remapped 'res://game/assets/blocks/grass_side_overlay.png' at thread -1
+Loading resource: res://game/assets/blocks/grass_top_overlay.png remapped: res://game/assets/blocks/grass_top_overlay.png
+Loading resource: res://.godot/imported/grass_top_overlay.png-316873726447439fe3ecad47f0e50e08.ctex remapped: res://.godot/imported/grass_top_overlay.png-316873726447439fe3ecad47f0e50e08.ctex
+Completed load for: 'res://game/assets/blocks/grass_top_overlay.png' remapped 'res://game/assets/blocks/grass_top_overlay.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles1.png remapped: res://game/assets/blocks/pebbles1.png
+Loading resource: res://.godot/imported/pebbles1.png-2f3a2c8b0df15ea9b39c80f36835e818.ctex remapped: res://.godot/imported/pebbles1.png-2f3a2c8b0df15ea9b39c80f36835e818.ctex
+Completed load for: 'res://game/assets/blocks/pebbles1.png' remapped 'res://game/assets/blocks/pebbles1.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles2.png remapped: res://game/assets/blocks/pebbles2.png
+Loading resource: res://.godot/imported/pebbles2.png-6e46e60d3380b9b024085c65d533d978.ctex remapped: res://.godot/imported/pebbles2.png-6e46e60d3380b9b024085c65d533d978.ctex
+Completed load for: 'res://game/assets/blocks/pebbles2.png' remapped 'res://game/assets/blocks/pebbles2.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles3.png remapped: res://game/assets/blocks/pebbles3.png
+Loading resource: res://.godot/imported/pebbles3.png-414182317ea1967774784830037b498d.ctex remapped: res://.godot/imported/pebbles3.png-414182317ea1967774784830037b498d.ctex
+Completed load for: 'res://game/assets/blocks/pebbles3.png' remapped 'res://game/assets/blocks/pebbles3.png' at thread -1
+Loading resource: res://game/assets/blocks/stone.png remapped: res://game/assets/blocks/stone.png
+Loading resource: res://.godot/imported/stone.png-dab6091dfb9ed4df4b43f0eccd55d93f.ctex remapped: res://.godot/imported/stone.png-dab6091dfb9ed4df4b43f0eccd55d93f.ctex
+Completed load for: 'res://game/assets/blocks/stone.png' remapped 'res://game/assets/blocks/stone.png' at thread -1
+Loading resource: res://game/assets/blocks/sand.png remapped: res://game/assets/blocks/sand.png
+Loading resource: res://.godot/imported/sand.png-6c849728e9e905455e4f0bbc7697c887.ctex remapped: res://.godot/imported/sand.png-6c849728e9e905455e4f0bbc7697c887.ctex
+Completed load for: 'res://game/assets/blocks/sand.png' remapped 'res://game/assets/blocks/sand.png' at thread -1
+Loading resource: res://game/world_generation/shaders/fantasy_sky.gdshader remapped: res://game/world_generation/shaders/fantasy_sky.gdshader
+Completed load for: 'res://game/world_generation/shaders/fantasy_sky.gdshader' remapped 'res://game/world_generation/shaders/fantasy_sky.gdshader' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc1.ogg remapped: res://sounds/vostokfootsteps/fc1.ogg
+Loading resource: res://.godot/imported/fc1.ogg-1c8facbc0236c7582e01a6f8b6589c4b.oggvorbisstr remapped: res://.godot/imported/fc1.ogg-1c8facbc0236c7582e01a6f8b6589c4b.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc1.ogg' remapped 'res://sounds/vostokfootsteps/fc1.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc2.ogg remapped: res://sounds/vostokfootsteps/fc2.ogg
+Loading resource: res://.godot/imported/fc2.ogg-95259b6ddc5a942b52660d9d61871ccc.oggvorbisstr remapped: res://.godot/imported/fc2.ogg-95259b6ddc5a942b52660d9d61871ccc.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc2.ogg' remapped 'res://sounds/vostokfootsteps/fc2.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc3.ogg remapped: res://sounds/vostokfootsteps/fc3.ogg
+Loading resource: res://.godot/imported/fc3.ogg-baaf2847cb718ab8537b969cad090d84.oggvorbisstr remapped: res://.godot/imported/fc3.ogg-baaf2847cb718ab8537b969cad090d84.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc3.ogg' remapped 'res://sounds/vostokfootsteps/fc3.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc4.ogg remapped: res://sounds/vostokfootsteps/fc4.ogg
+Loading resource: res://.godot/imported/fc4.ogg-4c982188cf99d0e65df64a0ad87013ce.oggvorbisstr remapped: res://.godot/imported/fc4.ogg-4c982188cf99d0e65df64a0ad87013ce.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc4.ogg' remapped 'res://sounds/vostokfootsteps/fc4.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc5.ogg remapped: res://sounds/vostokfootsteps/fc5.ogg
+Loading resource: res://.godot/imported/fc5.ogg-82f893abc9dbf77c84c6ac8aefefcd24.oggvorbisstr remapped: res://.godot/imported/fc5.ogg-82f893abc9dbf77c84c6ac8aefefcd24.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc5.ogg' remapped 'res://sounds/vostokfootsteps/fc5.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc6.ogg remapped: res://sounds/vostokfootsteps/fc6.ogg
+Loading resource: res://.godot/imported/fc6.ogg-b6699aae24e8cb449e2f2257b68dacce.oggvorbisstr remapped: res://.godot/imported/fc6.ogg-b6699aae24e8cb449e2f2257b68dacce.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc6.ogg' remapped 'res://sounds/vostokfootsteps/fc6.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc7.ogg remapped: res://sounds/vostokfootsteps/fc7.ogg
+Loading resource: res://.godot/imported/fc7.ogg-4ba13bf1d0991506de589aa88c7f57ba.oggvorbisstr remapped: res://.godot/imported/fc7.ogg-4ba13bf1d0991506de589aa88c7f57ba.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc7.ogg' remapped 'res://sounds/vostokfootsteps/fc7.ogg' at thread -1
+Loading resource: res://game/world_generation/shaders/cartoon_world.gdshader remapped: res://game/world_generation/shaders/cartoon_world.gdshader
+Completed load for: 'res://game/world_generation/shaders/cartoon_world.gdshader' remapped 'res://game/world_generation/shaders/cartoon_world.gdshader' at thread -1
+WORLD_OPEN Cave session test seed=1337
+Generation complete: first tile 606.7 ms | all LODs 3616.4 ms
+WORLD_STREAM_READY Generation complete: first tile 606.7 ms | all LODs 3616.4 ms
+Paint and overlays need a supporting block
+Loading resource: res://game/assets/blocks/dirt_block.png remapped: res://game/assets/blocks/dirt_block.png
+Loading resource: res://.godot/imported/dirt_block.png-d1956a93d7d2f4830a4cd7cee0f44b39.ctex remapped: res://.godot/imported/dirt_block.png-d1956a93d7d2f4830a4cd7cee0f44b39.ctex
+Completed load for: 'res://game/assets/blocks/dirt_block.png' remapped 'res://game/assets/blocks/dirt_block.png' at thread -1
+Loading resource: res://game/assets/blocks/grass_side_overlay.png remapped: res://game/assets/blocks/grass_side_overlay.png
+Loading resource: res://.godot/imported/grass_side_overlay.png-a872ba693370a6afbbf1c81e952a0956.ctex remapped: res://.godot/imported/grass_side_overlay.png-a872ba693370a6afbbf1c81e952a0956.ctex
+Completed load for: 'res://game/assets/blocks/grass_side_overlay.png' remapped 'res://game/assets/blocks/grass_side_overlay.png' at thread -1
+Loading resource: res://game/assets/blocks/grass_top_overlay.png remapped: res://game/assets/blocks/grass_top_overlay.png
+Loading resource: res://.godot/imported/grass_top_overlay.png-316873726447439fe3ecad47f0e50e08.ctex remapped: res://.godot/imported/grass_top_overlay.png-316873726447439fe3ecad47f0e50e08.ctex
+Completed load for: 'res://game/assets/blocks/grass_top_overlay.png' remapped 'res://game/assets/blocks/grass_top_overlay.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles1.png remapped: res://game/assets/blocks/pebbles1.png
+Loading resource: res://.godot/imported/pebbles1.png-2f3a2c8b0df15ea9b39c80f36835e818.ctex remapped: res://.godot/imported/pebbles1.png-2f3a2c8b0df15ea9b39c80f36835e818.ctex
+Completed load for: 'res://game/assets/blocks/pebbles1.png' remapped 'res://game/assets/blocks/pebbles1.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles2.png remapped: res://game/assets/blocks/pebbles2.png
+Loading resource: res://.godot/imported/pebbles2.png-6e46e60d3380b9b024085c65d533d978.ctex remapped: res://.godot/imported/pebbles2.png-6e46e60d3380b9b024085c65d533d978.ctex
+Completed load for: 'res://game/assets/blocks/pebbles2.png' remapped 'res://game/assets/blocks/pebbles2.png' at thread -1
+Loading resource: res://game/assets/blocks/pebbles3.png remapped: res://game/assets/blocks/pebbles3.png
+Loading resource: res://.godot/imported/pebbles3.png-414182317ea1967774784830037b498d.ctex remapped: res://.godot/imported/pebbles3.png-414182317ea1967774784830037b498d.ctex
+Completed load for: 'res://game/assets/blocks/pebbles3.png' remapped 'res://game/assets/blocks/pebbles3.png' at thread -1
+Loading resource: res://game/assets/blocks/stone.png remapped: res://game/assets/blocks/stone.png
+Loading resource: res://.godot/imported/stone.png-dab6091dfb9ed4df4b43f0eccd55d93f.ctex remapped: res://.godot/imported/stone.png-dab6091dfb9ed4df4b43f0eccd55d93f.ctex
+Completed load for: 'res://game/assets/blocks/stone.png' remapped 'res://game/assets/blocks/stone.png' at thread -1
+Loading resource: res://game/assets/blocks/sand.png remapped: res://game/assets/blocks/sand.png
+Loading resource: res://.godot/imported/sand.png-6c849728e9e905455e4f0bbc7697c887.ctex remapped: res://.godot/imported/sand.png-6c849728e9e905455e4f0bbc7697c887.ctex
+Completed load for: 'res://game/assets/blocks/sand.png' remapped 'res://game/assets/blocks/sand.png' at thread -1
+Loading resource: res://game/world_generation/shaders/fantasy_sky.gdshader remapped: res://game/world_generation/shaders/fantasy_sky.gdshader
+Completed load for: 'res://game/world_generation/shaders/fantasy_sky.gdshader' remapped 'res://game/world_generation/shaders/fantasy_sky.gdshader' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc1.ogg remapped: res://sounds/vostokfootsteps/fc1.ogg
+Loading resource: res://.godot/imported/fc1.ogg-1c8facbc0236c7582e01a6f8b6589c4b.oggvorbisstr remapped: res://.godot/imported/fc1.ogg-1c8facbc0236c7582e01a6f8b6589c4b.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc1.ogg' remapped 'res://sounds/vostokfootsteps/fc1.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc2.ogg remapped: res://sounds/vostokfootsteps/fc2.ogg
+Loading resource: res://.godot/imported/fc2.ogg-95259b6ddc5a942b52660d9d61871ccc.oggvorbisstr remapped: res://.godot/imported/fc2.ogg-95259b6ddc5a942b52660d9d61871ccc.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc2.ogg' remapped 'res://sounds/vostokfootsteps/fc2.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc3.ogg remapped: res://sounds/vostokfootsteps/fc3.ogg
+Loading resource: res://.godot/imported/fc3.ogg-baaf2847cb718ab8537b969cad090d84.oggvorbisstr remapped: res://.godot/imported/fc3.ogg-baaf2847cb718ab8537b969cad090d84.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc3.ogg' remapped 'res://sounds/vostokfootsteps/fc3.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc4.ogg remapped: res://sounds/vostokfootsteps/fc4.ogg
+Loading resource: res://.godot/imported/fc4.ogg-4c982188cf99d0e65df64a0ad87013ce.oggvorbisstr remapped: res://.godot/imported/fc4.ogg-4c982188cf99d0e65df64a0ad87013ce.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc4.ogg' remapped 'res://sounds/vostokfootsteps/fc4.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc5.ogg remapped: res://sounds/vostokfootsteps/fc5.ogg
+Loading resource: res://.godot/imported/fc5.ogg-82f893abc9dbf77c84c6ac8aefefcd24.oggvorbisstr remapped: res://.godot/imported/fc5.ogg-82f893abc9dbf77c84c6ac8aefefcd24.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc5.ogg' remapped 'res://sounds/vostokfootsteps/fc5.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc6.ogg remapped: res://sounds/vostokfootsteps/fc6.ogg
+Loading resource: res://.godot/imported/fc6.ogg-b6699aae24e8cb449e2f2257b68dacce.oggvorbisstr remapped: res://.godot/imported/fc6.ogg-b6699aae24e8cb449e2f2257b68dacce.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc6.ogg' remapped 'res://sounds/vostokfootsteps/fc6.ogg' at thread -1
+Loading resource: res://sounds/vostokfootsteps/fc7.ogg remapped: res://sounds/vostokfootsteps/fc7.ogg
+Loading resource: res://.godot/imported/fc7.ogg-4ba13bf1d0991506de589aa88c7f57ba.oggvorbisstr remapped: res://.godot/imported/fc7.ogg-4ba13bf1d0991506de589aa88c7f57ba.oggvorbisstr
+Completed load for: 'res://sounds/vostokfootsteps/fc7.ogg' remapped 'res://sounds/vostokfootsteps/fc7.ogg' at thread -1
+Loading resource: res://game/world_generation/shaders/cartoon_world.gdshader remapped: res://game/world_generation/shaders/cartoon_world.gdshader
+Completed load for: 'res://game/world_generation/shaders/cartoon_world.gdshader' remapped 'res://game/world_generation/shaders/cartoon_world.gdshader' at thread -1
+WORLD_OPEN World 1337 seed=1337
+Generation complete: first tile 245.1 ms | all LODs 4591.4 ms
+WORLD_STREAM_READY Generation complete: first tile 245.1 ms | all LODs 4591.4 ms
+CAVE_RUNTIME_PASS
+ERROR: Pages in use exist at exit in PagedAllocator: N20RasterizerSceneDummy21GeometryInstanceDummyE
+   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (./servers/rendering/storage/utilities.cpp:56)
+WARNING: 383 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (./core/object/object.cpp:2893)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+XR: Clearing primary interface
+XR: Removed interface "Native mobile"
+XR: Removed interface "OpenXR"
+ERROR: 54 RID allocations of type 'N13RendererDummy9DummyMeshE' were leaked at exit.
+ERROR: 54 RID allocations of type 'N17RendererSceneCull8InstanceE' were leaked at exit.
+Leaked instance: GDScriptNativeClass:9223372043381113250 - Reference count: 2
+Leaked instance: GDScriptNativeClass:9223372049337025343 - Reference count: 1
+Leaked instance: RayCast3D:112491234304 - Node path: 
+Leaked instance: RayCast3D:43469767684 - Node path: 
+Leaked instance: RayCast3D:43301995531 - Node path: 
+Leaked instance: RayCast3D:43033560088 - Node path: 
+Leaked instance: RayCast3D:42865787935 - Node path: 
+Leaked instance: RayCast3D:42597352492 - Node path: 
+Leaked instance: RayCast3D:42429580339 - Node path: 
+Leaked instance: RayCast3D:42161144896 - Node path: 
+Leaked instance: RayCast3D:41993372743 - Node path: 
+Leaked instance: RayCast3D:41724937300 - Node path: 
+Leaked instance: RayCast3D:41557165147 - Node path: 
+Leaked instance: RayCast3D:112390571101 - Node path: 
+Leaked instance: RayCast3D:112373793886 - Node path: 
+Leaked instance: RayCast3D:41288729704 - Node path: 
+Leaked instance: RayCast3D:41120957551 - Node path: 
+Leaked instance: RayCast3D:112256353435 - Node path: 
+Leaked instance: RayCast3D:112289907876 - Node path: 
+Leaked instance: RayCast3D:112357016746 - Node path: 
+Leaked instance: RayCast3D:112340239531 - Node path: 
+Leaked instance: RayCast3D:112323462316 - Node path: 
+Leaked instance: RayCast3D:112239576237 - Node path: 
+Leaked instance: RayCast3D:112273130670 - Node path: 
+Leaked instance: RayCast3D:112306685103 - Node path: 
+Leaked instance: RayCast3D:48704259297 - Node path: 
+Leaked instance: ORMMaterial3D:9223372085542257890 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372085525480676 - Reference count: 2
+Leaked instance: AudioStreamPlayerInternal:48066725094
+Leaked instance: AudioStreamPlayer3D:48049947879 - Node path: 
+Leaked instance: RefCounted:9223372084938278122 - Reference count: 1
+Leaked instance: RefCounted:9223372084887946475 - Reference count: 1
+Leaked instance: AudioStreamPlayerInternal:48016393452
+Leaked instance: RayCast3D:48251274477 - Node path: 
+Leaked instance: RayCast3D:48419046644 - Node path: 
+Leaked instance: Tween:9223372085290599669 - Reference count: 1
+Leaked instance: RayCast3D:48469378295 - Node path: 
+Leaked instance: MeshInstance3D:48486155512 - Node path: 
+Leaked instance: MeshInstance3D:48502932729 - Node path: 
+Leaked instance: ImmediateMesh:9223372085374485754 - Reference count: 2
+Leaked instance: AudioStreamPlayer3D:47999616251 - Node path: 
+Leaked instance: RayCast3D:37127980286 - Node path: 
+Leaked instance: RayCast3D:37111203071 - Node path: 
+Leaked instance: RayCast3D:37094425856 - Node path: 
+Leaked instance: RayCast3D:37077648641 - Node path: 
+Leaked instance: RayCast3D:37060871426 - Node path: 
+Leaked instance: RayCast3D:37044094211 - Node path: 
+Leaked instance: RayCast3D:37027316996 - Node path: 
+Leaked instance: RayCast3D:37010539781 - Node path: 
+Leaked instance: RayCast3D:36993762566 - Node path: 
+Leaked instance: RayCast3D:36976985351 - Node path: 
+Leaked instance: RayCast3D:36960208136 - Node path: 
+Leaked instance: RayCast3D:36943430921 - Node path: 
+Leaked instance: RayCast3D:36926653706 - Node path: 
+Leaked instance: RayCast3D:36909876491 - Node path: 
+Leaked instance: RayCast3D:36893099276 - Node path: 
+Leaked instance: RayCast3D:36876322061 - Node path: 
+Leaked instance: RayCast3D:36859544846 - Node path: 
+Leaked instance: RayCast3D:36842767631 - Node path: 
+Leaked instance: RayCast3D:36825990416 - Node path: 
+Leaked instance: RayCast3D:36809213201 - Node path: 
+Leaked instance: RayCast3D:36792435986 - Node path: 
+Leaked instance: RayCast3D:36775658771 - Node path: 
+Leaked instance: RayCast3D:36758881556 - Node path: 
+Leaked instance: RayCast3D:36742104341 - Node path: 
+Leaked instance: RayCast3D:36725327126 - Node path: 
+Leaked instance: RayCast3D:36708549911 - Node path: 
+Leaked instance: RayCast3D:36691772696 - Node path: 
+Leaked instance: RayCastERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+3D:36674995481 - Node path: 
+Leaked instance: RayCast3D:36658218266 - Node path: 
+Leaked instance: RayCast3D:36641441051 - Node path: 
+Leaked instance: RayCast3D:36624663836 - Node path: 
+Leaked instance: RayCast3D:36607886621 - Node path: 
+Leaked instance: RayCast3D:36591109406 - Node path: 
+Leaked instance: RayCast3D:36574332191 - Node path: 
+Leaked instance: RayCast3D:36557554976 - Node path: 
+Leaked instance: RayCast3D:36540777761 - Node path: 
+Leaked instance: RayCast3D:111920809276 - Node path: 
+Leaked instance: ORMMaterial3D:9223372072925791549 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072909014334 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372072892237119 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072875459904 - Reference count: 2
+Leaked instance: MeshInstance3D:36003906881 - Node path: 
+Leaked instance: MeshInstance3D:35987129666 - Node path: 
+Leaked instance: RayCast3D:35970352451 - Node path: 
+Leaked instance: ORMMaterial3D:9223372072808351044 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072791573829 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372072774796614 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072758019399 - Reference count: 2
+Leaked instance: MeshInstance3D:35886466376 - Node path: 
+Leaked instance: MeshInstance3D:35869689161 - Node path: 
+Leaked instance: RayCast3D:35852911946 - Node path: 
+Leaked instance: ORMMaterial3D:9223372072690910539 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072674133324 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372072657356109 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072640578894 - Reference count: 2
+Leaked instance: MeshInstance3D:35769025871 - Node path: 
+Leaked instance: MeshInstance3D:35752248656 - Node path: 
+Leaked instance: RayCast3D:35735471441 - Node path: 
+Leaked instance: ORMMaterial3D:9223372072573470034 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072556692819 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372072539915604 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072523138389 - Reference count: 2
+Leaked instance: MeshInstance3D:35651585366 - Node path: 
+Leaked instance: MeshInstance3D:35634808151 - Node path: 
+Leaked instance: RayCast3D:35618030936 - Node path: 
+Leaked instance: ORMMaterial3D:9223372072456029529 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072439252314 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372072422475099 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072405697884 - Reference count: 2
+Leaked instance: MeshInstance3D:35534144861 - Node path: 
+Leaked instance: MeshInstance3D:35517367646 - Node path: 
+Leaked instance: RayCast3D:35500590431 - Node path: 
+Leaked instance: ORMMaterial3D:9223372072338589024 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072321811809 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372072305034594 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072288257379 - Reference count: 2
+Leaked instance: MeshInstance3D:35416704356 - Node path: 
+Leaked instance: MeshInstance3D:35399927141 - Node path: 
+Leaked instance: RayCast3D:35383149926 - Node path: 
+Leaked instance: ORMMaterial3D:9223372072221148519 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072204371304 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372072187594089 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072170816874 - Reference count: 2
+Leaked instance: MeshInstance3D:35299263851 - Node path: 
+Leaked instance: MeshInstance3D:35282486636 - Node path: 
+Leaked instance: RayCast3D:35265709421 - Node path: 
+Leaked instance: ORMMaterial3D:9223372072103708014 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072086930799 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372072070153584 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372072053376369 - Reference count: 2
+Leaked instance: MeshInstance3D:35181823346 - Node path: 
+Leaked instance: MeshInstance3D:35165046131 ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+- Node path: 
+Leaked instance: RayCast3D:35148268916 - Node path: 
+Leaked instance: ORMMaterial3D:9223372071986267509 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372071969490294 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372071952713079 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372071935935864 - Reference count: 2
+Leaked instance: MeshInstance3D:35064382841 - Node path: 
+Leaked instance: MeshInstance3D:35047605626 - Node path: 
+Leaked instance: RayCast3D:35030828411 - Node path: 
+Leaked instance: Tween:9223372071852049789 - Reference count: 1
+Leaked instance: RayCast3D:34963719551 - Node path: 
+Leaked instance: ImmediateMesh:9223372085726807424 - Reference count: 2
+Leaked instance: RayCast3D:48821699969 - Node path: 
+Leaked instance: MeshInstance3D:48838477186 - Node path: 
+Leaked instance: MeshInstance3D:48855254403 - Node path: 
+Leaked instance: ORMMaterial3D:9223372085659698564 - Reference count: 1
+Leaked instance: ORMMaterial3D:9223372085743584645 - Reference count: 1
+Leaked instance: RayCast3D:34795947398 - Node path: 
+Leaked instance: ORMMaterial3D:9223372085626144135 - Reference count: 1
+Leaked instance: MeshInstance3D:48737813897 - Node path: 
+Leaked instance: ImmediateMesh:9223372085609366922 - Reference count: 2
+Leaked instance: MeshInstance3D:48721036683 - Node path: 
+Leaked instance: ImmediateMesh:9223372085642921356 - Reference count: 2
+Leaked instance: RefCounted:9223372071482951053 - Reference count: 1
+Leaked instance: AudioStreamPlayerInternal:34611398030
+Leaked instance: AudioStreamPlayer3D:34594620815 - Node path: 
+Leaked instance: RefCounted:9223372071432619408 - Reference count: 1
+Leaked instance: AudioStreamPlayerInternal:34561066385
+Leaked instance: AudioStreamPlayer3D:34544289170 - Node path: 
+Leaked instance: ImmediateMesh:9223372085491926419 - Reference count: 2
+Leaked instance: GDScript:9223372071197738388 - Reference count: 54
+Leaked instance: GDScript:9223372071164183958 - Reference count: 6
+Leaked instance: ORMMaterial3D:9223372085508703641 - Reference count: 1
+Leaked instance: GDScript:9223372070946080154 - Reference count: 1
+Leaked instance: MeshInstance3D:48620373403 - Node path: 
+Leaked instance: RayCast3D:48586818972 - Node path: 
+Leaked instance: MeshInstance3D:48603596189 - Node path: 
+Leaked instance: ORMMaterial3D:9223372085424817566 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372085408040351 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372085391263136 - Reference count: 1
+Leaked instance: ORMMaterial3D:9223372086246901199 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372086230123984 - Reference count: 2
+Leaked instance: MeshInstance3D:49425679825 - Node path: 
+Leaked instance: RayCast3D:49408902611 - Node path: 
+Leaked instance: ORMMaterial3D:9223372086364341734 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372086347564519 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372086330787304 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372086314010089 - Reference count: 2
+Leaked instance: MeshInstance3D:49442457066 - Node path: 
+Leaked instance: ORMMaterial3D:9223372086213346795 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372086196569580 - Reference count: 2
+Leaked instance: MeshInstance3D:49325016557 - Node path: 
+Leaked instance: MeshInstance3D:49308239342 - Node path: 
+Leaked instance: RayCast3D:49291462127 - Node path: 
+Leaked instance: ORMMaterial3D:9223372086129460720 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372086112683505 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372086095906290 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372086079129075 - Reference count: 2
+Leaked instance: MeshInstance3D:49207576052 - Node path: 
+Leaked instance: MeshInstance3D:49190798837 - Node path: 
+Leaked instance: RayCast3D:49174021622 - Node path: 
+Leaked instance: ORMMaterial3D:9223372086012020216 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372085995243001 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372085978465786 - Reference coERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+unt: 1
+Leaked instance: ImmediateMesh:9223372085961688571 - Reference count: 2
+Leaked instance: MeshInstance3D:49090135548 - Node path: 
+Leaked instance: MeshInstance3D:49073358333 - Node path: 
+Leaked instance: RayCast3D:49056581118 - Node path: 
+Leaked instance: ORMMaterial3D:9223372085894579711 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372085877802496 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372085861025281 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372085760361991 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372085777139208 - Reference count: 1
+Leaked instance: RayCast3D:48939140617 - Node path: 
+Leaked instance: MeshInstance3D:48972695050 - Node path: 
+Leaked instance: MeshInstance3D:48955917835 - Node path: 
+Leaked instance: ImmediateMesh:9223372085844248080 - Reference count: 2
+Leaked instance: RayCast3D:112088583062 - Node path: 
+Leaked instance: ORMMaterial3D:9223372147936725928 - Reference count: 1
+Leaked instance: RayCast3D:111904033706 - Node path: 
+Leaked instance: RayCast3D:111937588139 - Node path: 
+Leaked instance: ORMMaterial3D:9223372148171606964 - Reference count: 1
+Leaked instance: MeshInstance3D:111350385589 - Node path: 
+Leaked instance: ORMMaterial3D:9223372147433409472 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372147450186689 - Reference count: 2
+Leaked instance: MeshInstance3D:110545079234 - Node path: 
+Leaked instance: ImmediateMesh:9223372147416632259 - Reference count: 2
+Leaked instance: RayCast3D:110511524804 - Node path: 
+Leaked instance: MeshInstance3D:110528302021 - Node path: 
+Leaked instance: ImmediateMesh:9223372147332746182 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372147349523399 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372147299191756 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372147315968973 - Reference count: 1
+Leaked instance: MeshInstance3D:110410861518 - Node path: 
+Leaked instance: MeshInstance3D:110427638735 - Node path: 
+Leaked instance: RayCast3D:110394084305 - Node path: 
+Leaked instance: RayCast3D:110343752670 - Node path: 
+Leaked instance: Tween:9223372147215305695 - Reference count: 1
+Leaked instance: RayCast3D:112071805928 - Node path: 
+Leaked instance: RayCast3D:112105360361 - Node path: 
+Leaked instance: RayCast3D:112424127468 - Node path: 
+Leaked instance: MeshInstance3D:110662519810 - Node path: 
+Leaked instance: RayCast3D:110746405891 - Node path: 
+Leaked instance: RayCast3D:110175980557 - Node path: 
+Leaked instance: RefCounted:9223372146862984212 - Reference count: 1
+Leaked instance: AudioStreamPlayer3D:109974653974 - Node path: 
+Leaked instance: AudioStreamPlayerInternal:109991431191
+Leaked instance: RayCast3D:112055028760 - Node path: 
+Leaked instance: RayCast3D:112038251545 - Node path: 
+Leaked instance: ImmediateMesh:9223372147685067812 - Reference count: 2
+Leaked instance: RayCast3D:112138914856 - Node path: 
+Leaked instance: RayCast3D:112122137641 - Node path: 
+Leaked instance: MeshInstance3D:110645742638 - Node path: 
+Leaked instance: ImmediateMesh:9223372147534072879 - Reference count: 2
+Leaked instance: RayCast3D:110628965424 - Node path: 
+Leaked instance: ORMMaterial3D:9223372147466964017 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372147567627318 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372147550850103 - Reference count: 1
+Leaked instance: AudioStreamPlayerInternal:109941099576
+Leaked instance: RefCounted:9223372146812652601 - Reference count: 1
+Leaked instance: AudioStreamPlayer3D:109924322363 - Node path: 
+Leaked instance: ORMMaterial3D:9223372147584404542 - Reference count: 1
+Leaked instance: MeshInstance3D:110763183167 - Node path: 
+Leaked instance: ORMMaterial3D:9223372147668290640 - Reference count: 1
+Leaked instance: ORMMaterial3D:9223372147701845073 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372147768953954 - Reference count: 2
+Leaked instance: MeshInstance3D:110998064227 - Node path: 
+Leaked instance: ORMMaterial3D:9223372148020612200 - Reference count: 1
+Leaked instance: RayCast3D:110981287030 - ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+Node path: 
+Leaked instance: MeshInstance3D:111014841463 - Node path: 
+Leaked instance: MeshInstance3D:110897400978 - Node path: 
+Leaked instance: ORMMaterial3D:9223372147785731219 - Reference count: 1
+Leaked instance: MeshInstance3D:110880623764 - Node path: 
+Leaked instance: RayCast3D:110863846549 - Node path: 
+Leaked instance: ORMMaterial3D:9223372147819285656 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372147802508441 - Reference count: 2
+Leaked instance: ImmediateMesh:9223372147919948960 - Reference count: 2
+Leaked instance: RayCast3D:111098727585 - Node path: 
+Leaked instance: ORMMaterial3D:9223372147903171746 - Reference count: 1
+Leaked instance: ImmediateMesh:9223372147886394531 - Reference count: 2
+Leaked instance: MeshInstance3D:111249722590 - Node path: 
+Leaked instance: RayCast3D:111333608671 - Node path: 
+Leaked instance: MeshInstance3D:111132282090 - Node path: 
+Leaked instance: MeshInstance3D:111115504875 - Node path: 
+Leaked instance: ImmediateMesh:9223372148003835118 - Reference count: 2
+Leaked instance: ImmediateMesh:9223372148037389551 - Reference count: 2
+Leaked instance: MeshInstance3D:111232945400 - Node path: 
+Leaked instance: ImmediateMesh:9223372148121275641 - Reference count: 2
+Leaked instance: RayCast3D:111971142936 - Node path: 
+Leaked instance: RayCast3D:111954365721 - Node path: 
+Leaked instance: MeshInstance3D:110779960664 - Node path: 
+Leaked instance: ImmediateMesh:9223372147651513689 - Reference count: 2
+Leaked instance: RayCast3D:111987920240 - Node path: 
+Leaked instance: RayCast3D:112021474673 - Node path: 
+Leaked instance: ImmediateMesh:9223372148238716320 - Reference count: 2
+Leaked instance: MeshInstance3D:111367163297 - Node path: 
+Leaked instance: RayCast3D:112172469690 - Node path: 
+Leaked instance: ImmediateMesh:9223372148154830348 - Reference count: 2
+Leaked instance: ORMMaterial3D:9223372148138053133 - Reference count: 1
+Leaked instance: RayCast3D:111216168464 - Node path: 
+Leaked instance: ORMMaterial3D:9223372148054167057 - Reference count: 1
+Leaked instance: RayCast3D:112222801428 - Node path: 
+Leaked instance: RayCast3D:112206024213 - Node path: 
+Leaked instance: ImmediateMesh:9223372148272270890 - Reference count: 2
+Leaked instance: RayCast3D:112004697674 - Node path: 
+Leaked instance: RayCast3D:112407350860 - Node path: 
+Leaked instance: RayCast3D:112440905293 - Node path: 
+Leaked instance: RayCast3D:112155692634 - Node path: 
+Leaked instance: RayCast3D:112189247067 - Node path: 
+Leaked instance: ORMMaterial3D:9223372148289048174 - Reference count: 1
+Leaked instance: ORMMaterial3D:9223372148255493743 - Reference count: 1
+Leaked instance: RayCast3D:57730403969 - Node path: 
+Leaked instance: RayCast3D:57562631816 - Node path: 
+Leaked instance: RayCast3D:115997675149 - Node path: 
+Leaked instance: RayCast3D:57294196373 - Node path: 
+Leaked instance: RayCast3D:57126424220 - Node path: 
+Leaked instance: RayCast3D:116433882783 - Node path: 
+Leaked instance: RayCast3D:116165447331 - Node path: 
+Leaked instance: RayCast3D:56857988777 - Node path: 
+Leaked instance: RayCast3D:116601654958 - Node path: 
+Leaked instance: RayCast3D:56690216624 - Node path: 
+Leaked instance: RayCast3D:116870090417 - Node path: 
+Leaked instance: RayCast3D:56421781181 - Node path: 
+Leaked instance: RayCast3D:117037862592 - Node path: 
+Leaked instance: RayCast3D:56254009028 - Node path: 
+Leaked instance: RayCast3D:55985573585 - Node path: 
+Leaked instance: RayCast3D:117474070226 - Node path: 
+Leaked instance: RayCast3D:55817801432 - Node path: 
+Leaked instance: RayCast3D:117306298081 - Node path: 
+Leaked instance: RayCast3D:55549365989 - Node path: 
+Leaked instance: RayCast3D:55381593836 - Node path: 
+Leaked instance: RayCast3D:117742505716 - Node path: 
+Leaked instance: RayCast3D:117910277880 - Node path: 
+Leaked instance: RayCast3D:55113158393 - Node path: 
+Leaked instance: RayCast3D:118178713339 - Node path: 
+Leaked instance: RayCast3D:54945386240 - Node path: 
+Leaked instance: RayCast3D:118346485515 - Node path: 
+Leaked instance: RayCast3D:54676950797 - Node path: 
+Leaked instance: RayCaERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: Cannot get path of node as it is not in a scene tree.
+   at: get_path (./scene/main/node.cpp:2671)
+ERROR: 1 resources still in use at exit.
+   at: clear (./core/io/resource.cpp:898)
+st3D:118614920977 - Node path: 
+Leaked instance: RayCast3D:54509178644 - Node path: 
+Leaked instance: RayCast3D:118782693142 - Node path: 
+Leaked instance: RayCast3D:54240743201 - Node path: 
+Leaked instance: RayCast3D:119051128615 - Node path: 
+Leaked instance: RayCast3D:54072971048 - Node path: 
+Leaked instance: RayCast3D:119218900780 - Node path: 
+Leaked instance: RayCast3D:119655108463 - Node path: 
+Leaked instance: RayCast3D:119487336310 - Node path: 
+Leaked instance: RayCast3D:50566533022 - Node path: 
+Leaked instance: RayCast3D:50549755807 - Node path: 
+Leaked instance: RayCast3D:50532978592 - Node path: 
+Leaked instance: RayCast3D:50516201377 - Node path: 
+Leaked instance: RayCast3D:50499424162 - Node path: 
+Leaked instance: RayCast3D:50482646947 - Node path: 
+Leaked instance: RayCast3D:50465869732 - Node path: 
+Leaked instance: RayCast3D:50449092517 - Node path: 
+Leaked instance: RayCast3D:50432315302 - Node path: 
+Leaked instance: RayCast3D:50415538087 - Node path: 
+Leaked instance: RayCast3D:50398760872 - Node path: 
+Leaked instance: RayCast3D:50381983657 - Node path: 
+Leaked instance: RayCast3D:50365206442 - Node path: 
+Leaked instance: RayCast3D:50348429227 - Node path: 
+Leaked instance: RayCast3D:50331652012 - Node path: 
+Leaked instance: RayCast3D:50314874797 - Node path: 
+Leaked instance: RayCast3D:50298097582 - Node path: 
+Leaked instance: RayCast3D:50281320367 - Node path: 
+Leaked instance: RayCast3D:50264543152 - Node path: 
+Leaked instance: RayCast3D:50247765937 - Node path: 
+Leaked instance: RayCast3D:50230988722 - Node path: 
+Leaked instance: RayCast3D:50214211507 - Node path: 
+Leaked instance: RayCast3D:50197434292 - Node path: 
+Leaked instance: RayCast3D:50180657077 - Node path: 
+Leaked instance: RayCast3D:50163879862 - Node path: 
+Leaked instance: RayCast3D:50147102647 - Node path: 
+Leaked instance: RayCast3D:50130325432 - Node path: 
+Leaked instance: RayCast3D:50113548217 - Node path: 
+Leaked instance: RayCast3D:50096771002 - Node path: 
+Leaked instance: RayCast3D:50079993787 - Node path: 
+Leaked instance: RayCast3D:50063216572 - Node path: 
+Leaked instance: RayCast3D:50046439357 - Node path: 
+Leaked instance: RayCast3D:50029662142 - Node path: 
+Leaked instance: RayCast3D:50012884927 - Node path: 
+Leaked instance: RayCast3D:49996107712 - Node path: 
+Leaked instance: RayCast3D:49979330497 - Node path: 
+Leaked instance: RayCast3D:44778393544 - Node path: 
+Leaked instance: RayCast3D:44610621391 - Node path: 
+Leaked instance: RayCast3D:44342185948 - Node path: 
+Leaked instance: RayCast3D:44174413795 - Node path: 
+Leaked instance: RayCast3D:112457682916 - Node path: 
+Leaked instance: RayCast3D:112474460137 - Node path: 
+Leaked instance: RayCast3D:43905978352 - Node path: 
+Leaked instance: RayCast3D:43738206199 - Node path: 
+Hint: Leaked instances typically happen when nodes are removed from the scene tree (with `remove_child()`) but not freed (with `free()` or `queue_free()`).
+Resource still in use: res://addons/spatial_audio_3d/spatial_audio_3d.gd (GDScript)

@@ -56,7 +56,7 @@ func run() -> void:
     await settle()
     # Observe every frame while a populated chunk rebuilds.
     var before: Dictionary=game.get_debug_state()
-    check(before.grass_instances==0 and before.bushes==0,"3D grass and bushes are removed")
+    check(before.grass_instances>0,"Nearby grass blocks have animated tufts")
     var baseline_tiles: int=before.tiles
     var edits:=0
     for z in range(128,131):
@@ -74,7 +74,7 @@ func run() -> void:
     var after: Dictionary=game.get_debug_state()
     check(edits==3,"Three actual grass blocks were broken")
     check(minimum_tiles==baseline_tiles,"Breaking blocks never drops resident terrain chunks")
-    check(after.grass_instances==0 and after.bushes==0,"No 3D grass or bushes generated after edits")
+    check(after.grass_instances==before.grass_instances-edits*9,"Removing grass removes all of its tufts")
     print("EDIT_TILE_STABILITY baseline_tiles=",baseline_tiles," minimum_tiles=",minimum_tiles," final_tiles=",after.tiles)
     var themes: Dictionary={}
     for biome in ["normal","jungle","enchanted"]:

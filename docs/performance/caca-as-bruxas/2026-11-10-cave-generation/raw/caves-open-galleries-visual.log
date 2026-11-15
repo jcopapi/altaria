@@ -1,0 +1,17 @@
+/tmp/altaria-cave-visual.ndd4Wc/project
+Cave visual output: /tmp/altaria-cave-visual.ndd4Wc
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6360)
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4050 Laptop GPU
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World 1819596950 seed=1819596950
+WORLD_OPEN Cave visual validation seed=1337
+Generation complete: first tile 707.3 ms | all LODs 7548.2 ms
+WORLD_STREAM_READY Generation complete: first tile 707.3 ms | all LODs 7548.2 ms
+CAVE_VISUAL_CAPTURE kind=fungus rule=altaria:fungus supported=49 file=/tmp/altaria-cave-visual.ndd4Wc/images/fungus.png
+CAVE_VISUAL_CAPTURE kind=root rule=altaria:roots supported=29 file=/tmp/altaria-cave-visual.ndd4Wc/images/root.png
+CAVE_VISUAL_CAPTURE kind=vent rule=altaria:vent supported=124 file=/tmp/altaria-cave-visual.ndd4Wc/images/vent.png
+CAVE_VISUAL_PASS

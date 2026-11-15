@@ -1,0 +1,4 @@
+CAVE_ENTRANCES_PASS checked=25; actual terrain surface is open above each tested terminal
+CAVE_LANDMARK_ROUTES_PASS profile=2 shafts=12 mouths=2 ravines=12 dry=12,2,12 deepest_y=-679 dry_landmarks=85/94 narrow_branches=0
+CAVE_LANDMARK_ROUTES_PASS profile=3 shafts=20 mouths=2 ravines=14 dry=20,2,14 deepest_y=-708 dry_landmarks=85/94 narrow_branches=0
+CAVE_LANDMARK_ROUTES_PASS profile=3 shafts=35 mouths=7 ravines=14 dry=34,7,14 deepest_y=-542 dry_landmarks=85/94 narrow_branches=147

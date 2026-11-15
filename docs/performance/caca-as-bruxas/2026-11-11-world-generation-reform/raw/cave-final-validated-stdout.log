@@ -1,0 +1,17 @@
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6360)
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4050 Laptop GPU
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World -220952248 seed=-220952248
+WORLD_OPEN Cave reform validation seed=1337
+REFORM_INITIAL first_tile_ms=489.838729 ready_ms=4647.53014 voxel_bytes=36887960 tiles=444
+Generation complete: first tile 489.8 ms | all LODs 4647.5 ms
+WORLD_STREAM_READY Generation complete: first tile 489.8 ms | all LODs 4647.5 ms
+REFORM_FRAME stationary n=241 p50=8.315 p95=8.655 p99=8.8 max=8.982 voxel_bytes=36887960 pending=0 build=0
+REFORM_FRAME streaming n=445 p50=8.246 p95=16.045 p99=22.472 max=27.048 voxel_bytes=43860952 pending=24 build=0
+REFORM_LANDMARKS entrances={ "shaft": { "kind": "shaft", "position": (-84.66985, 108.5178, 104.5352) } } hall={ "id": "4397428119640772270", "depth": 2, "center": (100.0402, -370.1783, 375.8546), "radius": (75.6325, 26.66109, 40.04516), "archetype": "giant", "isolated": false } deep={ "id": "827820847019164541", "depth": 3, "center": (-214.7384, -678.6464, -93.46739), "radius": (11.16739, 6.889043, 14.05682), "archetype": "normal", "isolated": false }
+REFORM_DEEPEST (-215, -679, -93) block=0 below_surface=697.941589355469 fluid=dry
+CAVE_REFORM_RUNTIME_PASS

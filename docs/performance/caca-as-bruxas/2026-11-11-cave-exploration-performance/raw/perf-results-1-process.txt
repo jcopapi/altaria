@@ -1,0 +1,23 @@
+	Command being timed: "timeout 80s /home/jcopapi/.local/bin/gdstudio --disable-crash-handler --rendering-driver vulkan --path /tmp/altaria-exploration-tuning/optimized --script /tmp/altaria-exploration-tuning/surface-runtime.gd --log-file /tmp/altaria-exploration-tuning/perf-results/1/godot.log"
+	User time (seconds): 69.01
+	System time (seconds): 3.47
+	Percent of CPU this job got: 393%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:18.42
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1390392
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 5
+	Minor (reclaiming a frame) page faults: 230612
+	Voluntary context switches: 60434
+	Involuntary context switches: 8940
+	Swaps: 0
+	File system inputs: 248
+	File system outputs: 21784
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

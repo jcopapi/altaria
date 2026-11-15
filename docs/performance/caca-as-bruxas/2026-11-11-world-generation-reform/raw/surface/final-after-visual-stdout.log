@@ -1,0 +1,15 @@
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6360)
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4050 Laptop GPU
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World -1535636120 seed=-1535636120
+WORLD_OPEN Surface reform seed=1337
+SURFACE_READY ms=3879.754438 first=530.668498 voxels=35581680 tiles=444 decorations=0 textures=11
+Generation complete: first tile 530.7 ms | all LODs 3879.8 ms
+WORLD_STREAM_READY Generation complete: first tile 530.7 ms | all LODs 3879.8 ms
+SURFACE_FRAME stationary n=241 p50=8.231 p95=8.641 p99=8.725 max=9.015 voxels=35581680 pending=0 mesh_ms=4.79337072372437 max_upload_ms=19.5923118591309
+SURFACE_FRAME streaming n=470 p50=8.307 p95=11.205 p99=18.759 max=27.11 voxels=41084240 pending=14 mesh_ms=17.0250644683838 max_upload_ms=25.3953533172607
+SURFACE_RUNTIME_PASS

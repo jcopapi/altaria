@@ -1,0 +1,16 @@
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+   at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6360)
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4050 Laptop GPU
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World 543882053 seed=543882053
+WORLD_OPEN Cave benchmark seed=1337
+CAVE_BENCHMARK mode=X11 seed=1337 first_tile_ms=510.455289 ready_ms=6242.217355
+Generation complete: first tile 510.5 ms | all LODs 6242.2 ms
+WORLD_STREAM_READY Generation complete: first tile 510.5 ms | all LODs 6242.2 ms
+CAVE_FRAME stationary_lake count=241 p50_ms=8.033 p95_ms=9.319 p99_ms=9.407 max_ms=9.507 pending=0 tiles=460 voxel_bytes=99693440 collider_triangles=303972 collider_ms_max=21.9790058135986 upload_ms_max=26.0899028778076
+CAVE_FRAME streaming_stress count=594 p50_ms=8.146 p95_ms=11.896 p99_ms=18.605 max_ms=25.89 pending=24 tiles=498 voxel_bytes=174463520 collider_triangles=708340 collider_ms_max=21.9790058135986 upload_ms_max=26.0899028778076
+CAVE_FRAME lake_remesh count=241 p50_ms=8.118 p95_ms=9.312 p99_ms=9.492 max_ms=17.307 pending=0 tiles=463 voxel_bytes=106814400 collider_triangles=326740 collider_ms_max=22.1622352600098 upload_ms_max=28.2861919403076
+CAVE_FRAME_BENCHMARK_PASS

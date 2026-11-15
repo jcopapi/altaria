@@ -8,13 +8,16 @@ if env["platform"] == "linux":
     env["LINKFLAGS"] = [flag for flag in env["LINKFLAGS"]
                         if flag not in ("-static-libgcc", "-static-libstdc++")]
     env.Append(LINKFLAGS=["-Wl,--exclude-libs,ALL"])
-env.Append(CPPPATH=["src", "..", "build/fastnoise-install/include"])
+# Windows builds cross-compile with MinGW against their own FastNoise build
+# (tools/build_windows.sh).
+fastnoise = "build/fastnoise-win-install" if env["platform"] == "windows" else "build/fastnoise-install"
+env.Append(CPPPATH=["src", "..", fastnoise + "/include", "third_party/entt"])
 env.Append(CPPDEFINES=["FASTNOISE_STATIC_LIB"])
-env.Append(LIBPATH=["build/fastnoise-install/lib"])
+env.Append(LIBPATH=[fastnoise + "/lib"])
 env.Append(LIBS=["FastNoise", "pthread"])
 
 sources = [str(path) for path in sorted(Path("src").rglob("*.cpp"))]
-for folder in ("world_generation", "debug", "player"):
+for folder in ("world_generation", "debug", "player", "entities"):
     sources += [str(path) for path in sorted(Path("../game", folder).rglob("*.cpp"))]
 library = env.SharedLibrary(
     target="../bin/libaltaria{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),

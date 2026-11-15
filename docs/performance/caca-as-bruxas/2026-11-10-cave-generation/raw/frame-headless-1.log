@@ -1,0 +1,15 @@
+/tmp/altaria-cave-frame.w2Ocfs/project
+Cave benchmark output: /tmp/altaria-cave-frame.w2Ocfs
+GDstudio v0.4.1 beta (build 6915)
+Godot Engine v4.7.1.stable.mono.gdstudio.a450b93bf (2026-10-22 16:25:33 UTC) - https://godotengine.org
+
+Altaria: C++ voxel runtime ready (FastNoise2 / English default).
+WORLD_OPEN World -67386803 seed=-67386803
+WORLD_OPEN Cave benchmark seed=1337
+CAVE_BENCHMARK mode=headless seed=1337 first_tile_ms=282.294231 ready_ms=5027.600788
+Generation complete: first tile 282.3 ms | all LODs 5027.6 ms
+WORLD_STREAM_READY Generation complete: first tile 282.3 ms | all LODs 5027.6 ms
+CAVE_FRAME stationary_lake count=241 p50_ms=8.313 p95_ms=8.649 p99_ms=8.757 max_ms=8.812 pending=0 tiles=460 voxel_bytes=99693440 collider_ms_max=25.1879539489746 upload_ms_max=28.0925674438477
+CAVE_FRAME streaming_stress count=598 p50_ms=8.331 p95_ms=10.639 p99_ms=15.865 max_ms=23.694 pending=24 tiles=488 voxel_bytes=160221600 collider_ms_max=25.1879539489746 upload_ms_max=28.0925674438477
+CAVE_FRAME lake_remesh count=241 p50_ms=8.334 p95_ms=8.632 p99_ms=8.74 max_ms=15.714 pending=0 tiles=460 voxel_bytes=99693440 collider_ms_max=25.1879539489746 upload_ms_max=28.0925674438477
+CAVE_FRAME_BENCHMARK_PASS

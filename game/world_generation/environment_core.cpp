@@ -17,19 +17,15 @@ TemperatureSample temperature_at(const Generator &g, const EnvironmentSettings &
                                  float hour, Weather weather, float wind,
                                  const std::function<BlockId(int, int, int)> &query) {
     const auto &cfg = g.settings();
-    BiomeStage stage(cfg, g.seed_value());
-    auto mix = stage.regions({p[0]}, {p[2]})[0];
-    auto &a = cfg.biomes[mix.primary];
-    auto &b = cfg.biomes[mix.secondary];
-    float day = a.day_c * mix.primary_weight + b.day_c * (1 - mix.primary_weight);
-    float night = a.night_c * mix.primary_weight + b.night_c * (1 - mix.primary_weight);
+    auto column=g.column(int(std::floor(p[0])),int(std::floor(p[2])));
     // Daily peak at 14:00, minimum at 02:00, continuous through midnight.
     float daylight = .5f + .5f * std::cos((hour - 14) * 6.28318530718f / 24);
     float weather_delta = weather == Weather::Rain    ? s.rain_delta
                           : weather == Weather::Storm ? s.storm_delta
                                                       : 0;
     TemperatureSample out;
-    out.ambient = night + (day - night) * daylight - std::max(0.f, p[1] - cfg.sea_level) * s.lapse_c_per_m +
+    out.ambient = column.night_c + (column.day_c-column.night_c)*daylight -
+                  std::max(0.f, p[1] - cfg.sea_level) * s.lapse_c_per_m +
                   weather_delta;
     float radius = 0, cold = 0, warm = 0;
     for (auto &block : g.blocks().blocks)

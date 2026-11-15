@@ -1,0 +1,4 @@
+PROFILE_PASS smooth_hills cumulative_edges=192 visited=4045976
+PROFILE_PASS mountain_valleys cumulative_edges=384 visited=8277986
+PROFILE_PASS steep_smooth cumulative_edges=576 visited=13040381
+CONNECTIVITY_PASS edges=576 canonical_portals=258 entrances=21 shafts=75 complete_chambers=18 voxel_visits=13040381 detail_zero_and_max_shrink

@@ -19,19 +19,36 @@ continue to use the existing voxel world renderer.
 ## Play
 
 Dependencies and the Linux x86_64 debug library are already installed locally.
-Open `project.godot` in GDstudio and press **F5**: a new world with a random seed
-is created immediately. **Esc** opens the test menu.
+Open `project.godot` in GDstudio and press **F5**. The console opens with the
+command field focused. Enter `world new` and wait for initial chunk loading.
 Use WASD and the mouse to explore. F toggles flight/walking; Space supports double
-jump on foot. Left/right click remove/place blocks. **F1** opens the plain console;
-type **`fullbright`** and press Enter to toggle it. Look at a block and run
+jump on foot. Left/right click remove/place blocks. **Esc** and **F1** toggle the
+console. Press **Tab** to complete commands and **Enter** to run them. Use
+`fullbright` to toggle full lighting. Look at a block and run
 `paint #cc33ff` to tint it, or `overlay pebbles2` to add a decoration.
-`biome enchanted` teleports to the purple-grass biome. Run **`world new`** to generate
-another random world during play, or **`world new 12345`** to choose a seed. The
-previous world is discarded. The HUD/console show first-tile and total generation times.
+`biome enchanted` teleports to the purple-grass biome. Run `world new` for the
+default terrain with a random seed, `world new plain 12345` for a flat world with
+a chosen seed, or `world new structure` for a building space with a stone
+anchor. In Structure, right-click in empty space to place additional blocks.
+A new world replaces the current session. The HUD and console show first-tile
+and total generation times.
 
-Hold **R + wheel** to choose a block shape and **Q** to rotate it. Left-click wood
+Run `cheat inventory on`, close the console and press **T** to open **Cheat Inventory**.
+Search by block name, registry key or numeric ID. Click a block to add 64 to the player inventory.
+
+In Structure, aim and press **V** and **B** to mark the two corners of an area.
+Use `structure fill [block|air]` to fill or clear it and
+`structure export <name>` to save a shareable JSON file. The console prints
+the exported file's path. See the [structure command and JSON reference](game/debug/README.md#structure).
+
+Hold **R + wheel** to choose a block shape. Placement follows the camera's
+direction, and **Q** adds a quarter-turn. Pillars align with the clicked face
+and center on their support. Left-click wood
 to cut a tree; click fallen parts to detach them. **G** releases any solid block
-into physics. Try `time 19`, `weather storm`, `temperature` or `light #a055ff`.
+into physics. Try `time 19`, `weather storm` or `temperature`. Use `light` or
+`light blue` to place a stationary light at your viewpoint. Use `light follow`
+to toggle a light that moves with you. Run `log export 30s` to save recent game
+messages, errors and frame timings for troubleshooting.
 `outline off` and `pixelation off` toggle the visual effects. `fog #b08adc 80 900`
 overrides fog color/range; `fog biome` returns to automatic biome/day-night fog.
 Try `shape ramp` for manual construction and `godrays on|off`.
@@ -104,7 +121,8 @@ input for future LAN/online multiplayer. **Network play is not implemented yet.*
 
 Third-party sources: [FastNoise2](https://github.com/Auburn/FastNoise2),
 [FastSIMD](https://github.com/Auburn/FastSIMD),
-[godot-cpp](https://github.com/godotengine/godot-cpp).
+[godot-cpp](https://github.com/godotengine/godot-cpp),
+[EnTT](https://github.com/skypjack/entt) (entity-component-system for creatures).
 
 Current development check: `./tests/run_ephemeral_tests.sh`. Older persistence
 fixtures are obsolete while world saving is disabled.

@@ -1,0 +1,4 @@
+SEED seed=1337 regions=13 eligible_tiles=23 tested_tiles=23 pre_cave_water=123065 carved_below_sea=164983 shoreline_faces=22669 possible_envelope_columns=691 dry_tiles=8 lake_tiles=11 lava_tiles=4
+SEED seed=19 regions=12 eligible_tiles=24 tested_tiles=24 pre_cave_water=47717 carved_below_sea=167625 shoreline_faces=14106 possible_envelope_columns=1083 dry_tiles=7 lake_tiles=9 lava_tiles=8
+SEED seed=42 regions=12 eligible_tiles=44 tested_tiles=44 pre_cave_water=138374 carved_below_sea=430601 shoreline_faces=33467 possible_envelope_columns=1363 dry_tiles=6 lake_tiles=18 lava_tiles=20
+LATERAL_WATER_SWEEP_PASS eligible_tiles=91 tested_tiles=91 pre_cave_water=309156 carved_below_sea=763209 shoreline_faces=70242 possible_envelope_columns=3137 shoreline_cliff_max=1 shoreline_terrace_max=1

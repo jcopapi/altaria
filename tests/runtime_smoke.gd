@@ -39,21 +39,17 @@ func run() -> void:
     root.add_child(game)
     await process_frame
     check(game.get_debug_state().language == "en", "English is default")
-    check(game.get_debug_state().world_open, "Play immediately creates a random world")
-    var escape := InputEventKey.new()
-    escape.keycode = KEY_ESCAPE
-    escape.pressed = true
-    Input.parse_input_event(escape)
-    await process_frame
-    await capture("menu")
+    check(not game.get_debug_state().world_open, "Startup waits for a world command")
+    await capture("startup_console")
     check(game.start_world("Runtime test", 1337), "Create world")
     await wait_for_terrain()
     var state: Dictionary = game.get_debug_state()
     print("RUNTIME_STATS ", state)
+    check(not state.get("flying", true), "Default world starts in ground movement mode")
     check(state.get("lod0", 0) > 0 and state.get("lod1", 0) > 0 and state.get("lod2", 0) > 0 and state.get("lod3", 0) > 0, "All LODs streaming")
     check(state.get("lod4", 0) > 0 and state.get("lod5", 0) > 0, "Distant voxel horizon has six LOD levels")
     check(state.get("view_distance", 0) >= 6000, "Large world view distance")
-    check(state.get("decorations", 0) > 0 and state.get("overlay_quads", 0) > 0 and state.get("texture_layers", 0) >= 10, "Assets and procedural surface layers loaded")
+    check(state.get("decorations", 0) == 0 and state.get("overlay_quads", 0) > 0 and state.get("texture_layers", 0) >= 10, "Block textures and grass transitions loaded without pebble decals")
     check(state.get("triangles", 0) > 1000, "Terrain geometry uploaded")
     await create_timer(0.8).timeout
     await capture("world")
@@ -71,9 +67,8 @@ func run() -> void:
     check(game.execute_command("paint at -1 290 -33 #cc33ff 0.4 1.25") == "Paint applied.", "Paint console command")
     check(game.get_voxel_appearance(-1, 290, -33).color == "#cc33ff", "Individual HSV tint stored")
     check(game.execute_command("overlay at -1 290 -33 grass") == "Overlay applied.", "Grass layer added over clay base")
-    check(game.execute_command("overlay at -1 290 -33 pebbles2") == "Overlay applied.", "Decoration added over surface overlay")
     check(game.get_voxel(-1, 290, -33) == 8, "Overlay does not replace underlying block")
-    check(game.get_voxel_appearance(-1, 290, -33).overlay_id == 1 and game.get_voxel_appearance(-1, 290, -33).decoration_id == 3, "Independent overlay and decoration slots")
+    check(game.get_voxel_appearance(-1, 290, -33).overlay_id == 1, "Grass transition has its own overlay slot")
     check(game.execute_command("paint at -1 290 -33 #zzzzzz").begins_with("Invalid"), "Invalid color rejected")
     check(not game.set_voxel(0, -64, 0, 0), "Bedrock protected")
     check(game.save_world(), "Save metadata")
@@ -82,7 +77,7 @@ func run() -> void:
     check(game.get_voxel(-1, 290, -33) == 8, "Placement survives reopening")
     check(game.get_voxel(-1, 100, -33) == 0, "Removal survives reopening")
     var appearance: Dictionary = game.get_voxel_appearance(-1, 290, -33)
-    check(appearance.painted and appearance.color == "#cc33ff" and appearance.overlay_id == 1 and appearance.decoration_id == 3, "Paint and stacked overlays survive reopening")
+    check(appearance.painted and appearance.color == "#cc33ff" and appearance.overlay_id == 1, "Paint and grass overlay survive reopening")
     # Jump across the origin into another LOD partition, then return to edited chunks.
     check(game.execute_command("tp -600 230 -600") == "Teleported.", "Teleport across negative world coordinates")
     await wait_for_terrain()
@@ -114,7 +109,9 @@ func run() -> void:
         await process_frame
         physical_key(KEY_F, false)
         await process_frame
-        check(game.get_debug_state().flying, "F toggles flight")
+        check(not game.get_debug_state().flying, "F does not toggle flight by default")
+        check(game.execute_command("fly on") == "fly: ON", "fly command enables flight")
+        check(game.get_debug_state().flying, "Flight active after fly command")
         var before: Vector3 = game.get_debug_state().player_position
         physical_key(KEY_W, true)
         await create_timer(0.2).timeout
